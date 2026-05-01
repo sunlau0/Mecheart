@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha Heart</title>
+    <link rel="stylesheet" href="src/styles.css?v=20" />
+  </head>
+  <body>
+    <main id="game-shell">
+      <section id="stage-wrap">
+        <canvas id="game" width="1280" height="720" aria-label="宇宙心戰隊戰場"></canvas>
+        <div id="skill-bar">
+          <div id="skill-buttons"></div>
+        </div>
+        <div id="briefing">
+          <div class="title-content">
+            <p class="kicker">機動兵器戰線指揮</p>
+            <h1 class="title-logo" data-text="Mecha Heart">
+              <span>Mecha</span>
+              <span>Heart</span>
+            </h1>
+            <p>軌道戰場 Roguelike 小隊指揮</p>
+          </div>
+          <button id="start-btn" class="title-start">開始作戰</button>
+        </div>
+        <div id="reward" hidden>
+          <div>
+            <p class="kicker">Boss 擊破</p>
+            <h2>選擇一項強化</h2>
+          </div>
+          <div id="reward-options"></div>
+        </div>
+        <div id="result" hidden>
+          <h2 id="result-title">作戰完成</h2>
+          <div id="result-copy" class="result-copy">艦隊防線仍然健在。</div>
+          <button id="restart-btn">再次出擊</button>
+        </div>
+      </section>
+      <aside id="hud">
+        <div class="hud-head">
+          <p class="kicker">戰術艦橋介面</p>
+          <h2>小隊狀態</h2>
+        </div>
+        <div id="cards"></div>
+        <section id="intel" class="intel-panel"></section>
+        <details class="database" open>
+          <summary>機體設計資料庫</summary>
+          <div class="database-art">
+            <img src="assets/sd-sprite-check.png?v=18" alt="SD allied and enemy mobile suit sprite art" />
+            <img src="assets/enemy-variants.png?v=18" alt="Enemy original mobile suit sprite art" />
+          </div>
+          <div id="database-list"></div>
+        </details>
+        <div class="panel score-panel">
+          <div class="stat-row round-row"><span>回合</span><strong id="wave">1</strong></div>
+          <div class="stat-row score-row"><span>分數</span><strong id="score">0</strong></div>
+          <div class="stat-row"><span>最高記錄</span><strong id="best-score">0</strong></div>
+          <div class="stat-row"><span>敵機</span><strong id="enemy-count">0</strong></div>
+          <div class="stat-row"><span>指令</span><strong id="command">待命</strong></div>
+        </div>
+      </aside>
+    </main>
+    <script src="src/main.js?v=25"></script>
+  </body>
+</html>
