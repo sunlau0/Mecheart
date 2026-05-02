@@ -20,6 +20,11 @@ const rewardOptionsEl = document.getElementById("reward-options");
 const intelEl = document.getElementById("intel");
 const databaseListEl = document.getElementById("database-list");
 const skillButtonsEl = document.getElementById("skill-buttons");
+const leaderboardEl = document.getElementById("leaderboard");
+const leaderboardFormEl = document.getElementById("leaderboard-form");
+const leaderboardListEl = document.getElementById("leaderboard-list");
+const leaderboardMessageEl = document.getElementById("leaderboard-message");
+const playerNameEl = document.getElementById("player-name");
 
 const W = 1280;
 const H = 720;
@@ -33,6 +38,12 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.png";
 const labelFaction = (faction) => faction === "Allied" ? "友軍" : "敵軍";
+const leaderboardDefaults = [
+  { name: "Sun", score: 99230 },
+  { name: "Candy", score: 86000 },
+  { name: "Hayden", score: 85800 },
+  { name: "Jeanis", score: 60080 }
+];
 let running = false;
 let last = now();
 let wave = 1;
@@ -45,6 +56,8 @@ let score = 0;
 let bestScore = Number(localStorage.getItem("cosmic-heart-best") || 0);
 let rewardChoices = [];
 let nextHudRefresh = 0;
+let leaderboardScore = 0;
+let leaderboardSubmitted = false;
 const defaultSquadNames = ["Asterion", "Caliburn", "Seraphim", "Orion"];
 let selectedSquadNames = [...defaultSquadNames];
 let formationFocusName = "Asterion";
@@ -524,6 +537,100 @@ function chooseEnemyType(index, count, isBossRound) {
 function setMessage(text) {
   commandEl.textContent = text;
   messageTime = now() + 1.8;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function sanitizePlayerName(value) {
+  return String(value || "")
+    .replace(/[\u0000-\u001f\u007f<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 16) || "Pilot";
+}
+
+function formatScore(value) {
+  return String(Math.max(0, Math.floor(Number(value) || 0)));
+}
+
+function normalizeLeaderboard(rankings) {
+  const bestByName = new Map();
+  (Array.isArray(rankings) ? rankings : []).forEach((entry) => {
+    const name = sanitizePlayerName(entry?.name);
+    const scoreValue = Math.max(0, Math.floor(Number(entry?.score) || 0));
+    const key = name.toLocaleLowerCase();
+    const previous = bestByName.get(key);
+    if (!previous || scoreValue > previous.score) bestByName.set(key, { name, score: scoreValue });
+  });
+  return [...bestByName.values()]
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, 10);
+}
+
+function renderLeaderboard(rankings, message = "") {
+  const normalized = normalizeLeaderboard([...(rankings || []), ...leaderboardDefaults]);
+  leaderboardListEl.innerHTML = normalized.map((entry, index) => `
+    <li class="${entry.score === leaderboardScore ? "current-score" : ""}">
+      <span class="rank-number">${index + 1}</span>
+      <strong>${escapeHtml(entry.name)}</strong>
+      <em>${formatScore(entry.score)}</em>
+    </li>
+  `).join("");
+  leaderboardMessageEl.textContent = message || "輸入姓名後可提交今局分數。";
+}
+
+async function loadLeaderboard() {
+  renderLeaderboard(leaderboardDefaults, "讀取排行榜中...");
+  try {
+    const response = await fetch("/api/leaderboard", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    renderLeaderboard(data.rankings, data.writable === false ? "已載入預設排名；Cloudflare KV 尚未綁定。" : "輸入姓名後可提交今局分數。");
+  } catch {
+    renderLeaderboard(leaderboardDefaults, "暫時未能連線排行榜，先顯示預設排名。");
+  }
+}
+
+async function submitLeaderboard(event) {
+  event.preventDefault();
+  if (leaderboardSubmitted) {
+    leaderboardMessageEl.textContent = "今局分數已提交。";
+    return;
+  }
+
+  const name = sanitizePlayerName(playerNameEl.value);
+  playerNameEl.value = name;
+  localStorage.setItem("mecha-heart-player-name", name);
+  leaderboardMessageEl.textContent = "提交分數中...";
+  const submitButton = leaderboardFormEl.querySelector("button");
+  submitButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/leaderboard", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name, score: leaderboardScore })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
+    leaderboardSubmitted = true;
+    renderLeaderboard(data.rankings, data.message || "分數已提交。");
+  } catch (error) {
+    submitButton.disabled = false;
+    const localRankings = normalizeLeaderboard([
+      ...leaderboardDefaults,
+      { name, score: leaderboardScore }
+    ]);
+    renderLeaderboard(localRankings, `${error.message || "提交失敗"} 本機先預覽排名，Cloudflare KV 設定後會同步。`);
+  }
 }
 
 function resizeCanvas() {
@@ -1221,6 +1328,10 @@ function endMission(won) {
   running = false;
   document.body.classList.add("setup-mode");
   resizeCanvas();
+  leaderboardScore = score;
+  leaderboardSubmitted = false;
+  playerNameEl.value = localStorage.getItem("mecha-heart-player-name") || "";
+  leaderboardFormEl.querySelector("button").disabled = false;
   resultEl.classList.toggle("lost", !won);
   resultEl.classList.toggle("won", won);
   resultTitleEl.textContent = won ? "作戰完成" : "作戰失敗";
@@ -1236,6 +1347,7 @@ function endMission(won) {
     </div>
   `;
   resultEl.hidden = false;
+  loadLeaderboard();
 }
 
 function updateHud() {
@@ -1831,6 +1943,8 @@ rewardOptionsEl.addEventListener("click", (event) => {
   if (!card) return;
   chooseReward(Number(card.dataset.rewardIndex));
 });
+
+leaderboardFormEl.addEventListener("submit", submitLeaderboard);
 
 document.getElementById("start-btn").addEventListener("click", () => {
   showFormation();

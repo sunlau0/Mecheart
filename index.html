@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
-    <link rel="stylesheet" href="src/styles.css?v=26" />
+    <link rel="stylesheet" href="src/styles.css?v=27" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -76,6 +76,21 @@
         <div id="result" hidden>
           <h2 id="result-title">作戰完成</h2>
           <div id="result-copy" class="result-copy">艦隊防線仍然健在。</div>
+          <section id="leaderboard" class="leaderboard-panel" aria-live="polite">
+            <div class="leaderboard-head">
+              <p class="kicker">Top 10 Ranking</p>
+              <h3>排行榜</h3>
+            </div>
+            <form id="leaderboard-form" class="leaderboard-form">
+              <label for="player-name">輸入姓名</label>
+              <div class="leaderboard-entry">
+                <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" placeholder="Pilot" />
+                <button type="submit">提交分數</button>
+              </div>
+              <p id="leaderboard-message">讀取排行榜中...</p>
+            </form>
+            <ol id="leaderboard-list" class="leaderboard-list"></ol>
+          </section>
           <button id="restart-btn">再次出擊</button>
         </div>
       </section>
@@ -94,6 +109,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=32"></script>
+    <script src="src/main.js?v=33"></script>
   </body>
 </html>
