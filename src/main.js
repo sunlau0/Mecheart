@@ -23,6 +23,10 @@ const skillButtonsEl = document.getElementById("skill-buttons");
 
 const W = 1280;
 const H = 720;
+const ALLIED_MIN_X = 72;
+const ALLIED_MAX_X = W - 72;
+const ALLIED_MIN_Y = 72;
+const ALLIED_MAX_Y = H - 132;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
@@ -583,7 +587,10 @@ function issueCommand(unit, point) {
   }
 
   unit.target = null;
-  unit.move = { x: clamp(point.x, 70, W - 70), y: clamp(point.y, 70, H - 70) };
+  unit.move = {
+    x: clamp(point.x, ALLIED_MIN_X, ALLIED_MAX_X),
+    y: clamp(point.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+  };
   unit.command = "move";
   unit.assistId = null;
   setMessage(`${unit.name}: 移動`);
@@ -1003,8 +1010,8 @@ function moveAwayFrom(actor, target, amount) {
 }
 
 function clampToBattlefield(actor, limitAutoChase = false) {
-  actor.x = clamp(actor.x, 72, limitAutoChase ? W * 0.75 : W - 72);
-  actor.y = clamp(actor.y, 72, H - 96);
+  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? W * 0.75 : ALLIED_MAX_X);
+  actor.y = clamp(actor.y, ALLIED_MIN_Y, ALLIED_MAX_Y);
 }
 
 function bodyRadius(actor) {
