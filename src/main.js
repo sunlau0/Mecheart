@@ -1486,7 +1486,7 @@ function drawEnergyBoundary() {
   ctx.fillStyle = "rgba(4,8,14,0.28)";
   ctx.fillRect(x + 10, 0, W - x - 10, H);
   ctx.fillStyle = "rgba(75,228,255,0.85)";
-  ctx.font = "700 14px 'Microsoft JhengHei', sans-serif";
+  ctx.font = "800 16px 'Microsoft JhengHei', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("自動追擊邊界", x, 34);
   ctx.restore();

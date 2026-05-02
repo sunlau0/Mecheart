@@ -34,6 +34,7 @@ button {
   background: #153849;
   color: var(--text);
   cursor: pointer;
+  font-size: 15px;
   font-weight: 800;
   min-height: 44px;
   padding: 0 18px;
@@ -139,7 +140,7 @@ body.setup-mode #skill-bar {
   grid-template-rows: 42px auto auto 1fr;
   gap: 2px;
   justify-items: center;
-  min-height: 118px;
+  min-height: 124px;
   overflow: hidden;
   padding: 5px;
   position: relative;
@@ -164,14 +165,14 @@ body.setup-mode #skill-bar {
 }
 
 .skill-button span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   white-space: nowrap;
 }
 
 .skill-button small {
   color: var(--gold);
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -179,10 +180,10 @@ body.setup-mode #skill-bar {
   align-self: start;
   color: #b9c7dc;
   display: -webkit-box;
-  font-size: 10px;
+  font-size: 11px;
   font-style: normal;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.22;
   text-align: center;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -497,7 +498,7 @@ body.setup-mode #skill-bar {
 
 .tutorial-notes p {
   color: #cfe0f5;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1.45;
   margin: 0;
@@ -525,7 +526,7 @@ body.setup-mode #skill-bar {
   display: grid;
   gap: 10px;
   grid-template-columns: 84px minmax(0, 1fr) auto;
-  min-height: 142px;
+  min-height: 152px;
   padding: 10px;
 }
 
@@ -562,15 +563,15 @@ body.setup-mode #skill-bar {
 }
 
 .formation-card h3 {
-  font-size: 18px;
+  font-size: 20px;
   margin: 0;
 }
 
 .formation-card-title span,
 .formation-card p {
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
+  font-size: 13px;
+  line-height: 1.38;
   margin: 0;
 }
 
@@ -587,11 +588,11 @@ body.setup-mode #skill-bar {
 
 .formation-card dt {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .formation-card dd {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   margin: 0;
   overflow: hidden;
@@ -622,7 +623,7 @@ body.setup-mode #skill-bar {
 
 .kicker {
   color: var(--cyan);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0;
   margin: 0 0 8px;
@@ -896,13 +897,13 @@ h1 {
 }
 
 .unit-card h3 {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0 0 8px;
 }
 
 .role {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   margin-bottom: 8px;
 }
 
@@ -953,7 +954,7 @@ h1 {
 
 .intel-panel h3,
 .database h3 {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0 0 8px;
 }
 
@@ -985,8 +986,8 @@ h1 {
   grid-template-columns: 82px 1fr;
   gap: 8px;
   color: #d9e5f8;
-  font-size: 13px;
-  line-height: 1.35;
+  font-size: 14px;
+  line-height: 1.38;
 }
 
 .spec-grid span {
@@ -1015,7 +1016,7 @@ h1 {
 .database-art figcaption,
 .db-heading {
   color: var(--gold);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -1063,14 +1064,14 @@ h1 {
 }
 
 .db-row h3 {
-  font-size: 14px;
+  font-size: 15px;
   margin-bottom: 4px;
 }
 
 .db-row p {
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
+  font-size: 13px;
+  line-height: 1.38;
   margin: 0;
 }
 
@@ -1080,6 +1081,7 @@ h1 {
   gap: 16px;
   color: var(--muted);
   align-items: baseline;
+  font-size: 15px;
 }
 
 .stat-row strong {
@@ -1096,7 +1098,7 @@ h1 {
 
 .score-row span {
   color: var(--gold);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -1117,7 +1119,7 @@ h1 {
 .round-row strong {
   color: var(--gold);
   font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   letter-spacing: 0;
   text-shadow: 0 0 14px rgba(255, 209, 102, 0.45);
 }
@@ -1172,7 +1174,7 @@ h1 {
 
   .unit-card {
     grid-template-columns: 50px minmax(0, 1fr);
-    min-height: 76px;
+    min-height: 80px;
   }
 
   .unit-card img {
@@ -1180,12 +1182,12 @@ h1 {
   }
 
   .unit-card h3 {
-    font-size: 14px;
+    font-size: 15px;
     margin-bottom: 5px;
   }
 
   .role {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 5px;
   }
 
@@ -1218,7 +1220,7 @@ h1 {
 
   .skill-button {
     grid-template-rows: 34px auto auto 1fr;
-    min-height: 94px;
+    min-height: 102px;
   }
 
   .skill-button img {
@@ -1226,16 +1228,16 @@ h1 {
   }
 
   .skill-button span {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .skill-button small {
-    font-size: 10px;
+    font-size: 10.5px;
   }
 
   .skill-button em {
     -webkit-line-clamp: 2;
-    font-size: 8px;
+    font-size: 9px;
   }
 }
 
@@ -1248,7 +1250,7 @@ h1 {
 
   .skill-button {
     grid-template-rows: 34px auto auto 1fr;
-    min-height: 94px;
+    min-height: 102px;
   }
 
   .skill-button img {
@@ -1256,16 +1258,16 @@ h1 {
   }
 
   .skill-button span {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .skill-button small {
-    font-size: 10px;
+    font-size: 10.5px;
   }
 
   .skill-button em {
     -webkit-line-clamp: 2;
-    font-size: 8px;
+    font-size: 9px;
   }
 }
 
@@ -1360,7 +1362,7 @@ h1 {
   }
 
   .title-content p:not(.kicker) {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .title-start {
@@ -1411,20 +1413,20 @@ h1 {
   }
 
   .reward-card h3 {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .reward-card p {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .reward-type {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 5px;
   }
 
   .hud-head h2 {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 10px;
   }
 
@@ -1450,7 +1452,7 @@ h1 {
 
   .spec-grid div {
     grid-template-columns: 70px 1fr;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .database-art {
@@ -1508,7 +1510,7 @@ h1 {
 
   .skill-button {
     grid-template-rows: 32px auto auto 1fr;
-    min-height: 94px;
+    min-height: 100px;
     padding: 3px;
   }
 
@@ -1518,15 +1520,15 @@ h1 {
 
   .skill-button span {
     display: block;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .skill-button small {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .skill-button em {
-    font-size: 8px;
+    font-size: 9px;
     -webkit-line-clamp: 3;
   }
 }
