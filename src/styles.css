@@ -45,27 +45,48 @@ button:hover {
 
 #game-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 16px;
   min-height: 100vh;
   padding: 16px;
 }
 
 #stage-wrap {
+  aspect-ratio: 16 / 9;
   position: relative;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #05070b;
-  min-height: calc(100vh - 32px);
+  min-height: 0;
 }
 
 #game {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: calc(100vh - 34px);
+  min-height: 0;
   touch-action: none;
+}
+
+body.setup-mode #game-shell {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.setup-mode #stage-wrap {
+  aspect-ratio: auto;
+  min-height: calc(100svh - 32px);
+  width: 100%;
+}
+
+body.setup-mode #game {
+  height: calc(100svh - 32px);
+  min-height: calc(100svh - 32px);
+}
+
+body.setup-mode #hud {
+  display: none;
 }
 
 #skill-bar {
@@ -201,6 +222,7 @@ button:hover {
 }
 
 #briefing,
+#formation,
 #reward,
 #result {
   position: absolute;
@@ -313,9 +335,283 @@ button:hover {
 }
 
 #briefing[hidden],
+#formation[hidden],
 #reward[hidden],
 #result[hidden] {
   display: none;
+}
+
+#formation {
+  align-content: start;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 14, 0.93), rgba(5, 8, 14, 0.84)),
+    url("../assets/battlefield-bg.png?v=19") center / cover no-repeat;
+  justify-items: stretch;
+  overflow-y: auto;
+  padding: clamp(14px, 2.4vw, 28px);
+  text-align: left;
+}
+
+.formation-shell {
+  display: grid;
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 1180px;
+  min-height: min-content;
+  width: 100%;
+}
+
+.formation-head {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.formation-head h2 {
+  font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+  font-size: clamp(34px, 4.2vw, 68px);
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 0.92;
+  margin: 0 0 8px;
+  text-shadow: 0 0 22px rgba(75, 228, 255, 0.45), 0 8px 22px rgba(0, 0, 0, 0.75);
+}
+
+.formation-head p {
+  color: #dce8ff;
+  font-size: clamp(13px, 1.25vw, 17px);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.formation-actions {
+  align-items: end;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.formation-actions strong {
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.formation-actions button:disabled,
+.formation-toggle:disabled {
+  cursor: default;
+  filter: grayscale(0.8);
+  opacity: 0.5;
+}
+
+.formation-slots {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.formation-slot {
+  align-items: center;
+  border: 1px solid rgba(122, 242, 255, 0.3);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(18, 27, 39, 0.92), rgba(7, 10, 16, 0.94));
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto 48px minmax(0, 1fr);
+  min-height: 64px;
+  padding: 8px;
+}
+
+.formation-slot.empty {
+  color: var(--muted);
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.formation-slot span {
+  color: var(--gold);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 22px;
+}
+
+.formation-slot img {
+  aspect-ratio: 1;
+  object-fit: contain;
+  width: 48px;
+}
+
+.formation-slot strong,
+.formation-slot small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formation-slot small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tutorial-panel {
+  align-items: center;
+  border: 1px solid rgba(122, 242, 255, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(7, 12, 20, 0.82), rgba(4, 7, 12, 0.92)),
+    radial-gradient(circle at 15% 0, rgba(75, 228, 255, 0.16), transparent 38%);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  padding: 10px;
+}
+
+.tutorial-panel img {
+  border: 1px solid rgba(122, 242, 255, 0.22);
+  border-radius: 8px;
+  display: block;
+  object-fit: contain;
+  width: 100%;
+}
+
+.tutorial-notes {
+  display: grid;
+  gap: 8px;
+}
+
+.tutorial-notes h3 {
+  color: #ffffff;
+  font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+  font-size: 30px;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 1;
+  margin: 0;
+  text-shadow: 0 0 18px rgba(75, 228, 255, 0.4);
+}
+
+.tutorial-notes p {
+  color: #cfe0f5;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.formation-scroll {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(270px, 0.8fr);
+}
+
+.formation-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.formation-card {
+  border: 1px solid rgba(122, 242, 255, 0.22);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(18, 25, 36, 0.95), rgba(7, 10, 16, 0.94)),
+    radial-gradient(circle at 10% 0, rgba(75, 228, 255, 0.18), transparent 34%);
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  min-height: 142px;
+  padding: 10px;
+}
+
+.formation-card.selected {
+  border-color: rgba(255, 209, 102, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 209, 102, 0.18), 0 0 18px rgba(255, 209, 102, 0.12);
+}
+
+.formation-card.focused {
+  background:
+    linear-gradient(180deg, rgba(22, 35, 52, 0.98), rgba(8, 12, 20, 0.95)),
+    radial-gradient(circle at 10% 0, rgba(75, 228, 255, 0.25), transparent 36%);
+}
+
+.formation-card > img {
+  align-self: center;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.34));
+  object-fit: contain;
+  padding: 4px;
+  width: 84px;
+}
+
+.formation-card-copy {
+  min-width: 0;
+}
+
+.formation-card-title {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.formation-card h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.formation-card-title span,
+.formation-card p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.formation-card dl {
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 8px 0 0;
+}
+
+.formation-card dl div {
+  min-width: 0;
+}
+
+.formation-card dt {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.formation-card dd {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formation-toggle {
+  align-self: end;
+  min-width: 66px;
+  padding: 0 10px;
+}
+
+.formation-scroll .intel-panel,
+.formation-scroll .database {
+  margin-top: 0;
+}
+
+.formation-scroll .intel-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.formation-scroll .database {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .kicker {
@@ -657,7 +953,7 @@ h1 {
 
 .intel-layout {
   display: grid;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 112px 1fr;
   gap: 10px;
 }
 
@@ -704,6 +1000,19 @@ h1 {
   margin: 10px 0;
 }
 
+.database-art figure {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.database-art figcaption,
+.db-heading {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .database-art img {
   aspect-ratio: 16 / 10;
   border: 1px solid rgba(122, 242, 255, 0.26);
@@ -718,13 +1027,33 @@ h1 {
   gap: 8px;
 }
 
+.db-heading {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 8px 0 -2px;
+  padding-top: 10px;
+}
+
+.db-heading:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .db-row {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   display: grid;
-  grid-template-columns: 54px 1fr;
+  grid-template-columns: 78px 1fr;
   gap: 9px;
   padding: 8px;
+}
+
+.db-row.player {
+  border-color: rgba(122, 242, 255, 0.16);
+}
+
+.db-row.enemy {
+  border-color: rgba(255, 91, 102, 0.16);
 }
 
 .db-row h3 {
@@ -787,7 +1116,7 @@ h1 {
   text-shadow: 0 0 14px rgba(255, 209, 102, 0.45);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   #game-shell {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -797,39 +1126,156 @@ h1 {
   #stage-wrap {
     border: 0;
     border-radius: 0;
+    justify-self: center;
+    max-width: 100vw;
+    min-height: 0;
+    width: min(100vw, calc((100svh - 240px) * 16 / 9));
+  }
+
+  body.setup-mode #stage-wrap {
+    min-height: 100svh;
+    width: 100vw;
+  }
+
+  body.setup-mode #game {
+    height: 100svh;
     min-height: 100svh;
   }
 
   #hud {
     border-radius: 0;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 320px);
     min-height: auto;
+    max-height: none;
     padding: 12px;
   }
 
-  #game {
-    height: 100svh;
-    min-height: 100svh;
+  .hud-head {
+    grid-column: 1 / -1;
+  }
+
+  #cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .score-panel {
+    margin-top: 0;
   }
 
   .unit-card {
-    grid-template-columns: 54px 1fr;
+    grid-template-columns: 50px minmax(0, 1fr);
+    min-height: 76px;
   }
 
   .unit-card img {
-    width: 54px;
+    width: 50px;
   }
 
-  #hud {
-    max-height: none;
+  .unit-card h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .role {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .formation-scroll {
+    grid-template-columns: 1fr;
+  }
+
+  .tutorial-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .formation-scroll .intel-panel,
+  .formation-scroll .database {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .formation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #reward-options {
     grid-template-columns: 1fr;
   }
+
+  #skill-bar {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    padding: 6px;
+  }
+
+  .skill-button {
+    grid-template-rows: 34px auto auto 1fr;
+    min-height: 94px;
+  }
+
+  .skill-button img {
+    width: 38px;
+  }
+
+  .skill-button span {
+    font-size: 10px;
+  }
+
+  .skill-button small {
+    font-size: 10px;
+  }
+
+  .skill-button em {
+    -webkit-line-clamp: 2;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 820px) {
+  #hud {
+    grid-template-columns: 1fr;
+  }
+
+  #cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formation-head {
+    grid-template-columns: 1fr;
+  }
+
+  .formation-actions {
+    justify-items: stretch;
+  }
+
+  .formation-slots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formation-list {
+    grid-template-columns: 1fr;
+  }
+
+  .tutorial-notes {
+    grid-template-columns: 1fr;
+  }
+
+  .formation-card {
+    grid-template-columns: 78px minmax(0, 1fr) auto;
+  }
+
+  .formation-card > img {
+    width: 78px;
+  }
 }
 
 @media (max-width: 640px) {
   #briefing,
+  #formation,
   #reward,
   #result {
     overflow-y: auto;
@@ -950,6 +1396,11 @@ h1 {
 
   #cards {
     gap: 8px;
+    grid-template-columns: 1fr;
+  }
+
+  #hud {
+    grid-template-columns: 1fr;
   }
 
   .unit-card,
@@ -960,7 +1411,7 @@ h1 {
   }
 
   .intel-layout {
-    grid-template-columns: 58px 1fr;
+    grid-template-columns: 72px 1fr;
   }
 
   .spec-grid div {
@@ -972,8 +1423,12 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .tutorial-notes {
+    grid-template-columns: 1fr;
+  }
+
   .db-row {
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 62px 1fr;
   }
 
   #skill-bar {
@@ -981,6 +1436,32 @@ h1 {
     bottom: 8px;
     left: 8px;
     padding: 6px;
+  }
+
+  .formation-head {
+    grid-template-columns: 1fr;
+  }
+
+  .formation-actions {
+    justify-items: stretch;
+  }
+
+  .formation-slots,
+  .formation-list {
+    grid-template-columns: 1fr;
+  }
+
+  .formation-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .formation-card > img {
+    width: 72px;
+  }
+
+  .formation-toggle {
+    grid-column: 1 / -1;
+    justify-self: stretch;
   }
 
   #skill-buttons {
