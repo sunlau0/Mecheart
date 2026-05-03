@@ -31,6 +31,8 @@ const pauseToggleEl = document.getElementById("pause-toggle");
 const pauseOverlayEl = document.getElementById("pause-overlay");
 const pauseResumeEl = document.getElementById("pause-resume");
 const pauseFormationEl = document.getElementById("pause-formation");
+const loadingEl = document.getElementById("loading-overlay");
+const loadingCopyEl = document.getElementById("loading-copy");
 
 const W = 1280;
 const H = 720;
@@ -43,7 +45,7 @@ const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
-const BACKDROP_VERSION = 20;
+const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 35;
 const REWARD_ICON_VERSION = 18;
 const SKILL_ICON_VERSION = 35;
@@ -461,6 +463,7 @@ let gravityFields = [];
 let skillEffects = [];
 let stars = [];
 const art = new Map();
+const artLoadPromises = new Map();
 let hudCardsSignature = "";
 let skillBarSignature = "";
 
@@ -1517,10 +1520,12 @@ function advanceRound() {
   spawnWave();
 }
 
-function showReward() {
+async function showReward() {
   running = false;
   setPauseButtonVisible(false);
   rewardChoices = pickRewards();
+  showLoading("載入獎勵圖像...");
+  await loadRewardArt(rewardChoices);
   rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
     <button class="reward-card" data-reward-index="${index}">
       <img src="${assetSrc(reward.icon)}" alt="${reward.name} icon" />
@@ -1531,6 +1536,7 @@ function showReward() {
       </div>
     </button>
   `).join("");
+  hideLoading();
   rewardEl.hidden = false;
   setMessage("選擇一項強化");
 }
@@ -1793,39 +1799,44 @@ function toggleFormationUnit(name) {
   renderFormation();
 }
 
-function showFormation() {
+async function showFormation() {
   running = false;
   setPauseButtonVisible(false);
+  showLoading("載入編隊機體...");
+  if (selectedSquadNames.length !== 4) selectedSquadNames = [...defaultSquadNames];
+  formationFocusName = selectedSquadNames[0] || defaultSquadNames[0];
+  await loadFormationArt();
   document.body.classList.add("setup-mode");
   briefingEl.hidden = true;
   rewardEl.hidden = true;
   resultEl.hidden = true;
   resultEl.classList.remove("lost", "won");
   formationEl.hidden = false;
-  hydrateDeferredImages(formationEl);
   renderDatabase();
-  loadFormationArt();
-  loadBattleArt();
-  if (selectedSquadNames.length !== 4) selectedSquadNames = [...defaultSquadNames];
-  formationFocusName = selectedSquadNames[0] || defaultSquadNames[0];
   resizeCanvas();
   renderFormation();
+  await hydrateDeferredImages(formationEl);
+  hideLoading();
+  loadBattleArt();
 }
 
-function startBattleFromFormation() {
+async function startBattleFromFormation() {
   if (selectedSquadNames.length !== 4) {
     setMessage("請選擇 4 架機體出擊。");
     renderFormation();
     return;
   }
+  showLoading("載入戰鬥機體...");
+  await loadBattleArt();
   formationEl.hidden = true;
   document.body.classList.remove("setup-mode");
-  loadBattleArt();
   resizeCanvas();
   reset();
   running = true;
   setPauseButtonVisible(true);
   last = now();
+  hideLoading();
+  loadAllRewardArt();
 }
 
 function renderDatabase() {
@@ -2591,24 +2602,59 @@ function initStars() {
   }));
 }
 
-function preloadArt(paths) {
-  paths.forEach((path) => {
-    if (!path || art.has(path)) return;
-    const img = new Image();
+function showLoading(message) {
+  if (loadingCopyEl && message) loadingCopyEl.textContent = message;
+  if (loadingEl) loadingEl.hidden = false;
+}
+
+function hideLoading() {
+  if (loadingEl) loadingEl.hidden = true;
+}
+
+function loadImageAsset(path) {
+  if (!path) return Promise.resolve(null);
+  const src = assetSrc(path);
+  let img = art.get(path);
+  if (img?.complete && img.naturalWidth > 0 && img.src.endsWith(src)) return Promise.resolve(img);
+  if (artLoadPromises.has(path)) return artLoadPromises.get(path);
+
+  if (!img) {
+    img = new Image();
     img.decoding = "async";
-    img.src = assetSrc(path);
     art.set(path, img);
+  }
+
+  const promise = new Promise((resolve) => {
+    const finish = async () => {
+      try {
+        if (img.decode) await img.decode();
+      } catch {
+        // Decoding failure should not trap the player on the loading overlay.
+      }
+      resolve(img);
+    };
+    img.onload = finish;
+    img.onerror = finish;
+    img.src = src;
+    if (img.complete) finish();
   });
+  artLoadPromises.set(path, promise);
+  return promise;
+}
+
+function preloadArt(paths) {
+  return Promise.all([...paths].map(loadImageAsset));
 }
 
 function loadFormationArt() {
   const paths = new Set();
+  paths.add(battlefieldArt);
   squadSeeds.forEach((unit) => {
     paths.add(unit.art);
     if (unit.sprite) paths.add(unit.sprite);
   });
   Object.values(enemyTypes).forEach((unit) => paths.add(unit.art));
-  preloadArt(paths);
+  return preloadArt(paths);
 }
 
 function loadBattleArt() {
@@ -2616,19 +2662,42 @@ function loadBattleArt() {
   selectedSquadSeeds().forEach((unit) => {
     if (unit.sprite) paths.add(unit.sprite);
     if (unit.sheet) paths.add(unit.sheet);
+    if (unit.activeIcon) paths.add(unit.activeIcon);
+    if (unit.ultimateIcon) paths.add(unit.ultimateIcon);
   });
   Object.values(enemyTypes).forEach((unit) => {
     if (unit.sprite) paths.add(unit.sprite);
     if (unit.sheet) paths.add(unit.sheet);
   });
-  preloadArt(paths);
+  return preloadArt(paths);
+}
+
+function loadRewardArt(rewards) {
+  return preloadArt(new Set(rewards.map((reward) => reward.icon)));
+}
+
+function loadAllRewardArt() {
+  return preloadArt(new Set(upgradePool.map((reward) => reward.icon)));
+}
+
+function warmGameArt() {
+  loadFormationArt()
+    .then(() => loadBattleArt())
+    .then(() => loadAllRewardArt());
 }
 
 function hydrateDeferredImages(root = document) {
-  root.querySelectorAll("img[data-src]").forEach((img) => {
-    if (img.getAttribute("src")) return;
+  const images = [...root.querySelectorAll("img[data-src]")];
+  return Promise.all(images.map((img) => new Promise((resolve) => {
+    if (img.getAttribute("src") && img.complete) {
+      resolve(img);
+      return;
+    }
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(img);
     img.src = img.dataset.src;
-  });
+    if (img.complete) resolve(img);
+  })));
 }
 
 canvas.addEventListener("pointerdown", (event) => {
@@ -2748,6 +2817,11 @@ window.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    warmGameArt();
+  }, 500);
+}, { once: true });
 initStars();
 resizeCanvas();
 loadLeaderboard();

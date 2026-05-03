@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
-    <link rel="preload" as="image" href="assets/title-screen.webp?v=20" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=34" />
+    <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
+    <link rel="stylesheet" href="src/styles.css?v=35" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -13,6 +13,13 @@
         <canvas id="game" width="1280" height="720" aria-label="宇宙心戰隊戰場"></canvas>
         <div id="skill-bar">
           <div id="skill-buttons"></div>
+        </div>
+        <div id="loading-overlay" class="loading-overlay" hidden>
+          <div class="loading-panel">
+            <span class="loading-ring" aria-hidden="true"></span>
+            <strong>Loading</strong>
+            <small id="loading-copy">載入機體圖像...</small>
+          </div>
         </div>
         <button id="pause-toggle" class="pause-toggle" type="button" aria-label="暫停遊戲" aria-pressed="false" hidden>
           <span class="pause-icon" aria-hidden="true"></span>
@@ -78,11 +85,11 @@
                 <div class="database-art">
                   <figure>
                     <figcaption>玩家機體設計</figcaption>
-                    <img data-src="assets/player-new-lineup.webp?v=5" loading="lazy" decoding="async" alt="Six redesigned player mobile suits" />
+                    <img data-src="assets/player-new-lineup.webp?v=6" loading="lazy" decoding="async" alt="Six redesigned player mobile suits" />
                   </figure>
                   <figure>
                     <figcaption>敵方機體設計</figcaption>
-                    <img data-src="assets/enemy-variants.webp?v=19" loading="lazy" decoding="async" alt="Enemy original mobile suit sprite art" />
+                    <img data-src="assets/enemy-variants.webp?v=20" loading="lazy" decoding="async" alt="Enemy original mobile suit sprite art" />
                   </figure>
                 </div>
                 <div id="database-list"></div>
@@ -133,6 +140,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=48"></script>
+    <script src="src/main.js?v=49"></script>
   </body>
 </html>

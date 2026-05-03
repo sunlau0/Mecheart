@@ -376,7 +376,7 @@ body.paused-mode #game {
   align-items: start;
   background:
     linear-gradient(90deg, rgba(4, 6, 10, 0.88), rgba(4, 6, 10, 0.28)),
-    url("../assets/game-over-screen.webp?v=20") center / cover no-repeat;
+    url("../assets/game-over-screen.webp?v=21") center / cover no-repeat;
   grid-template-columns: minmax(320px, 620px) minmax(300px, 430px);
   justify-items: start;
   overflow-x: hidden;
@@ -386,7 +386,7 @@ body.paused-mode #game {
 #result.won {
   background:
     linear-gradient(90deg, rgba(4, 8, 14, 0.9), rgba(4, 8, 14, 0.42)),
-    url("../assets/battlefield-bg.webp?v=20") center / cover no-repeat;
+    url("../assets/battlefield-bg.webp?v=21") center / cover no-repeat;
 }
 
 #result::before {
@@ -634,7 +634,7 @@ body.paused-mode #game {
   background:
     linear-gradient(180deg, rgba(4, 7, 12, 0.08), rgba(4, 7, 12, 0.7)),
     radial-gradient(circle at 50% 50%, rgba(5, 8, 14, 0.16), rgba(5, 8, 14, 0.78)),
-    url("../assets/title-screen.webp?v=20") center / cover no-repeat;
+    url("../assets/title-screen.webp?v=21") center / cover no-repeat;
   grid-template-areas:
     "title board"
     "start board";
@@ -653,11 +653,72 @@ body.paused-mode #game {
   display: none;
 }
 
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(75, 228, 255, 0.12), transparent 34%),
+    rgba(2, 5, 10, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.loading-overlay[hidden] {
+  display: none;
+}
+
+.loading-panel {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  min-width: 220px;
+  padding: 22px 26px;
+  border: 1px solid rgba(75, 228, 255, 0.56);
+  border-radius: 8px;
+  background: rgba(6, 12, 20, 0.84);
+  box-shadow: 0 0 28px rgba(75, 228, 255, 0.18), inset 0 0 24px rgba(75, 228, 255, 0.08);
+  color: #eef7ff;
+  text-align: center;
+}
+
+.loading-panel strong {
+  color: #ffffff;
+  font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+  font-size: 30px;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(75, 228, 255, 0.55);
+}
+
+.loading-panel small {
+  color: #bfeeff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.loading-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(75, 228, 255, 0.24);
+  border-top-color: #6ff3ff;
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(75, 228, 255, 0.42);
+  animation: loading-spin 0.78s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 #formation {
   align-content: start;
   background:
     linear-gradient(180deg, rgba(5, 8, 14, 0.93), rgba(5, 8, 14, 0.84)),
-    url("../assets/battlefield-bg.webp?v=20") center / cover no-repeat;
+    url("../assets/battlefield-bg.webp?v=21") center / cover no-repeat;
   justify-items: stretch;
   overflow-y: auto;
   padding: clamp(14px, 2.4vw, 28px);
@@ -1666,7 +1727,7 @@ h1 {
     background:
       linear-gradient(180deg, rgba(4, 7, 12, 0.2), rgba(4, 7, 12, 0.78)),
       radial-gradient(circle at 50% 48%, rgba(5, 8, 14, 0.1), rgba(5, 8, 14, 0.82)),
-      url("../assets/title-screen.webp?v=20") center / cover no-repeat;
+      url("../assets/title-screen.webp?v=21") center / cover no-repeat;
     gap: 16px;
   }
 
