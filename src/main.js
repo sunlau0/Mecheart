@@ -424,6 +424,8 @@ let shots = [];
 let sparks = [];
 let stars = [];
 const art = new Map();
+let hudCardsSignature = "";
+let skillBarSignature = "";
 
 function selectedSquadSeeds() {
   const selectedSeeds = selectedSquadNames
@@ -475,9 +477,11 @@ function reset() {
   rewardEl.hidden = true;
   rewardChoices = [];
   nextHudRefresh = 0;
+  hudCardsSignature = "";
+  skillBarSignature = "";
   spawnWave();
   renderIntel(squad[0]);
-  updateSkillBar();
+  updateHud();
 }
 
 function spawnWave() {
@@ -1424,53 +1428,99 @@ function endMission(won) {
   loadLeaderboard();
 }
 
+function renderHudCardsShell() {
+  const signature = squad.map((u) => `${u.id}:${u.name}:${u.role}:${u.sprite || u.art}`).join("|");
+  if (signature === hudCardsSignature) return;
+  hudCardsSignature = signature;
+  cardsEl.innerHTML = squad.map((u) => `
+    <article class="unit-card" data-unit-id="${u.id}">
+      <img src="${u.sprite || u.art}?v=31" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
+      <div class="unit-info">
+        <h3>${u.name}</h3>
+        <div class="role">${u.role}</div>
+        <div class="bar hp"><span data-card-hp></span></div>
+        <div class="bar cool"><span data-card-cool></span></div>
+      </div>
+    </article>
+  `).join("");
+}
+
 function updateHud() {
   waveEl.textContent = wave % 3 === 0 ? `${wave} BOSS` : String(wave);
   scoreEl.textContent = String(score);
   bestScoreEl.textContent = String(bestScore);
   enemyCountEl.textContent = String(enemies.length);
-  cardsEl.innerHTML = squad.map((u) => {
+  renderHudCardsShell();
+  squad.forEach((u) => {
     const hp = Math.max(0, (u.hp / u.maxHp) * 100);
     const cool = 100 - Math.min(100, (u.skillCooldown / 10) * 100);
-    return `
-      <article class="unit-card" data-unit-id="${u.id}">
-        <img src="${u.sprite || u.art}?v=31" alt="${u.name} artwork" />
-        <div class="unit-info">
-          <h3>${u.name}</h3>
-          <div class="role">${u.role}</div>
-          <div class="bar hp"><span style="width:${hp}%"></span></div>
-          <div class="bar cool"><span style="width:${cool}%"></span></div>
-        </div>
-      </article>
-    `;
-  }).join("");
+    const card = cardsEl.querySelector(`.unit-card[data-unit-id="${u.id}"]`);
+    if (!card) return;
+    card.classList.toggle("down", u.hp <= 0);
+    card.querySelector("[data-card-hp]").style.width = `${hp}%`;
+    card.querySelector("[data-card-cool]").style.width = `${cool}%`;
+  });
   updateSkillBar();
 }
 
-function updateSkillBar() {
+function renderSkillBarShell() {
+  const signature = squad.map((unit) => [
+    unit.id,
+    unit.name,
+    unit.skill,
+    unit.ultimate,
+    unit.activeIcon,
+    unit.ultimateIcon,
+    unit.activeDesc,
+    unit.ultimateDesc
+  ].join(":")).join("|");
+  if (signature === skillBarSignature) return;
+  skillBarSignature = signature;
   skillButtonsEl.innerHTML = squad.map((unit) => {
-    const charge = Math.floor(((unit.ultCharge || 0) / (unit.ultMax || 100)) * 100);
-    const dead = unit.hp <= 0;
-    const activeCooling = unit.skillCooldown > 0;
-    const ultCharging = charge < 100;
-    const pulse = unit.buttonPulse > 0 ? "pulse" : "";
     return `
-      <div class="skill-pair ${focusedUnit?.id === unit.id ? "focused" : ""}">
-        <button class="skill-button active ${activeCooling ? "not-ready" : ""} ${pulse}" data-unit-id="${unit.id}" data-skill-kind="active" ${dead ? "disabled" : ""} title="${unit.name}: ${unit.skill} - ${unit.activeDesc}">
-          <img src="${unit.activeIcon}?v=31" alt="${unit.skill}" />
+      <div class="skill-pair" data-unit-id="${unit.id}">
+        <button class="skill-button active" data-unit-id="${unit.id}" data-skill-kind="active" title="${unit.name}: ${unit.skill} - ${unit.activeDesc}">
+          <img src="${unit.activeIcon}?v=31" alt="${unit.skill}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.skill}</span>
-          <small>${activeCooling ? Math.ceil(unit.skillCooldown) + "秒" : unit.name}</small>
+          <small data-skill-status>${unit.name}</small>
           <em>${unit.activeDesc}</em>
         </button>
-        <button class="skill-button ultimate ${ultCharging ? "not-ready" : ""} ${pulse}" data-unit-id="${unit.id}" data-skill-kind="ultimate" style="--charge:${charge}%;" ${dead ? "disabled" : ""} title="${unit.name}: ${unit.ultimate} - ${unit.ultimateDesc}">
-          <img src="${unit.ultimateIcon}?v=31" alt="${unit.ultimate}" />
+        <button class="skill-button ultimate" data-unit-id="${unit.id}" data-skill-kind="ultimate" title="${unit.name}: ${unit.ultimate} - ${unit.ultimateDesc}">
+          <img src="${unit.ultimateIcon}?v=31" alt="${unit.ultimate}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.ultimate}</span>
-          <small>${charge}%</small>
+          <small data-ultimate-charge>0%</small>
           <em>${unit.ultimateDesc}</em>
         </button>
       </div>
     `;
   }).join("");
+}
+
+function updateSkillBar() {
+  renderSkillBarShell();
+  squad.forEach((unit) => {
+    const charge = Math.floor(((unit.ultCharge || 0) / (unit.ultMax || 100)) * 100);
+    const dead = unit.hp <= 0;
+    const activeCooling = unit.skillCooldown > 0;
+    const ultCharging = charge < 100;
+    const pulse = unit.buttonPulse > 0;
+    const pair = skillButtonsEl.querySelector(`.skill-pair[data-unit-id="${unit.id}"]`);
+    if (!pair) return;
+    pair.classList.toggle("focused", focusedUnit?.id === unit.id);
+
+    const activeButton = pair.querySelector('.skill-button[data-skill-kind="active"]');
+    activeButton.classList.toggle("not-ready", activeCooling);
+    activeButton.classList.toggle("pulse", pulse);
+    activeButton.disabled = dead;
+    activeButton.querySelector("[data-skill-status]").textContent = activeCooling ? `${Math.ceil(unit.skillCooldown)}秒` : unit.name;
+
+    const ultimateButton = pair.querySelector('.skill-button[data-skill-kind="ultimate"]');
+    ultimateButton.classList.toggle("not-ready", ultCharging);
+    ultimateButton.classList.toggle("pulse", pulse);
+    ultimateButton.disabled = dead;
+    ultimateButton.style.setProperty("--charge", `${charge}%`);
+    ultimateButton.querySelector("[data-ultimate-charge]").textContent = `${charge}%`;
+  });
 }
 
 function getEnemyScale(enemy) {

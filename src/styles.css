@@ -263,9 +263,15 @@ body.paused-mode #game {
 
 .skill-button img {
   aspect-ratio: 1;
+  backface-visibility: hidden;
   border-radius: 6px;
   object-fit: cover;
+  position: relative;
+  transform: translateZ(0);
   width: 46px;
+  z-index: 1;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
 }
 
 .skill-button span,
@@ -1171,12 +1177,20 @@ h1 {
 
 .unit-card img {
   aspect-ratio: 1;
+  backface-visibility: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.28));
   object-fit: contain;
   padding: 4px;
+  transform: translateZ(0);
   width: 64px;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+}
+
+.unit-card.down img {
+  opacity: 0.42;
 }
 
 .unit-info {
