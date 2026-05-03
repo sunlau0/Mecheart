@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Lancer rail scope upgrade icon">
+  <defs>
+    <linearGradient id="frame" x1="18" y1="18" x2="238" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f7ffff"/><stop offset=".24" stop-color="#31445a"/><stop offset=".58" stop-color="#06101b"/><stop offset=".84" stop-color="#4aa8ff"/><stop offset="1" stop-color="#111925"/>
+    </linearGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="62%">
+      <stop stop-color="#ffffff"/><stop offset=".2" stop-color="#a9dcff"/><stop offset=".48" stop-color="#4aa8ff"/><stop offset="1" stop-color="#03101f"/>
+    </radialGradient>
+    <filter id="glow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="256" height="256" rx="34" fill="#02060c"/>
+  <path d="M36 14h184l22 22v184l-22 22H36l-22-22V36z" fill="#06101a" stroke="url(#frame)" stroke-width="5"/>
+  <path d="M52 31h152l21 21v152l-21 21H52l-21-21V52z" fill="#07111d" stroke="#4aa8ff" stroke-width="2" opacity=".76"/>
+  <g filter="url(#glow)">
+    <circle cx="128" cy="128" r="73" fill="url(#core)" opacity=".22" stroke="#8ed0ff" stroke-width="5"/>
+    <circle cx="128" cy="128" r="38" fill="none" stroke="#ffffff" stroke-width="6"/>
+    <circle cx="128" cy="128" r="94" fill="none" stroke="#4aa8ff" stroke-width="4" stroke-dasharray="13 12"/>
+    <path d="M25 128h206M128 25v206" stroke="#e8f7ff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M67 188 190 65" stroke="#4aa8ff" stroke-width="10" stroke-linecap="round"/>
+    <path d="M151 50h42v42M63 164v42h42" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
