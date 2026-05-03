@@ -95,11 +95,11 @@ const squadSeeds = [
   { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp" },
   { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
-  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 285, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
+  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "熱能刃 / 短距離爆發推進器", trait: "速度最快，可快速切入敵群，但耐久中等。", tactic: "用來追擊後排或清理密集小兵，避免單獨承受 Boss 火力。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "熱刃旋風", activeDesc: "對附近敵人造成範圍斬擊。", ultimate: "突擊超載", ultimateDesc: "短時間高速突入，重創周圍多名敵軍。", activeIcon: "assets/upgrade-seed-rush.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
-  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 29, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
-  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "幻象干擾", activeDesc: "干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控並造成傷害。", activeIcon: "assets/upgrade-dragoon-pods.webp", ultimateIcon: "assets/skill-orion-active.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
+  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
+  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "????", activeDesc: "????????????????????", ultimate: "?????", ultimateDesc: "???????????????????????", activeIcon: "assets/upgrade-dragoon-pods.webp", ultimateIcon: "assets/skill-orion-active.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -256,7 +256,7 @@ const upgradePool = [
       u.shieldDuration = (u.shieldDuration || 5) + 2;
       u.guardianRegenDuration = (u.guardianRegenDuration || 5) + 2;
       u.guardianRegenRate = (u.guardianRegenRate || 5) + 2;
-      u.gravityRadius = (u.gravityRadius || 170) + 22;
+      u.gravityRadius = (u.gravityRadius || 187) + 22;
       u.gravityPull = (u.gravityPull || 170) + 36;
     }
   },
@@ -569,7 +569,8 @@ function spawnWave() {
       tauntTarget: null,
       tauntTime: 0,
       jamTime: 0,
-      slowTime: 0
+      slowTime: 0,
+      fireControlTime: 0
     });
   }
   setMessage(isBossRound ? `Boss 回合 ${wave}` : `第 ${wave} 回合`);
@@ -935,16 +936,13 @@ function activateSkill(unit) {
     }
     setMessage("重炮壓制");
   } else if (unit.name === "Mirage") {
-    const radius = unit.jamRadius || 250;
-    const duration = unit.jamDuration || 4.5;
-    enemies.filter((e) => e.hp > 0 && dist(unit, e) < radius).forEach((e) => {
-      e.jamTime = Math.max(e.jamTime || 0, duration);
-      e.slowTime = Math.max(e.slowTime || 0, duration);
-      hit(e, 18 + Math.floor(unit.damage * 0.5), "#c37bff", unit.id);
-    });
+    const radius = unit.jamRadius || 270;
+    const duration = unit.jamDuration || 5.2;
+    unit.mirageAuraTime = Math.max(unit.mirageAuraTime || 0, duration);
+    applyMirageAura(unit, 0.18);
     burst(unit.x, unit.y, "#c37bff", 52);
-    addSkillEffect("jam", unit, { radius, color: "#c37bff", life: 1.0 });
-    setMessage("幻象干擾");
+    addSkillEffect("jam-aura", unit, { radius, color: "#c37bff", life: duration });
+    setMessage("??????");
   }
 }
 
@@ -973,7 +971,7 @@ function useUltimate(unit) {
     gravityFields.push({
       x: clamp(target.x + (dx / d) * 74, 70, W - 70),
       y: clamp(target.y + (dy / d) * 74, 70, H - 100),
-      radius: unit.gravityRadius || 170,
+      radius: unit.gravityRadius || 187,
       pull: unit.gravityPull || 170,
       life: unit.gravityDuration || 5.2,
       maxLife: unit.gravityDuration || 5.2,
@@ -981,7 +979,7 @@ function useUltimate(unit) {
       source: unit.id
     });
     burst(target.x, target.y, "#4be4ff", 84);
-    addSkillEffect("gravity-cast", unit, { x: target.x, y: target.y, radius: unit.gravityRadius || 170, color: "#4be4ff", life: 0.9 });
+    addSkillEffect("gravity-cast", unit, { x: target.x, y: target.y, radius: unit.gravityRadius || 187, color: "#4be4ff", life: 0.9 });
     setMessage("重力球生成");
     return;
   }
@@ -1094,15 +1092,29 @@ function useUltimate(unit) {
   }
 
   if (unit.name === "Mirage") {
-    const duration = (unit.jamDuration || 4.5) + 2.5;
-    enemies.filter((e) => e.hp > 0).forEach((e) => {
+    const duration = (unit.jamDuration || 4.5) + 3.5;
+    const radius = unit.mirageDomainRadius || 420;
+    skillEffects.push({
+      type: "mirage-domain",
+      x: unit.x,
+      y: unit.y,
+      radius,
+      color: "#c37bff",
+      life: duration,
+      maxLife: duration,
+      source: unit.id,
+      damagePerSecond: unit.mirageDomainDamage || 18 + unit.damage * 0.55,
+      rotation: Math.random() * Math.PI * 2,
+      follow: false,
+      tick: 0
+    });
+    enemies.filter((e) => e.hp > 0 && dist(unit, e) < radius).forEach((e) => {
       e.jamTime = Math.max(e.jamTime || 0, duration);
       e.slowTime = Math.max(e.slowTime || 0, duration);
-      hit(e, 42 + unit.damage, "#c37bff", unit.id);
+      e.fireControlTime = Math.max(e.fireControlTime || 0, duration);
     });
     burst(unit.x, unit.y, "#c37bff", 84);
-    addSkillEffect("jam", unit, { radius: 300, color: "#c37bff", life: 1.1 });
-    setMessage("海市蜃樓域");
+    setMessage("???????");
     return;
   }
 
@@ -1154,6 +1166,34 @@ function applyHelixRegen(unit, dt) {
     const spread = Math.random() * radius;
     burst(unit.x + Math.cos(angle) * spread, unit.y + Math.sin(angle) * spread, "#7cffc4", 1);
   }
+}
+
+function applyMirageAura(unit, dt) {
+  const radius = unit.jamRadius || 270;
+  enemies
+    .filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius)
+    .forEach((enemy) => {
+      enemy.jamTime = Math.max(enemy.jamTime || 0, 0.35);
+      enemy.slowTime = Math.max(enemy.slowTime || 0, 0.35);
+      if (Math.random() < dt * 10) burst(enemy.x, enemy.y, "#c37bff", 1);
+    });
+}
+
+function updateMirageDomains(dt) {
+  skillEffects
+    .filter((effect) => effect.type === "mirage-domain")
+    .forEach((effect) => {
+      effect.tick = (effect.tick || 0) + dt;
+      enemies
+        .filter((enemy) => enemy.hp > 0 && dist(enemy, effect) < effect.radius)
+        .forEach((enemy) => {
+          enemy.jamTime = Math.max(enemy.jamTime || 0, 0.45);
+          enemy.slowTime = Math.max(enemy.slowTime || 0, 0.45);
+          enemy.fireControlTime = Math.max(enemy.fireControlTime || 0, 0.45);
+          if (effect.tick >= 0.24) hit(enemy, effect.damagePerSecond * effect.tick, effect.color, effect.source);
+        });
+      if (effect.tick >= 0.24) effect.tick = 0;
+    });
 }
 
 function applyGuardianRegen(unit, dt) {
@@ -1255,9 +1295,11 @@ function stepUnit(unit, dt) {
   unit.regenGlow = Math.max(0, (unit.regenGlow || 0) - dt);
   unit.guardianRegenTime = Math.max(0, (unit.guardianRegenTime || 0) - dt);
   unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
+  unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
   if (unit.name === "Asterion" && unit.guardianRegenTime > 0) applyGuardianRegen(unit, dt);
   if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
   if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
+  if (unit.name === "Mirage" && unit.mirageAuraTime > 0) applyMirageAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1);
 
@@ -1423,11 +1465,12 @@ function stepEnemy(enemy, dt) {
   enemy.tauntTime = Math.max(0, (enemy.tauntTime || 0) - dt);
   enemy.jamTime = Math.max(0, (enemy.jamTime || 0) - dt);
   enemy.slowTime = Math.max(0, (enemy.slowTime || 0) - dt);
+  enemy.fireControlTime = Math.max(0, (enemy.fireControlTime || 0) - dt);
   const target = chooseEnemyTarget(enemy, living);
   const d = dist(enemy, target);
   const speedFactor = enemy.slowTime > 0 ? 0.54 : 1;
   if (d > enemy.range) moveToward(enemy, target, enemy.speed * speedFactor * dt);
-  if (d <= enemy.range && enemy.cooldown <= 0) {
+  if (d <= enemy.range && enemy.cooldown <= 0 && (enemy.fireControlTime || 0) <= 0) {
     const jamFactor = enemy.jamTime > 0 ? 1.38 : 1;
     enemy.cooldown = enemy.rate * jamFactor + Math.random() * 0.22;
     enemy.attackPulse = 0.2;
@@ -1463,6 +1506,7 @@ function update(dt) {
   squad.forEach((u) => stepUnit(u, dt));
   enemies.forEach((e) => stepEnemy(e, dt));
   updateGravityFields(dt);
+  updateMirageDomains(dt);
   resolveBodyOverlaps();
 
   shots.forEach((shot) => {
@@ -2382,14 +2426,29 @@ function drawSkillEffects() {
       if (effect.type === "artillery") {
         for (let i = 0; i < 4; i++) ctx.strokeRect(point.x - size * (0.25 + i * 0.18), point.y - size * (0.25 + i * 0.18), size * (0.5 + i * 0.36), size * (0.5 + i * 0.36));
       }
-    } else if (effect.type === "jam" || effect.type === "cloak") {
+    } else if (effect.type === "jam" || effect.type === "cloak" || effect.type === "jam-aura" || effect.type === "mirage-domain") {
+      const persistent = effect.type === "jam-aura" || effect.type === "mirage-domain";
+      const pulse = 0.72 + Math.sin(now() * 5.6 + effect.rotation) * 0.18;
+      ctx.globalAlpha = persistent ? pulse : alpha;
+      ctx.strokeStyle = effect.type === "cloak" ? "#7cffc4" : effect.color;
+      ctx.lineWidth = effect.type === "mirage-domain" ? 5 : 3;
+      ctx.setLineDash(effect.type === "mirage-domain" ? [18, 12] : [10, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.96 + Math.sin(now() * 3.2) * 0.02), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = persistent ? 0.12 : alpha * 0.14;
+      ctx.fillStyle = effect.color;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = effect.color;
       for (let i = 0; i < 12; i++) {
         const angle = i * 1.73 + effect.rotation;
         const spread = radius * (0.18 + (i % 5) * 0.12);
         const w = 14 + (i % 3) * 10;
         const h = 4 + (i % 4) * 3;
-        ctx.globalAlpha = alpha * (effect.type === "cloak" ? 0.34 : 0.58);
+        ctx.globalAlpha = (persistent ? pulse : alpha) * (effect.type === "cloak" ? 0.34 : 0.58);
         ctx.fillRect(point.x + Math.cos(angle) * spread, point.y + Math.sin(angle) * spread, w, h);
       }
     } else if (effect.type === "gn-cast") {
