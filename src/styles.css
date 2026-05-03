@@ -98,6 +98,15 @@ body.setup-mode #skill-bar {
   display: none;
 }
 
+body.setup-mode #pause-toggle,
+body.setup-mode #pause-overlay {
+  display: none;
+}
+
+body.paused-mode #game {
+  filter: brightness(0.72) saturate(0.78);
+}
+
 #skill-bar {
   position: relative;
   z-index: 5;
@@ -108,6 +117,111 @@ body.setup-mode #skill-bar {
   margin: 0 18px 18px;
   padding: 8px;
   pointer-events: auto;
+}
+
+.pause-toggle {
+  align-items: center;
+  display: inline-grid;
+  gap: 7px;
+  grid-template-columns: 18px auto;
+  min-height: 42px;
+  min-width: 96px;
+  padding: 0 13px;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 12;
+  background: rgba(5, 12, 20, 0.74);
+  border-color: rgba(122, 242, 255, 0.62);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.42), 0 0 18px rgba(75, 228, 255, 0.16);
+  touch-action: manipulation;
+}
+
+.pause-toggle[hidden],
+.pause-overlay[hidden] {
+  display: none;
+}
+
+.pause-icon {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(2, 5px);
+  height: 18px;
+  justify-content: center;
+}
+
+.pause-icon::before,
+.pause-icon::after {
+  content: "";
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ffffff, var(--cyan));
+  box-shadow: 0 0 10px rgba(75, 228, 255, 0.8);
+}
+
+.pause-toggle[aria-pressed="true"] .pause-icon {
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 15px solid var(--gold);
+  filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.82));
+}
+
+.pause-toggle[aria-pressed="true"] .pause-icon::before,
+.pause-toggle[aria-pressed="true"] .pause-icon::after {
+  display: none;
+}
+
+.pause-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 44px);
+  background: rgba(4, 7, 12, 0.34);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.pause-panel {
+  border: 1px solid rgba(122, 242, 255, 0.46);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(7, 12, 20, 0.84), rgba(4, 7, 12, 0.76)),
+    radial-gradient(circle at 50% 0, rgba(75, 228, 255, 0.18), transparent 55%);
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 14px;
+  max-width: min(440px, 92vw);
+  padding: clamp(18px, 3vw, 28px);
+  text-align: center;
+}
+
+.pause-panel h2 {
+  color: #ffffff;
+  font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+  font-size: clamp(36px, 5vw, 62px);
+  font-style: italic;
+  line-height: 0.94;
+  margin: 0;
+  text-shadow: 0 0 22px rgba(75, 228, 255, 0.58), 0 7px 0 #061d55;
+  -webkit-text-stroke: 1px #061d55;
+}
+
+.pause-panel p:not(.kicker) {
+  color: #dce9ff;
+  font-size: clamp(15px, 1.8vw, 18px);
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pause-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 #skill-buttons {
@@ -1391,6 +1505,13 @@ h1 {
     padding: 6px;
   }
 
+  .pause-toggle {
+    min-height: 40px;
+    min-width: 90px;
+    right: 10px;
+    top: 10px;
+  }
+
   .skill-button {
     grid-template-rows: 34px auto auto 1fr;
     min-height: 102px;
@@ -1689,6 +1810,20 @@ h1 {
   #skill-bar {
     inset: auto;
     padding: 6px;
+  }
+
+  .pause-toggle {
+    right: max(8px, env(safe-area-inset-right));
+    top: max(8px, env(safe-area-inset-top));
+  }
+
+  .pause-panel {
+    max-width: calc(100vw - 36px);
+    padding: 16px;
+  }
+
+  .pause-actions {
+    grid-template-columns: 1fr;
   }
 
   .formation-head {

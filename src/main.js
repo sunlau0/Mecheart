@@ -27,6 +27,10 @@ const leaderboardMessageEl = document.getElementById("leaderboard-message");
 const playerNameEl = document.getElementById("player-name");
 const titleLeaderboardListEl = document.getElementById("title-leaderboard-list");
 const titleLeaderboardMessageEl = document.getElementById("title-leaderboard-message");
+const pauseToggleEl = document.getElementById("pause-toggle");
+const pauseOverlayEl = document.getElementById("pause-overlay");
+const pauseResumeEl = document.getElementById("pause-resume");
+const pauseFormationEl = document.getElementById("pause-formation");
 
 const W = 1280;
 const H = 720;
@@ -60,6 +64,8 @@ let rewardChoices = [];
 let nextHudRefresh = 0;
 let leaderboardScore = 0;
 let leaderboardSubmitted = false;
+let paused = false;
+let pausedAt = 0;
 const defaultSquadNames = ["Asterion", "Caliburn", "Seraphim", "Orion"];
 let selectedSquadNames = [...defaultSquadNames];
 let formationFocusName = "Asterion";
@@ -429,6 +435,10 @@ function selectedSquadSeeds() {
 }
 
 function reset() {
+  paused = false;
+  pausedAt = 0;
+  updatePauseControls();
+  setPauseButtonVisible(false);
   squad = selectedSquadSeeds().map((u, i) => {
     const slot = squadSlots[i] || { x: 220 + i * 42, y: 220 + i * 88 };
     return ({
@@ -600,6 +610,51 @@ function renderTitleLeaderboard(rankings, message = "") {
 function renderLeaderboards(rankings, resultMessage = "", titleMessage = "") {
   renderResultLeaderboard(rankings, resultMessage);
   renderTitleLeaderboard(rankings, titleMessage);
+}
+
+function updatePauseControls() {
+  pauseOverlayEl.hidden = !paused;
+  pauseToggleEl.setAttribute("aria-pressed", paused ? "true" : "false");
+  pauseToggleEl.setAttribute("aria-label", paused ? "繼續遊戲" : "暫停遊戲");
+  pauseToggleEl.querySelector(".pause-label").textContent = paused ? "繼續" : "暫停";
+  document.body.classList.toggle("paused-mode", paused);
+}
+
+function setPauseButtonVisible(visible) {
+  pauseToggleEl.hidden = !visible;
+  if (!visible && paused) {
+    paused = false;
+    pausedAt = 0;
+    updatePauseControls();
+  }
+}
+
+function setPaused(value) {
+  const shouldPause = Boolean(value);
+  if (shouldPause && !running) return;
+  if (paused === shouldPause) return;
+  paused = shouldPause;
+  updatePauseControls();
+  if (paused) {
+    pausedAt = now();
+    selected = null;
+    pointer = null;
+    commandEl.textContent = "暫停中";
+    return;
+  }
+  if (pausedAt) {
+    const pauseDuration = now() - pausedAt;
+    nextWaveAt += pauseDuration;
+    if (messageTime) messageTime += pauseDuration;
+    pausedAt = 0;
+  }
+  last = now();
+  setMessage("繼續作戰");
+}
+
+function togglePause() {
+  if (pauseToggleEl.hidden || rewardEl.hidden === false || resultEl.hidden === false || formationEl.hidden === false || briefingEl.hidden === false) return;
+  setPaused(!paused);
 }
 
 async function loadLeaderboard() {
@@ -1240,7 +1295,7 @@ function chooseEnemyTarget(enemy, living) {
 }
 
 function update(dt) {
-  if (!running) return;
+  if (!running || paused) return;
   squad.forEach((u) => stepUnit(u, dt));
   enemies.forEach((e) => stepEnemy(e, dt));
   resolveBodyOverlaps();
@@ -1298,6 +1353,7 @@ function advanceRound() {
 
 function showReward() {
   running = false;
+  setPauseButtonVisible(false);
   rewardChoices = pickRewards();
   rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
     <button class="reward-card" data-reward-index="${index}">
@@ -1338,10 +1394,12 @@ function chooseReward(index) {
   renderIntel(squad.find((u) => u.hp > 0) || squad[0]);
   advanceRound();
   running = true;
+  setPauseButtonVisible(true);
 }
 
 function endMission(won) {
   running = false;
+  setPauseButtonVisible(false);
   document.body.classList.add("setup-mode");
   resizeCanvas();
   leaderboardScore = score;
@@ -1509,6 +1567,7 @@ function toggleFormationUnit(name) {
 
 function showFormation() {
   running = false;
+  setPauseButtonVisible(false);
   document.body.classList.add("setup-mode");
   briefingEl.hidden = true;
   rewardEl.hidden = true;
@@ -1532,6 +1591,8 @@ function startBattleFromFormation() {
   resizeCanvas();
   reset();
   running = true;
+  setPauseButtonVisible(true);
+  last = now();
 }
 
 function renderDatabase() {
@@ -1880,7 +1941,7 @@ function loadArt() {
 }
 
 canvas.addEventListener("pointerdown", (event) => {
-  if (!running) return;
+  if (!running || paused) return;
   const point = canvasPoint(event);
   selected = unitAt(point);
   if (selected) {
@@ -1896,18 +1957,19 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 canvas.addEventListener("pointermove", (event) => {
-  if (!running || !selected) return;
+  if (!running || paused || !selected) return;
   pointer = canvasPoint(event);
 });
 
 canvas.addEventListener("pointerup", (event) => {
-  if (!running || !selected) return;
+  if (!running || paused || !selected) return;
   issueCommand(selected, canvasPoint(event));
   selected = null;
   pointer = null;
 });
 
 canvas.addEventListener("dblclick", (event) => {
+  if (!running || paused) return;
   const unit = unitAt(canvasPoint(event));
   if (unit) activateSkill(unit);
 });
@@ -1928,6 +1990,7 @@ skillButtonsEl.addEventListener("pointerdown", (event) => {
   if (!button) return;
   event.preventDefault();
   event.stopPropagation();
+  if (!running || paused) return;
   const unit = squad.find((u) => u.id === button.dataset.unitId);
   if (!unit) return;
   focusedUnit = unit;
@@ -1962,6 +2025,16 @@ rewardOptionsEl.addEventListener("click", (event) => {
 
 leaderboardFormEl.addEventListener("submit", submitLeaderboard);
 
+pauseToggleEl.addEventListener("click", togglePause);
+
+pauseResumeEl.addEventListener("click", () => {
+  setPaused(false);
+});
+
+pauseFormationEl.addEventListener("click", () => {
+  showFormation();
+});
+
 document.getElementById("start-btn").addEventListener("click", () => {
   showFormation();
 });
@@ -1972,6 +2045,15 @@ formationStartEl.addEventListener("click", () => {
 
 document.getElementById("restart-btn").addEventListener("click", () => {
   showFormation();
+});
+
+window.addEventListener("keydown", (event) => {
+  const tag = event.target?.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || event.isComposing) return;
+  if (event.key === "Escape" || event.key.toLocaleLowerCase() === "p") {
+    event.preventDefault();
+    togglePause();
+  }
 });
 
 window.addEventListener("resize", resizeCanvas);
