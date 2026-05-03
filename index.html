@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
-    <link rel="stylesheet" href="src/styles.css?v=29" />
+    <link rel="stylesheet" href="src/styles.css?v=30" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -12,6 +12,21 @@
         <canvas id="game" width="1280" height="720" aria-label="宇宙心戰隊戰場"></canvas>
         <div id="skill-bar">
           <div id="skill-buttons"></div>
+        </div>
+        <button id="pause-toggle" class="pause-toggle" type="button" aria-label="暫停遊戲" aria-pressed="false" hidden>
+          <span class="pause-icon" aria-hidden="true"></span>
+          <span class="pause-label">暫停</span>
+        </button>
+        <div id="pause-overlay" class="pause-overlay" hidden>
+          <section class="pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+            <p class="kicker">Tactical Pause</p>
+            <h2 id="pause-title">遊戲已暫停</h2>
+            <p>戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。</p>
+            <div class="pause-actions">
+              <button id="pause-resume" type="button">繼續作戰</button>
+              <button id="pause-formation" type="button">回編隊</button>
+            </div>
+          </section>
         </div>
         <div id="briefing">
           <div class="title-content">
@@ -117,6 +132,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=34"></script>
+    <script src="src/main.js?v=35"></script>
   </body>
 </html>
