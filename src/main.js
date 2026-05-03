@@ -42,7 +42,18 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
 const now = () => performance.now() / 1000;
-const battlefieldArt = "assets/battlefield-bg.png";
+const battlefieldArt = "assets/battlefield-bg.webp";
+const BACKDROP_VERSION = 20;
+const UNIT_ART_VERSION = 35;
+const REWARD_ICON_VERSION = 18;
+const SKILL_ICON_VERSION = 35;
+const assetVersion = (path) => {
+  if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
+  if (path.includes("skill-")) return SKILL_ICON_VERSION;
+  if (path.includes("upgrade-")) return REWARD_ICON_VERSION;
+  return UNIT_ART_VERSION;
+};
+const assetSrc = (path, version = assetVersion(path)) => `${path}?v=${version}`;
 const labelFaction = (faction) => faction === "Allied" ? "友軍" : "敵軍";
 const leaderboardDefaults = [
   { name: "Sun", score: 99230 },
@@ -77,16 +88,16 @@ const squadSlots = [
 ];
 
 const squadSeeds = [
-  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.png", ultimateIcon: "assets/skill-asterion-gravity.png", art: "assets/asterion-profile.png", sprite: "assets/sd-asterion.png" },
-  { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.png", ultimateIcon: "assets/skill-caliburn-ultimate.png", art: "assets/caliburn-profile.png", sprite: "assets/sd-caliburn.png" },
-  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.png", ultimateIcon: "assets/skill-seraphim-ultimate.png", art: "assets/seraphim-profile.png", sprite: "assets/sd-seraphim.png" },
-  { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.png", ultimateIcon: "assets/skill-orion-ultimate.png", art: "assets/orion-profile.png", sprite: "assets/sd-orion.png" },
-  { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.png", ultimateIcon: "assets/skill-valkyr-gn-field.png", art: "assets/player-valkyr-profile.png", sprite: "assets/player-valkyr-sd.png" },
-  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 285, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.png", ultimateIcon: "assets/skill-orion-ultimate.png", art: "assets/player-lancer-profile.png", sprite: "assets/player-lancer-sd.png" },
-  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "熱能刃 / 短距離爆發推進器", trait: "速度最快，可快速切入敵群，但耐久中等。", tactic: "用來追擊後排或清理密集小兵，避免單獨承受 Boss 火力。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "熱刃旋風", activeDesc: "對附近敵人造成範圍斬擊。", ultimate: "突擊超載", ultimateDesc: "短時間高速突入，重創周圍多名敵軍。", activeIcon: "assets/upgrade-seed-rush.png", ultimateIcon: "assets/skill-caliburn-ultimate.png", art: "assets/player-nova-profile.png", sprite: "assets/player-nova-sd.png" },
-  { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.png", ultimateIcon: "assets/skill-helix-ultimate.png", art: "assets/player-helix-profile.png", sprite: "assets/player-helix-sd.png" },
-  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 29, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.png", ultimateIcon: "assets/upgrade-overclocked-servos.png", art: "assets/player-bastion-profile.png", sprite: "assets/player-bastion-sd.png" },
-  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "幻象干擾", activeDesc: "干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控並造成傷害。", activeIcon: "assets/upgrade-dragoon-pods.png", ultimateIcon: "assets/skill-orion-active.png", art: "assets/player-mirage-profile.png", sprite: "assets/player-mirage-sd.png" }
+  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp" },
+  { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/caliburn-profile.webp", sprite: "assets/sd-caliburn.webp" },
+  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp" },
+  { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
+  { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
+  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 285, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
+  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "熱能刃 / 短距離爆發推進器", trait: "速度最快，可快速切入敵群，但耐久中等。", tactic: "用來追擊後排或清理密集小兵，避免單獨承受 Boss 火力。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "熱刃旋風", activeDesc: "對附近敵人造成範圍斬擊。", ultimate: "突擊超載", ultimateDesc: "短時間高速突入，重創周圍多名敵軍。", activeIcon: "assets/upgrade-seed-rush.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
+  { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
+  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 29, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
+  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "幻象干擾", activeDesc: "干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控並造成傷害。", activeIcon: "assets/upgrade-dragoon-pods.webp", ultimateIcon: "assets/skill-orion-active.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -105,8 +116,8 @@ const enemyTypes = {
     rateBase: 1.65,
     radius: 22,
     points: 75,
-    art: "assets/enemy-drone-profile.png",
-    sprite: "assets/sd-drone.png"
+    art: "assets/enemy-drone-profile.webp",
+    sprite: "assets/sd-drone.webp"
   },
   raider: {
     name: "Helios Raider",
@@ -123,8 +134,8 @@ const enemyTypes = {
     rateBase: 1.25,
     radius: 21,
     points: 105,
-    art: "assets/enemy-raider-profile.png",
-    sprite: "assets/sd-raider.png"
+    art: "assets/enemy-raider-profile.webp",
+    sprite: "assets/sd-raider.webp"
   },
   sniper: {
     name: "Azure Lancer",
@@ -141,8 +152,8 @@ const enemyTypes = {
     rateBase: 2.05,
     radius: 24,
     points: 125,
-    art: "assets/enemy-sniper-profile.png",
-    sprite: "assets/sd-sniper.png"
+    art: "assets/enemy-sniper-profile.webp",
+    sprite: "assets/sd-sniper.webp"
   },
   guard: {
     name: "Obsidian Guard",
@@ -159,8 +170,8 @@ const enemyTypes = {
     rateBase: 1.9,
     radius: 31,
     points: 150,
-    art: "assets/enemy-guard-profile.png",
-    sprite: "assets/sd-guard.png"
+    art: "assets/enemy-guard-profile.webp",
+    sprite: "assets/sd-guard.webp"
   },
   commander: {
     name: "Crimson Marshal",
@@ -177,8 +188,8 @@ const enemyTypes = {
     rateBase: 1.55,
     radius: 27,
     points: 175,
-    art: "assets/enemy-commander-profile.png",
-    sprite: "assets/sd-commander.png"
+    art: "assets/enemy-commander-profile.webp",
+    sprite: "assets/sd-commander.webp"
   },
   boss: {
     name: "Dread Sovereign",
@@ -196,8 +207,8 @@ const enemyTypes = {
     radius: 48,
     points: 700,
     boss: true,
-    art: "assets/enemy-boss-profile.png",
-    sprite: "assets/sd-boss.png"
+    art: "assets/enemy-boss-profile.webp",
+    sprite: "assets/sd-boss.webp"
   }
 };
 
@@ -206,7 +217,7 @@ const upgradePool = [
     id: "beam-capacitors",
     type: "武器",
     name: "高出力光束電容",
-    icon: "assets/upgrade-beam-capacitors.png",
+    icon: "assets/upgrade-beam-capacitors.webp",
     text: "所有攻擊型機體武器傷害 +15%。",
     apply() {
       squad.forEach((u) => {
@@ -218,7 +229,7 @@ const upgradePool = [
     id: "phase-armor",
     type: "裝甲",
     name: "相轉移裝甲改修",
-    icon: "assets/upgrade-phase-armor.png",
+    icon: "assets/upgrade-phase-armor.webp",
     text: "全體友軍最大 HP +25，並立即修復 25 HP。",
     apply() {
       squad.forEach((u) => {
@@ -232,7 +243,7 @@ const upgradePool = [
     unit: "Asterion",
     type: "Asterion 技能",
     name: "守護反應爐",
-    icon: "assets/upgrade-asterion-gravity-core.png",
+    icon: "assets/upgrade-asterion-gravity-core.webp",
     text: "Asterion 最大 HP +45、傷害 +5，守護爆發自我修復更久，重力球範圍更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Asterion");
@@ -252,7 +263,7 @@ const upgradePool = [
     unit: "Caliburn",
     type: "Caliburn 武器",
     name: "SEED 突擊 OS",
-    icon: "assets/upgrade-seed-rush.png",
+    icon: "assets/upgrade-seed-rush.webp",
     text: "Caliburn 傷害 +12、攻擊更快，突擊技能更強。",
     apply() {
       const u = squad.find((unit) => unit.name === "Caliburn");
@@ -268,7 +279,7 @@ const upgradePool = [
     unit: "Seraphim",
     type: "Seraphim 技能",
     name: "修復無人機群",
-    icon: "assets/upgrade-repair-drones.png",
+    icon: "assets/upgrade-repair-drones.webp",
     text: "Seraphim 治療量提升、射程更遠，幻象修復會加上更厚護盾。",
     apply() {
       const u = squad.find((unit) => unit.name === "Seraphim");
@@ -284,7 +295,7 @@ const upgradePool = [
     unit: "Orion",
     type: "Orion 武器",
     name: "龍騎兵炮莢擴充",
-    icon: "assets/upgrade-dragoon-pods.png",
+    icon: "assets/upgrade-dragoon-pods.webp",
     text: "Orion 傷害 +9、射程 +35，主動技發射更多炮莢。",
     apply() {
       const u = squad.find((unit) => unit.name === "Orion");
@@ -300,7 +311,7 @@ const upgradePool = [
     unit: "Valkyr",
     type: "Valkyr 技能",
     name: "GN 防線核心",
-    icon: "assets/upgrade-valkyr-gn-core.png",
+    icon: "assets/upgrade-valkyr-gn-core.webp",
     text: "Valkyr 最大 HP +55、射程 +25，挑釁信標持續更久，GN 力場範圍和推力提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Valkyr");
@@ -319,7 +330,7 @@ const upgradePool = [
     unit: "Lancer",
     type: "Lancer 武器",
     name: "軌道照準器",
-    icon: "assets/upgrade-lancer-rail-scope.png",
+    icon: "assets/upgrade-lancer-rail-scope.webp",
     text: "Lancer 傷害 +14、射程 +35，穿甲狙擊和軌道貫穿更痛。",
     apply() {
       const u = squad.find((unit) => unit.name === "Lancer");
@@ -334,7 +345,7 @@ const upgradePool = [
     unit: "Nova",
     type: "Nova 機動",
     name: "突擊推進翼",
-    icon: "assets/upgrade-nova-assault-wing.png",
+    icon: "assets/upgrade-nova-assault-wing.webp",
     text: "Nova 傷害 +8、射程 +30、速度 +24，範圍斬擊更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Nova");
@@ -351,7 +362,7 @@ const upgradePool = [
     unit: "Helix",
     type: "Helix 維修",
     name: "再生力場矩陣",
-    icon: "assets/upgrade-helix-beacon-grid.png",
+    icon: "assets/upgrade-helix-beacon-grid.webp",
     text: "Helix 治療量提升、射程 +35，再生力場範圍和持續時間增加。",
     apply() {
       const u = squad.find((unit) => unit.name === "Helix");
@@ -370,7 +381,7 @@ const upgradePool = [
     unit: "Helix",
     type: "Helix 粒子",
     name: "幻象粒子增幅器",
-    icon: "assets/upgrade-helix-mirage-particles.png",
+    icon: "assets/upgrade-helix-mirage-particles.webp",
     text: "幻象粒子隱形時間增加，發動時令附近敵機短暫失準。",
     apply() {
       const u = squad.find((unit) => unit.name === "Helix");
@@ -386,7 +397,7 @@ const upgradePool = [
     unit: "Bastion",
     type: "Bastion 重炮",
     name: "重炮穩定器",
-    icon: "assets/upgrade-bastion-stabilizer.png",
+    icon: "assets/upgrade-bastion-stabilizer.webp",
     text: "Bastion 傷害 +10、射程 +30，重炮壓制範圍擴大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Bastion");
@@ -402,7 +413,7 @@ const upgradePool = [
     unit: "Mirage",
     type: "Mirage 干擾",
     name: "幻象干擾核心",
-    icon: "assets/upgrade-mirage-phantom-core.png",
+    icon: "assets/upgrade-mirage-phantom-core.webp",
     text: "Mirage 傷害 +8、射程 +25，干擾持續時間和範圍提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Mirage");
@@ -417,7 +428,7 @@ const upgradePool = [
     id: "overclocked-servos",
     type: "機動",
     name: "超頻 AMBAC 伺服系統",
-    icon: "assets/upgrade-overclocked-servos.png",
+    icon: "assets/upgrade-overclocked-servos.webp",
     text: "全體機體移動更快，攻擊間隔縮短 8%。",
     apply() {
       squad.forEach((u) => {
@@ -430,7 +441,7 @@ const upgradePool = [
     id: "emergency-nanites",
     type: "生存",
     name: "緊急納米修復槽",
-    icon: "assets/upgrade-emergency-nanites.png",
+    icon: "assets/upgrade-emergency-nanites.webp",
     text: "全體回復 40% HP；已擊破機體以 35% HP 回歸。",
     apply() {
       squad.forEach((u) => {
@@ -1512,7 +1523,7 @@ function showReward() {
   rewardChoices = pickRewards();
   rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
     <button class="reward-card" data-reward-index="${index}">
-      <img src="${reward.icon}?v=17" alt="${reward.name} icon" />
+      <img src="${assetSrc(reward.icon)}" alt="${reward.name} icon" />
       <div class="reward-copy">
         <div class="reward-type">${reward.type}</div>
         <h3>${reward.name}</h3>
@@ -1601,7 +1612,7 @@ function renderHudCardsShell() {
   hudCardsSignature = signature;
   cardsEl.innerHTML = squad.map((u) => `
     <article class="unit-card" data-unit-id="${u.id}">
-      <img src="${u.sprite || u.art}?v=33" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
+      <img src="${assetSrc(u.sprite || u.art)}" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
       <div class="unit-info">
         <h3>${u.name}</h3>
         <div class="role">${u.role}</div>
@@ -1647,13 +1658,13 @@ function renderSkillBarShell() {
     return `
       <div class="skill-pair" data-unit-id="${unit.id}">
         <button class="skill-button active" data-unit-id="${unit.id}" data-skill-kind="active" title="${unit.name}: ${unit.skill} - ${unit.activeDesc}">
-          <img src="${unit.activeIcon}?v=34" alt="${unit.skill}" draggable="false" decoding="async" loading="eager" />
+          <img src="${assetSrc(unit.activeIcon)}" alt="${unit.skill}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.skill}</span>
           <small data-skill-status>${unit.name}</small>
           <em>${unit.activeDesc}</em>
         </button>
         <button class="skill-button ultimate" data-unit-id="${unit.id}" data-skill-kind="ultimate" title="${unit.name}: ${unit.ultimate} - ${unit.ultimateDesc}">
-          <img src="${unit.ultimateIcon}?v=34" alt="${unit.ultimate}" draggable="false" decoding="async" loading="eager" />
+          <img src="${assetSrc(unit.ultimateIcon)}" alt="${unit.ultimate}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.ultimate}</span>
           <small data-ultimate-charge>0%</small>
           <em>${unit.ultimateDesc}</em>
@@ -1703,7 +1714,7 @@ function renderIntel(unit) {
   intelEl.innerHTML = `
     <p class="kicker">戰術情報</p>
     <div class="intel-layout">
-      <img src="${unit.art || unit.sprite}?v=33" alt="${unit.name} profile" />
+      <img src="${assetSrc(unit.art || unit.sprite)}" alt="${unit.name} profile" />
       <div>
         <h3>${unit.name}</h3>
         <div class="role">${labelFaction(unit.faction)} / ${unit.role}</div>
@@ -1735,7 +1746,7 @@ function renderFormation() {
     return `
       <article class="formation-slot" data-unit-name="${unit.name}">
         <span>${index + 1}</span>
-        <img src="${unit.sprite || unit.art}?v=33" alt="${unit.name} SD sprite" />
+        <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name} SD sprite" />
         <div>
           <strong>${unit.name}</strong>
           <small>${unit.role}</small>
@@ -1749,7 +1760,7 @@ function renderFormation() {
     const focusedClass = unit.name === focused.name ? "focused" : "";
     return `
       <article class="formation-card ${selectedForBattle ? "selected" : ""} ${focusedClass}" data-unit-name="${unit.name}">
-        <img src="${unit.sprite || unit.art}?v=33" alt="${unit.name} SD sprite" />
+        <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name} SD sprite" />
         <div class="formation-card-copy">
           <div class="formation-card-title">
             <h3>${unit.name}</h3>
@@ -1791,6 +1802,10 @@ function showFormation() {
   resultEl.hidden = true;
   resultEl.classList.remove("lost", "won");
   formationEl.hidden = false;
+  hydrateDeferredImages(formationEl);
+  renderDatabase();
+  loadFormationArt();
+  loadBattleArt();
   if (selectedSquadNames.length !== 4) selectedSquadNames = [...defaultSquadNames];
   formationFocusName = selectedSquadNames[0] || defaultSquadNames[0];
   resizeCanvas();
@@ -1805,6 +1820,7 @@ function startBattleFromFormation() {
   }
   formationEl.hidden = true;
   document.body.classList.remove("setup-mode");
+  loadBattleArt();
   resizeCanvas();
   reset();
   running = true;
@@ -1815,7 +1831,7 @@ function startBattleFromFormation() {
 function renderDatabase() {
   const renderRows = (entries, className) => entries.map((unit) => `
     <article class="db-row ${className}">
-      <img src="${unit.art || unit.sprite}?v=33" alt="${unit.name} design" />
+      <img src="${assetSrc(unit.art || unit.sprite)}" alt="${unit.name} design" />
       <div>
         <h3>${unit.name}</h3>
         <p>${labelFaction(unit.faction)} / ${unit.role}</p>
@@ -2575,17 +2591,43 @@ function initStars() {
   }));
 }
 
-function loadArt() {
-  const paths = new Set([battlefieldArt]);
-  [...squadSeeds, ...Object.values(enemyTypes)].forEach((unit) => {
+function preloadArt(paths) {
+  paths.forEach((path) => {
+    if (!path || art.has(path)) return;
+    const img = new Image();
+    img.decoding = "async";
+    img.src = assetSrc(path);
+    art.set(path, img);
+  });
+}
+
+function loadFormationArt() {
+  const paths = new Set();
+  squadSeeds.forEach((unit) => {
     paths.add(unit.art);
+    if (unit.sprite) paths.add(unit.sprite);
+  });
+  Object.values(enemyTypes).forEach((unit) => paths.add(unit.art));
+  preloadArt(paths);
+}
+
+function loadBattleArt() {
+  const paths = new Set([battlefieldArt]);
+  selectedSquadSeeds().forEach((unit) => {
     if (unit.sprite) paths.add(unit.sprite);
     if (unit.sheet) paths.add(unit.sheet);
   });
-  paths.forEach((path) => {
-    const img = new Image();
-    img.src = path;
-    art.set(path, img);
+  Object.values(enemyTypes).forEach((unit) => {
+    if (unit.sprite) paths.add(unit.sprite);
+    if (unit.sheet) paths.add(unit.sheet);
+  });
+  preloadArt(paths);
+}
+
+function hydrateDeferredImages(root = document) {
+  root.querySelectorAll("img[data-src]").forEach((img) => {
+    if (img.getAttribute("src")) return;
+    img.src = img.dataset.src;
   });
 }
 
@@ -2707,11 +2749,7 @@ window.addEventListener("keydown", (event) => {
 
 window.addEventListener("resize", resizeCanvas);
 initStars();
-loadArt();
-renderDatabase();
-renderFormation();
 resizeCanvas();
-reset();
 loadLeaderboard();
 render();
 frame();

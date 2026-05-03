@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
-    <link rel="stylesheet" href="src/styles.css?v=33" />
+    <link rel="preload" as="image" href="assets/title-screen.webp?v=20" type="image/webp" fetchpriority="high" />
+    <link rel="stylesheet" href="src/styles.css?v=34" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -62,7 +63,7 @@
             </header>
             <div id="formation-slots" class="formation-slots" aria-label="出戰隊伍"></div>
             <section class="tutorial-panel" aria-label="新手操作教學">
-              <img src="assets/tutorial-controls.png?v=3" alt="新手操作教學：揀機、拖線移動、指向目標、放技能" />
+              <img data-src="assets/tutorial-controls.webp?v=4" loading="lazy" decoding="async" alt="新手操作教學：揀機、拖線移動、指向目標、放技能" />
               <div class="tutorial-notes">
                 <h3>新手教學</h3>
                 <p>先編成 4 架機體。入場後拖拉機體落地圖下令，拖到敵人會攻擊，拖到友軍會補血或協助集火。</p>
@@ -77,11 +78,11 @@
                 <div class="database-art">
                   <figure>
                     <figcaption>玩家機體設計</figcaption>
-                    <img src="assets/player-new-lineup.png?v=4" alt="Six redesigned player mobile suits" />
+                    <img data-src="assets/player-new-lineup.webp?v=5" loading="lazy" decoding="async" alt="Six redesigned player mobile suits" />
                   </figure>
                   <figure>
                     <figcaption>敵方機體設計</figcaption>
-                    <img src="assets/enemy-variants.png?v=18" alt="Enemy original mobile suit sprite art" />
+                    <img data-src="assets/enemy-variants.webp?v=19" loading="lazy" decoding="async" alt="Enemy original mobile suit sprite art" />
                   </figure>
                 </div>
                 <div id="database-list"></div>
@@ -132,6 +133,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=46"></script>
+    <script src="src/main.js?v=48"></script>
   </body>
 </html>

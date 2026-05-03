@@ -376,7 +376,7 @@ body.paused-mode #game {
   align-items: start;
   background:
     linear-gradient(90deg, rgba(4, 6, 10, 0.88), rgba(4, 6, 10, 0.28)),
-    url("../assets/game-over-screen.png?v=19") center / cover no-repeat;
+    url("../assets/game-over-screen.webp?v=20") center / cover no-repeat;
   grid-template-columns: minmax(320px, 620px) minmax(300px, 430px);
   justify-items: start;
   overflow-x: hidden;
@@ -386,7 +386,7 @@ body.paused-mode #game {
 #result.won {
   background:
     linear-gradient(90deg, rgba(4, 8, 14, 0.9), rgba(4, 8, 14, 0.42)),
-    url("../assets/battlefield-bg.png?v=19") center / cover no-repeat;
+    url("../assets/battlefield-bg.webp?v=20") center / cover no-repeat;
 }
 
 #result::before {
@@ -634,7 +634,7 @@ body.paused-mode #game {
   background:
     linear-gradient(180deg, rgba(4, 7, 12, 0.08), rgba(4, 7, 12, 0.7)),
     radial-gradient(circle at 50% 50%, rgba(5, 8, 14, 0.16), rgba(5, 8, 14, 0.78)),
-    url("../assets/title-screen.png?v=18") center / cover no-repeat;
+    url("../assets/title-screen.webp?v=20") center / cover no-repeat;
   grid-template-areas:
     "title board"
     "start board";
@@ -657,7 +657,7 @@ body.paused-mode #game {
   align-content: start;
   background:
     linear-gradient(180deg, rgba(5, 8, 14, 0.93), rgba(5, 8, 14, 0.84)),
-    url("../assets/battlefield-bg.png?v=19") center / cover no-repeat;
+    url("../assets/battlefield-bg.webp?v=20") center / cover no-repeat;
   justify-items: stretch;
   overflow-y: auto;
   padding: clamp(14px, 2.4vw, 28px);
@@ -1666,7 +1666,7 @@ h1 {
     background:
       linear-gradient(180deg, rgba(4, 7, 12, 0.2), rgba(4, 7, 12, 0.78)),
       radial-gradient(circle at 50% 48%, rgba(5, 8, 14, 0.1), rgba(5, 8, 14, 0.82)),
-      url("../assets/title-screen.png?v=18") center / cover no-repeat;
+      url("../assets/title-screen.webp?v=20") center / cover no-repeat;
     gap: 16px;
   }
 
