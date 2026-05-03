@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
-    <link rel="stylesheet" href="src/styles.css?v=27" />
+    <link rel="stylesheet" href="src/styles.css?v=28" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -23,6 +23,14 @@
             <p>軌道戰場 Roguelike 小隊指揮</p>
           </div>
           <button id="start-btn" class="title-start">開始作戰</button>
+          <section id="title-leaderboard" class="leaderboard-panel title-leaderboard" aria-live="polite">
+            <div class="leaderboard-head">
+              <p class="kicker">Top 10 Ranking</p>
+              <h3>王牌排行榜</h3>
+            </div>
+            <p id="title-leaderboard-message">讀取排行榜中...</p>
+            <ol id="title-leaderboard-list" class="leaderboard-list"></ol>
+          </section>
         </div>
         <div id="formation" hidden>
           <div class="formation-shell">
@@ -109,6 +117,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=33"></script>
+    <script src="src/main.js?v=34"></script>
   </body>
 </html>

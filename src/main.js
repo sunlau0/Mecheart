@@ -25,6 +25,8 @@ const leaderboardFormEl = document.getElementById("leaderboard-form");
 const leaderboardListEl = document.getElementById("leaderboard-list");
 const leaderboardMessageEl = document.getElementById("leaderboard-message");
 const playerNameEl = document.getElementById("player-name");
+const titleLeaderboardListEl = document.getElementById("title-leaderboard-list");
+const titleLeaderboardMessageEl = document.getElementById("title-leaderboard-message");
 
 const W = 1280;
 const H = 720;
@@ -562,40 +564,54 @@ function formatScore(value) {
 }
 
 function normalizeLeaderboard(rankings) {
-  const bestByName = new Map();
-  (Array.isArray(rankings) ? rankings : []).forEach((entry) => {
-    const name = sanitizePlayerName(entry?.name);
-    const scoreValue = Math.max(0, Math.floor(Number(entry?.score) || 0));
-    const key = name.toLocaleLowerCase();
-    const previous = bestByName.get(key);
-    if (!previous || scoreValue > previous.score) bestByName.set(key, { name, score: scoreValue });
-  });
-  return [...bestByName.values()]
-    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+  return (Array.isArray(rankings) ? rankings : []).map((entry, index) => ({
+    id: typeof entry?.id === "string" ? entry.id : "",
+    name: sanitizePlayerName(entry?.name),
+    score: Math.max(0, Math.floor(Number(entry?.score) || 0)),
+    submittedAt: typeof entry?.submittedAt === "string" ? entry.submittedAt : "",
+    order: index
+  }))
+    .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.name.localeCompare(b.name) || a.order - b.order)
     .slice(0, 10);
 }
 
-function renderLeaderboard(rankings, message = "") {
-  const normalized = normalizeLeaderboard([...(rankings || []), ...leaderboardDefaults]);
-  leaderboardListEl.innerHTML = normalized.map((entry, index) => `
-    <li class="${entry.score === leaderboardScore ? "current-score" : ""}">
+function renderLeaderboardList(listEl, rankings, highlightScore = null) {
+  const normalized = normalizeLeaderboard(rankings || leaderboardDefaults);
+  listEl.innerHTML = normalized.map((entry, index) => `
+    <li class="${highlightScore !== null && entry.score === highlightScore ? "current-score" : ""}">
       <span class="rank-number">${index + 1}</span>
       <strong>${escapeHtml(entry.name)}</strong>
       <em>${formatScore(entry.score)}</em>
     </li>
   `).join("");
+  return normalized;
+}
+
+function renderResultLeaderboard(rankings, message = "") {
+  renderLeaderboardList(leaderboardListEl, rankings, leaderboardScore);
   leaderboardMessageEl.textContent = message || "輸入姓名後可提交今局分數。";
 }
 
+function renderTitleLeaderboard(rankings, message = "") {
+  renderLeaderboardList(titleLeaderboardListEl, rankings);
+  titleLeaderboardMessageEl.textContent = message || "挑戰最高分數，打入王牌榜。";
+}
+
+function renderLeaderboards(rankings, resultMessage = "", titleMessage = "") {
+  renderResultLeaderboard(rankings, resultMessage);
+  renderTitleLeaderboard(rankings, titleMessage);
+}
+
 async function loadLeaderboard() {
-  renderLeaderboard(leaderboardDefaults, "讀取排行榜中...");
+  renderLeaderboards(leaderboardDefaults, "讀取排行榜中...", "讀取排行榜中...");
   try {
     const response = await fetch("/api/leaderboard", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    renderLeaderboard(data.rankings, data.writable === false ? "已載入預設排名；Cloudflare KV 尚未綁定。" : "輸入姓名後可提交今局分數。");
+    const fallbackMessage = data.writable === false ? "已載入預設排名；Cloudflare KV 尚未綁定。" : "輸入姓名後可提交今局分數。";
+    renderLeaderboards(data.rankings, fallbackMessage, data.writable === false ? "預設排行榜" : "即時排行榜");
   } catch {
-    renderLeaderboard(leaderboardDefaults, "暫時未能連線排行榜，先顯示預設排名。");
+    renderLeaderboards(leaderboardDefaults, "暫時未能連線排行榜，先顯示預設排名。", "暫時顯示預設排行榜");
   }
 }
 
@@ -622,14 +638,14 @@ async function submitLeaderboard(event) {
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
     leaderboardSubmitted = true;
-    renderLeaderboard(data.rankings, data.message || "分數已提交。");
+    renderLeaderboards(data.rankings, data.message || "分數已提交。", "即時排行榜已更新");
   } catch (error) {
     submitButton.disabled = false;
     const localRankings = normalizeLeaderboard([
       ...leaderboardDefaults,
       { name, score: leaderboardScore }
     ]);
-    renderLeaderboard(localRankings, `${error.message || "提交失敗"} 本機先預覽排名，Cloudflare KV 設定後會同步。`);
+    renderLeaderboards(localRankings, `${error.message || "提交失敗"} 本機先預覽排名，Cloudflare KV 設定後會同步。`, "本機預覽排行榜");
   }
 }
 
@@ -1965,5 +1981,6 @@ renderDatabase();
 renderFormation();
 resizeCanvas();
 reset();
+loadLeaderboard();
 render();
 frame();

@@ -33,18 +33,37 @@ function sanitizeScore(value) {
   return Math.min(score, 999999999);
 }
 
+function makeRecordId() {
+  return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function normalizeEntry(entry, index) {
+  return {
+    id: typeof entry?.id === "string" ? entry.id : "",
+    name: sanitizeName(entry?.name),
+    score: sanitizeScore(entry?.score),
+    submittedAt: typeof entry?.submittedAt === "string" ? entry.submittedAt : "",
+    order: index
+  };
+}
+
 function normalizeRankings(rankings) {
-  const bestByName = new Map();
-  for (const entry of Array.isArray(rankings) ? rankings : []) {
-    const name = sanitizeName(entry?.name);
-    const score = sanitizeScore(entry?.score);
-    const key = name.toLocaleLowerCase();
-    const previous = bestByName.get(key);
-    if (!previous || score > previous.score) bestByName.set(key, { name, score });
-  }
-  return [...bestByName.values()]
-    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+  return (Array.isArray(rankings) ? rankings : []).map(normalizeEntry)
+    .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.name.localeCompare(b.name) || a.order - b.order)
+    .map(({ order, ...entry }) => entry)
     .slice(0, TOP_LIMIT);
+}
+
+function withDefaultRankings(rankings) {
+  const combined = Array.isArray(rankings) ? [...rankings] : [];
+  for (const seed of DEFAULT_RANKINGS) {
+    const hasSeed = combined.some((entry) =>
+      sanitizeName(entry?.name).toLocaleLowerCase() === seed.name.toLocaleLowerCase() &&
+      sanitizeScore(entry?.score) === seed.score
+    );
+    if (!hasSeed) combined.push({ ...seed, id: `seed-${seed.name.toLocaleLowerCase()}` });
+  }
+  return combined;
 }
 
 async function readRankings(env) {
@@ -54,7 +73,7 @@ async function readRankings(env) {
   }
 
   const saved = await store.get(LEADERBOARD_KEY, "json");
-  const rankings = normalizeRankings([...(saved || []), ...DEFAULT_RANKINGS]);
+  const rankings = normalizeRankings(withDefaultRankings(saved));
   return { rankings, writable: true, store };
 }
 
@@ -82,12 +101,14 @@ export async function onRequestPost({ request, env }) {
   }
 
   const entry = {
+    id: makeRecordId(),
     name: sanitizeName(payload?.name),
-    score: sanitizeScore(payload?.score)
+    score: sanitizeScore(payload?.score),
+    submittedAt: new Date().toISOString()
   };
   const updated = normalizeRankings([...rankings, entry]);
   await store.put(LEADERBOARD_KEY, JSON.stringify(updated));
-  const rank = updated.findIndex((item) => item.name.toLocaleLowerCase() === entry.name.toLocaleLowerCase() && item.score === entry.score) + 1;
+  const rank = updated.findIndex((item) => item.id === entry.id) + 1;
 
   return json({
     rankings: updated,
