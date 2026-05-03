@@ -351,6 +351,10 @@ body.setup-mode #skill-bar {
 }
 
 .title-leaderboard {
+  background:
+    linear-gradient(180deg, rgba(7, 12, 20, 0.2), rgba(4, 7, 12, 0.2)),
+    radial-gradient(circle at 82% 0, rgba(75, 228, 255, 0.1), transparent 46%);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   grid-area: board;
   max-height: min(560px, calc(100vh - 64px));
   max-width: min(390px, 92vw);
@@ -376,6 +380,8 @@ body.setup-mode #skill-bar {
 }
 
 .title-leaderboard .leaderboard-list li {
+  background: rgba(8, 13, 22, 0.2);
+  border-color: rgba(255, 255, 255, 0.12);
   min-height: 32px;
   padding: 5px 8px;
 }
