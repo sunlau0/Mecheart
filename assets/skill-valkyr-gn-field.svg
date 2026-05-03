@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Valkyr GN field skill icon">
+  <defs>
+    <linearGradient id="frame" x1="18" y1="18" x2="238" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f7ffff"/>
+      <stop offset=".22" stop-color="#334457"/>
+      <stop offset=".55" stop-color="#051019"/>
+      <stop offset=".82" stop-color="#8bd7ff"/>
+      <stop offset="1" stop-color="#111a22"/>
+    </linearGradient>
+    <radialGradient id="field" cx="50%" cy="48%" r="63%">
+      <stop stop-color="#ffffff"/>
+      <stop offset=".2" stop-color="#aaf6ff"/>
+      <stop offset=".42" stop-color="#8bd7ff"/>
+      <stop offset=".68" stop-color="#30e7d4"/>
+      <stop offset="1" stop-color="#03141b"/>
+    </radialGradient>
+    <filter id="glow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="34" fill="#02070d"/>
+  <path d="M36 14h184l22 22v184l-22 22H36l-22-22V36z" fill="#061019" stroke="url(#frame)" stroke-width="5"/>
+  <path d="M52 31h152l21 21v152l-21 21H52l-21-21V52z" fill="#07131d" stroke="#8bd7ff" stroke-width="2" opacity=".76"/>
+  <g opacity=".28" stroke="#8bd7ff" stroke-width="2">
+    <path d="M38 128h180M128 38v180M58 58l140 140M198 58 58 198"/>
+  </g>
+  <g filter="url(#glow)">
+    <path d="M128 37 205 82v92l-77 45-77-45V82z" fill="url(#field)" opacity=".25" stroke="#dffcff" stroke-width="7"/>
+    <path d="M128 62 183 94v68l-55 32-55-32V94z" fill="rgba(139,215,255,.12)" stroke="#8bd7ff" stroke-width="6"/>
+    <path d="M128 91 160 110v36l-32 19-32-19v-36z" fill="#dffcff" opacity=".9"/>
+    <path d="M128 37v54M128 165v54M51 82l47 27M158 147l47 27M205 82l-47 27M98 147l-47 27" stroke="#8bd7ff" stroke-width="6" stroke-linecap="round"/>
+    <path d="M43 127c36-24 69-24 101 0 26 20 52 20 77 0" fill="none" stroke="#30e7d4" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="128" cy="128" r="102" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="5 15" opacity=".68"/>
+  </g>
+</svg>

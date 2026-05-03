@@ -77,14 +77,14 @@ const squadSlots = [
 ];
 
 const squadSeeds = [
-  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 盾牌衝撞", trait: "最高耐久。適合頂在前線，拖住近戰敵人。", tactic: "先把它拉進敵群吸火，讓遠程機在後方輸出。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾。", ultimate: "重力嘲諷場", ultimateDesc: "吸引範圍內敵人轉為攻擊 Asterion。", activeIcon: "assets/skill-asterion-active.png", ultimateIcon: "assets/skill-asterion-ultimate.png", art: "assets/asterion-profile.png", sprite: "assets/sd-asterion.png" },
+  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.svg", ultimateIcon: "assets/skill-asterion-gravity.svg", art: "assets/asterion-profile.png", sprite: "assets/sd-asterion.png" },
   { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.png", ultimateIcon: "assets/skill-caliburn-ultimate.png", art: "assets/caliburn-profile.png", sprite: "assets/sd-caliburn.png" },
-  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束", trait: "不會攻擊。負責維修友軍，射程更遠且生存力提升。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍機體。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.png", ultimateIcon: "assets/skill-seraphim-ultimate.png", art: "assets/seraphim-profile.png", sprite: "assets/sd-seraphim.png" },
+  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.png", ultimateIcon: "assets/skill-seraphim-ultimate.png", art: "assets/seraphim-profile.png", sprite: "assets/sd-seraphim.png" },
   { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.png", ultimateIcon: "assets/skill-orion-ultimate.png", art: "assets/orion-profile.png", sprite: "assets/sd-orion.png" },
-  { name: "Valkyr", faction: "Allied", role: "重盾防線機", weapon: "大型抗光束盾 / 近距離散射炮", trait: "防禦力高，能保護隊友，但輸出和速度較低。", tactic: "放在前線邊緣承受火力，配合 Seraphim 可形成穩固防線。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "屏障陣列", activeDesc: "替全隊展開短時間護盾，前線隊友效果更強。", ultimate: "零域壁壘", ultimateDesc: "大幅強化全隊護盾，並吸引附近敵軍火力。", activeIcon: "assets/upgrade-phase-armor.png", ultimateIcon: "assets/upgrade-guardian-reactor.png", art: "assets/player-valkyr-profile.png", sprite: "assets/player-valkyr-sd.png" },
+  { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.svg", ultimateIcon: "assets/skill-valkyr-gn-field.svg", art: "assets/player-valkyr-profile.png", sprite: "assets/player-valkyr-sd.png" },
   { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 285, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.png", ultimateIcon: "assets/skill-orion-ultimate.png", art: "assets/player-lancer-profile.png", sprite: "assets/player-lancer-sd.png" },
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "熱能刃 / 短距離爆發推進器", trait: "速度最快，可快速切入敵群，但耐久中等。", tactic: "用來追擊後排或清理密集小兵，避免單獨承受 Boss 火力。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "熱刃旋風", activeDesc: "對附近敵人造成範圍斬擊。", ultimate: "突擊超載", ultimateDesc: "短時間高速突入，重創周圍多名敵軍。", activeIcon: "assets/upgrade-seed-rush.png", ultimateIcon: "assets/skill-caliburn-ultimate.png", art: "assets/player-nova-profile.png", sprite: "assets/player-nova-sd.png" },
-  { name: "Helix", faction: "Allied", role: "戰場維修航標機", weapon: "遠距離修復鏈 / 防護航標", trait: "第二款補機。治療較穩定，能給被鎖定友軍額外護盾。", tactic: "適合跟住主坦或近戰機，令前線更持久。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 225, damage: -22, rate: 0.72, speed: 158, skill: "修復航標", activeDesc: "標記最受傷友軍，立即補血並給予護盾。", ultimate: "再生節點", ultimateDesc: "回復全隊並復活一架倒下機體。", activeIcon: "assets/upgrade-repair-drones.png", ultimateIcon: "assets/skill-seraphim-ultimate.png", art: "assets/player-helix-profile.png", sprite: "assets/player-helix-sd.png" },
+  { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.svg", ultimateIcon: "assets/skill-helix-ultimate.svg", art: "assets/player-helix-profile.png", sprite: "assets/player-helix-sd.png" },
   { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 29, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.png", ultimateIcon: "assets/upgrade-overclocked-servos.png", art: "assets/player-bastion-profile.png", sprite: "assets/player-bastion-sd.png" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "幻象干擾", activeDesc: "干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控並造成傷害。", activeIcon: "assets/upgrade-dragoon-pods.png", ultimateIcon: "assets/skill-orion-active.png", art: "assets/player-mirage-profile.png", sprite: "assets/player-mirage-sd.png" }
 ];
@@ -232,8 +232,8 @@ const upgradePool = [
     unit: "Asterion",
     type: "Asterion 技能",
     name: "守護反應爐",
-    icon: "assets/upgrade-guardian-reactor.png",
-    text: "Asterion 最大 HP +45、傷害 +5，守護爆發持續更久。",
+    icon: "assets/upgrade-asterion-gravity-core.svg",
+    text: "Asterion 最大 HP +45、傷害 +5，守護爆發自我修復更久，重力球範圍更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Asterion");
       if (!u) return;
@@ -241,6 +241,10 @@ const upgradePool = [
       u.hp = clamp(u.hp + 45, 1, u.maxHp);
       u.damage += 5;
       u.shieldDuration = (u.shieldDuration || 5) + 2;
+      u.guardianRegenDuration = (u.guardianRegenDuration || 5) + 2;
+      u.guardianRegenRate = (u.guardianRegenRate || 5) + 2;
+      u.gravityRadius = (u.gravityRadius || 170) + 22;
+      u.gravityPull = (u.gravityPull || 170) + 36;
     }
   },
   {
@@ -265,13 +269,14 @@ const upgradePool = [
     type: "Seraphim 技能",
     name: "修復無人機群",
     icon: "assets/upgrade-repair-drones.png",
-    text: "Seraphim 治療量提升、射程更遠，群體修復更強。",
+    text: "Seraphim 治療量提升、射程更遠，幻象修復會加上更厚護盾。",
     apply() {
       const u = squad.find((unit) => unit.name === "Seraphim");
       if (!u) return;
       u.damage -= 9;
       u.range += 28;
       u.burstHeal = (u.burstHeal || 56) + 22;
+      u.seraphimShield = (u.seraphimShield || 4.5) + 2;
     }
   },
   {
@@ -294,17 +299,19 @@ const upgradePool = [
     id: "valkyr-zero-core",
     unit: "Valkyr",
     type: "Valkyr 技能",
-    name: "零域護盾核心",
-    icon: "assets/upgrade-guardian-reactor.png",
-    text: "Valkyr 最大 HP +55、射程 +25，屏障陣列和零域壁壘持續更久。",
+    name: "GN 防線核心",
+    icon: "assets/upgrade-valkyr-gn-core.svg",
+    text: "Valkyr 最大 HP +55、射程 +25，挑釁信標持續更久，GN 力場範圍和推力提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Valkyr");
       if (!u) return;
       u.maxHp += 55;
       u.hp = clamp(u.hp + 55, 1, u.maxHp);
       u.range += 25;
-      u.shieldDuration = (u.shieldDuration || 6) + 2;
-      u.tauntDurationBonus = (u.tauntDurationBonus || 0) + 1.5;
+      u.valkyrTauntDuration = (u.valkyrTauntDuration || 6) + 2;
+      u.gnFieldDuration = (u.gnFieldDuration || 5.5) + 2;
+      u.gnFieldRadius = (u.gnFieldRadius || 170) + 32;
+      u.gnPush = (u.gnPush || 210) + 42;
     }
   },
   {
@@ -312,7 +319,7 @@ const upgradePool = [
     unit: "Lancer",
     type: "Lancer 武器",
     name: "軌道照準器",
-    icon: "assets/upgrade-beam-capacitors.png",
+    icon: "assets/upgrade-lancer-rail-scope.svg",
     text: "Lancer 傷害 +14、射程 +35，穿甲狙擊和軌道貫穿更痛。",
     apply() {
       const u = squad.find((unit) => unit.name === "Lancer");
@@ -327,7 +334,7 @@ const upgradePool = [
     unit: "Nova",
     type: "Nova 機動",
     name: "突擊推進翼",
-    icon: "assets/upgrade-seed-rush.png",
+    icon: "assets/upgrade-nova-assault-wing.svg",
     text: "Nova 傷害 +8、射程 +30、速度 +24，範圍斬擊更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Nova");
@@ -343,9 +350,9 @@ const upgradePool = [
     id: "helix-beacon-grid",
     unit: "Helix",
     type: "Helix 維修",
-    name: "航標修復矩陣",
-    icon: "assets/upgrade-repair-drones.png",
-    text: "Helix 治療量提升、射程 +35，修復航標會給更厚護盾。",
+    name: "再生力場矩陣",
+    icon: "assets/upgrade-helix-beacon-grid.svg",
+    text: "Helix 治療量提升、射程 +35，再生力場範圍和持續時間增加。",
     apply() {
       const u = squad.find((unit) => unit.name === "Helix");
       if (!u) return;
@@ -353,8 +360,25 @@ const upgradePool = [
       u.range += 35;
       u.maxHp += 25;
       u.hp = clamp(u.hp + 25, 1, u.maxHp);
-      u.beaconHeal = (u.beaconHeal || 42) + 24;
-      u.beaconShield = (u.beaconShield || 4) + 2;
+      u.regenRate = (u.regenRate || 13) + 5;
+      u.regenDuration = (u.regenDuration || 6) + 2;
+      u.regenRadius = (u.regenRadius || 260) + 35;
+    }
+  },
+  {
+    id: "helix-mirage-particles",
+    unit: "Helix",
+    type: "Helix 粒子",
+    name: "幻象粒子增幅器",
+    icon: "assets/upgrade-helix-mirage-particles.svg",
+    text: "幻象粒子隱形時間增加，發動時令附近敵機短暫失準。",
+    apply() {
+      const u = squad.find((unit) => unit.name === "Helix");
+      if (!u) return;
+      u.maxHp += 18;
+      u.hp = clamp(u.hp + 18, 1, u.maxHp);
+      u.stealthDuration = (u.stealthDuration || 5.5) + 2;
+      u.mirageDisruptRadius = (u.mirageDisruptRadius || 390) + 70;
     }
   },
   {
@@ -362,7 +386,7 @@ const upgradePool = [
     unit: "Bastion",
     type: "Bastion 重炮",
     name: "重炮穩定器",
-    icon: "assets/upgrade-overclocked-servos.png",
+    icon: "assets/upgrade-bastion-stabilizer.svg",
     text: "Bastion 傷害 +10、射程 +30，重炮壓制範圍擴大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Bastion");
@@ -378,7 +402,7 @@ const upgradePool = [
     unit: "Mirage",
     type: "Mirage 干擾",
     name: "幻象干擾核心",
-    icon: "assets/upgrade-dragoon-pods.png",
+    icon: "assets/upgrade-mirage-phantom-core.svg",
     text: "Mirage 傷害 +8、射程 +25，干擾持續時間和範圍提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Mirage");
@@ -422,6 +446,8 @@ let squad = [];
 let enemies = [];
 let shots = [];
 let sparks = [];
+let gravityFields = [];
+let skillEffects = [];
 let stars = [];
 const art = new Map();
 let hudCardsSignature = "";
@@ -459,12 +485,19 @@ function reset() {
     command: "idle",
     assistId: null,
     ultCharge: 0,
-    ultMax: 100
+    ultMax: 100,
+    regenAuraTime: 0,
+    stealthTime: 0,
+    regenGlow: 0,
+    guardianRegenTime: 0,
+    gnFieldTime: 0
     });
   });
   enemies = [];
   shots = [];
   sparks = [];
+  gravityFields = [];
+  skillEffects = [];
   wave = 1;
   score = 0;
   nextWaveAt = 0;
@@ -778,6 +811,24 @@ function issueCommand(unit, point) {
   setMessage(`${unit.name}: 移動`);
 }
 
+function addSkillEffect(type, source, options = {}) {
+  const life = options.life || 0.9;
+  skillEffects.push({
+    type,
+    sourceId: source?.id || null,
+    x: options.x ?? source?.x ?? 0,
+    y: options.y ?? source?.y ?? 0,
+    tx: options.tx,
+    ty: options.ty,
+    radius: options.radius || 100,
+    color: options.color || source?.color || "#ffffff",
+    life,
+    maxLife: life,
+    rotation: options.rotation ?? Math.random() * Math.PI * 2,
+    follow: options.follow ?? (options.x === undefined && options.y === undefined)
+  });
+}
+
 function activateSkill(unit) {
   if (!unit || unit.hp <= 0) return;
   if (unit.skillCooldown > 0) {
@@ -792,60 +843,73 @@ function activateSkill(unit) {
     squad.forEach((ally) => {
       if (ally.hp > 0 && dist(unit, ally) < 230) ally.shield = unit.shieldDuration || 5;
     });
+    unit.guardianRegenTime = unit.guardianRegenDuration || 5;
     burst(unit.x, unit.y, "#4be4ff", 38);
+    addSkillEffect("guardian", unit, { radius: 230, color: "#4be4ff", life: 1.1 });
     setMessage("守護爆發已展開");
   } else if (unit.name === "Caliburn") {
     enemies.filter((e) => dist(unit, e) < (unit.rushRadius || 220)).forEach((e) => hit(e, unit.rushDamage || 52, "#ff5b66", unit.id));
     burst(unit.x, unit.y, "#ff5b66", 30);
+    addSkillEffect("slash", unit, { radius: unit.rushRadius || 220, color: "#ff5b66", life: 0.7 });
     setMessage("SEED 突擊發動");
   } else if (unit.name === "Seraphim") {
+    const radius = Math.max(300, unit.range + 80);
+    const shieldValue = unit.seraphimShield || 4.5;
     squad.forEach((ally) => {
-      if (dist(unit, ally) < Math.max(300, unit.range + 80)) {
+      if (ally.hp > 0 && dist(unit, ally) < radius) {
         const hpBefore = ally.hp;
         ally.hp = clamp(ally.hp + (unit.burstHeal || 56), 0, ally.maxHp);
+        ally.shield = Math.max(ally.shield || 0, shieldValue);
         chargeUltimateByHealing(unit, ally.hp - hpBefore);
       }
     });
     burst(unit.x, unit.y, "#62e6a7", 34);
-    setMessage("幻象修復已部署");
+    addSkillEffect("repair-shield", unit, { radius, color: "#62e6a7", life: 1.2 });
+    setMessage("幻象修復與護盾已部署");
   } else if (unit.name === "Orion") {
     enemies.slice(0, unit.volleyCount || 7).forEach((e) => {
       shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.28, maxLife: 0.28, damage: unit.volleyDamage || 34, target: e.id, source: unit.id });
     });
     setMessage("全方位齊射");
+    addSkillEffect("volley", unit, { radius: 170, color: "#ffd166", life: 0.72 });
   } else if (unit.name === "Valkyr") {
-    squad.forEach((ally) => {
-      if (ally.hp > 0) ally.shield = dist(unit, ally) < 260 ? 6 : 3.5;
+    const tauntRange = unit.valkyrTauntRange || 315;
+    const tauntDuration = unit.valkyrTauntDuration || 6;
+    unit.shield = Math.max(unit.shield || 0, 5.5);
+    enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < tauntRange).forEach((enemy) => {
+      enemy.tauntTarget = unit.id;
+      enemy.tauntTime = tauntDuration;
+      enemy.aim = { x: unit.x, y: unit.y };
     });
-    burst(unit.x, unit.y, "#8bd7ff", 42);
-    setMessage("屏障陣列展開");
+    burst(unit.x, unit.y, "#8bd7ff", 48);
+    addSkillEffect("taunt", unit, { radius: tauntRange, color: "#8bd7ff", life: 1.0 });
+    setMessage("挑釁信標展開");
   } else if (unit.name === "Lancer") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
       unit.target = target.id;
       shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.2, maxLife: 0.2, damage: 84 + unit.damage + (unit.lancerBonus || 0), target: target.id, source: unit.id });
       burst(unit.x, unit.y, "#4aa8ff", 24);
+      addSkillEffect("rail", unit, { tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.55 });
       setMessage("穿甲狙擊");
     }
   } else if (unit.name === "Nova") {
     enemies.filter((e) => e.hp > 0 && dist(unit, e) < (unit.rushRadius || 205)).forEach((e) => hit(e, unit.rushDamage || 58, "#ff9b38", unit.id));
     unit.speedBoost = 4;
     burst(unit.x, unit.y, "#ff9b38", 46);
+    addSkillEffect("dash", unit, { radius: unit.rushRadius || 205, color: "#ff9b38", life: 0.8 });
     setMessage("熱刃旋風");
   } else if (unit.name === "Helix") {
-    const target = squad
-      .filter((ally) => ally.hp > 0)
-      .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
-    if (target) {
-      const hpBefore = target.hp;
-      target.hp = clamp(target.hp + (unit.beaconHeal || 42), 1, target.maxHp);
-      target.shield = Math.max(target.shield || 0, unit.beaconShield || 4);
-      chargeUltimateByHealing(unit, target.hp - hpBefore);
-      unit.target = target.id;
-      unit.command = "support";
-      burst(target.x, target.y, "#7cffc4", 34);
-    }
-    setMessage("修復航標");
+    unit.regenAuraTime = unit.regenDuration || 6;
+    unit.regenPulse = 0.45;
+    squad.forEach((ally) => {
+      if (ally.hp > 0 && dist(unit, ally) < (unit.regenRadius || 260)) {
+        ally.regenGlow = Math.max(ally.regenGlow || 0, 0.5);
+      }
+    });
+    burst(unit.x, unit.y, "#7cffc4", 46);
+    addSkillEffect("regen-rain", unit, { radius: unit.regenRadius || 260, color: "#7cffc4", life: 1.25 });
+    setMessage("再生力場展開");
   } else if (unit.name === "Bastion") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
@@ -853,6 +917,7 @@ function activateSkill(unit) {
       hit(target, 70 + unit.damage + (unit.bastionBonus || 0), "#f6c34f", unit.id);
       enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 32 + Math.floor(unit.damage * 0.45), "#f6c34f", unit.id));
       burst(target.x, target.y, "#f6c34f", 56);
+      addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius: 120, color: "#f6c34f", life: 0.8 });
     }
     setMessage("重炮壓制");
   } else if (unit.name === "Mirage") {
@@ -864,6 +929,7 @@ function activateSkill(unit) {
       hit(e, 18 + Math.floor(unit.damage * 0.5), "#c37bff", unit.id);
     });
     burst(unit.x, unit.y, "#c37bff", 52);
+    addSkillEffect("jam", unit, { radius, color: "#c37bff", life: 1.0 });
     setMessage("幻象干擾");
   }
 }
@@ -881,18 +947,28 @@ function useUltimate(unit) {
   unit.attackPulse = 0.32;
 
   if (unit.name === "Asterion") {
-    const tauntDuration = 7 + (unit.tauntDurationBonus || 0);
-    const tauntRange = 310;
-    squad.forEach((ally) => {
-      if (ally.hp > 0 && dist(unit, ally) < 260) ally.shield = 5;
+    const target = enemies.find((enemy) => enemy.id === unit.target && enemy.hp > 0) || acquireTarget(unit, true) || enemies.filter((enemy) => enemy.hp > 0).sort((a, b) => dist(unit, a) - dist(unit, b))[0];
+    if (!target) {
+      setMessage("重力球: 沒有目標");
+      unit.ultCharge = unit.ultMax || 100;
+      return;
+    }
+    const dx = target.x - unit.x;
+    const dy = target.y - unit.y;
+    const d = Math.hypot(dx, dy) || 1;
+    gravityFields.push({
+      x: clamp(target.x + (dx / d) * 74, 70, W - 70),
+      y: clamp(target.y + (dy / d) * 74, 70, H - 100),
+      radius: unit.gravityRadius || 170,
+      pull: unit.gravityPull || 170,
+      life: unit.gravityDuration || 5.2,
+      maxLife: unit.gravityDuration || 5.2,
+      color: "#4be4ff",
+      source: unit.id
     });
-    enemies.filter((e) => e.hp > 0 && dist(unit, e) < tauntRange).forEach((e) => {
-      e.tauntTarget = unit.id;
-      e.tauntTime = tauntDuration;
-      e.aim = { x: unit.x, y: unit.y };
-    });
-    burst(unit.x, unit.y, "#4be4ff", 70);
-    setMessage("重力嘲諷場");
+    burst(target.x, target.y, "#4be4ff", 84);
+    addSkillEffect("gravity-cast", unit, { x: target.x, y: target.y, radius: unit.gravityRadius || 170, color: "#4be4ff", life: 0.9 });
+    setMessage("重力球生成");
     return;
   }
 
@@ -903,6 +979,7 @@ function useUltimate(unit) {
       .slice(0, 6)
       .forEach((e) => hit(e, 120 + unit.damage, "#ff5b66", unit.id));
     burst(unit.x, unit.y, "#ff5b66", 65);
+    addSkillEffect("blade-storm", unit, { radius: 245, color: "#ff5b66", life: 1.0 });
     setMessage("流星斬");
     return;
   }
@@ -913,6 +990,7 @@ function useUltimate(unit) {
       ally.shield = 5;
     });
     burst(unit.x, unit.y, "#62e6a7", 75);
+    addSkillEffect("revive", unit, { radius: 300, color: "#62e6a7", life: 1.25 });
     setMessage("天使光環");
     return;
   }
@@ -922,21 +1000,17 @@ function useUltimate(unit) {
       shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.38, maxLife: 0.38, damage: 105 + unit.damage, target: e.id, source: unit.id });
     });
     burst(unit.x, unit.y, "#ffd166", 72);
+    addSkillEffect("orbital", unit, { radius: 260, color: "#ffd166", life: 1.0 });
     setMessage("衛星全炮門");
     return;
   }
 
   if (unit.name === "Valkyr") {
-    squad.forEach((ally) => {
-      if (ally.hp > 0) ally.shield = 8 + Math.floor((unit.shieldDuration || 6) * 0.35);
-    });
-    enemies.filter((e) => e.hp > 0 && dist(unit, e) < 340).forEach((e) => {
-      e.tauntTarget = unit.id;
-      e.tauntTime = 6 + (unit.tauntDurationBonus || 0);
-      e.aim = { x: unit.x, y: unit.y };
-    });
+    unit.gnFieldTime = unit.gnFieldDuration || 5.5;
+    unit.shield = Math.max(unit.shield || 0, 6);
     burst(unit.x, unit.y, "#8bd7ff", 82);
-    setMessage("零域壁壘");
+    addSkillEffect("gn-cast", unit, { radius: unit.gnFieldRadius || 170, color: "#8bd7ff", life: 0.9 });
+    setMessage("GN 力場展開");
     return;
   }
 
@@ -946,6 +1020,7 @@ function useUltimate(unit) {
       unit.target = target.id;
       shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.42, maxLife: 0.42, damage: 185 + unit.damage + (unit.lancerBonus || 0), target: target.id, source: unit.id });
       burst(target.x, target.y, "#4aa8ff", 72);
+      addSkillEffect("rail", unit, { tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.72 });
     }
     setMessage("軌道貫穿");
     return;
@@ -959,25 +1034,33 @@ function useUltimate(unit) {
     targets.forEach((e) => hit(e, 92 + Math.floor(unit.damage * 0.5), "#ff9b38", unit.id));
     unit.speedBoost = 5;
     burst(unit.x, unit.y, "#ff9b38", 88);
+    addSkillEffect("dash", unit, { radius: unit.rushRadius || 230, color: "#ff9b38", life: 1.0 });
     setMessage("突擊超載");
     return;
   }
 
   if (unit.name === "Helix") {
-    let revived = false;
-    squad.forEach((ally) => {
-      if (ally.hp <= 0 && !revived) {
-        ally.hp = Math.ceil(ally.maxHp * 0.38);
-        revived = true;
-      } else if (ally.hp > 0) {
-        const hpBefore = ally.hp;
-        ally.hp = clamp(ally.hp + Math.ceil(ally.maxHp * 0.55), 1, ally.maxHp);
-        chargeUltimateByHealing(unit, ally.hp - hpBefore);
+    const liveBefore = squad.filter((ally) => ally.hp > 0);
+    const duration = unit.stealthDuration || 5.5;
+    const disruptRadius = unit.mirageDisruptRadius || 390;
+    unit.stealthTime = Math.max(unit.stealthTime || 0, duration);
+    unit.shield = Math.max(unit.shield || 0, 4);
+    enemies.filter((enemy) => enemy.hp > 0).forEach((enemy) => {
+      const targetBefore = chooseEnemyTarget(enemy, liveBefore);
+      if (enemy.tauntTarget === unit.id) {
+        enemy.tauntTarget = null;
+        enemy.tauntTime = 0;
       }
-      ally.shield = Math.max(ally.shield || 0, 4.5);
+      if (targetBefore?.id === unit.id || dist(enemy, unit) < disruptRadius) {
+        enemy.aim = null;
+        enemy.cooldown = Math.max(enemy.cooldown || 0, 0.45);
+        enemy.jamTime = Math.max(enemy.jamTime || 0, 0.9);
+        burst(enemy.x, enemy.y, "#7cffc4", 7);
+      }
     });
-    burst(unit.x, unit.y, "#7cffc4", 76);
-    setMessage("再生節點");
+    burst(unit.x, unit.y, "#7cffc4", 88);
+    addSkillEffect("cloak", unit, { radius: disruptRadius, color: "#7cffc4", life: 1.1 });
+    setMessage("幻象粒子散布");
     return;
   }
 
@@ -991,6 +1074,7 @@ function useUltimate(unit) {
         burst(e.x, e.y, "#f6c34f", 24);
       });
     burst(unit.x, unit.y, "#f6c34f", 82);
+    addSkillEffect("artillery", unit, { radius: 260, color: "#f6c34f", life: 1.0 });
     setMessage("要塞齊射");
     return;
   }
@@ -1003,6 +1087,7 @@ function useUltimate(unit) {
       hit(e, 42 + unit.damage, "#c37bff", unit.id);
     });
     burst(unit.x, unit.y, "#c37bff", 84);
+    addSkillEffect("jam", unit, { radius: 300, color: "#c37bff", life: 1.1 });
     setMessage("海市蜃樓域");
     return;
   }
@@ -1038,6 +1123,59 @@ function chargeUltimate(sourceId, amount) {
 function chargeUltimateByHealing(unit, amount) {
   if (!unit || unit.hp <= 0 || amount <= 0) return;
   chargeUltimate(unit.id, Math.max(1, amount * 0.42));
+}
+
+function applyHelixRegen(unit, dt) {
+  const radius = unit.regenRadius || 260;
+  const healPerSecond = unit.regenRate || 13;
+  squad.forEach((ally) => {
+    if (ally.hp <= 0 || dist(unit, ally) > radius) return;
+    const hpBefore = ally.hp;
+    ally.hp = clamp(ally.hp + healPerSecond * dt, 1, ally.maxHp);
+    ally.regenGlow = Math.max(ally.regenGlow || 0, 0.25);
+    chargeUltimateByHealing(unit, ally.hp - hpBefore);
+  });
+  if (Math.random() < dt * 18) {
+    const angle = Math.random() * Math.PI * 2;
+    const spread = Math.random() * radius;
+    burst(unit.x + Math.cos(angle) * spread, unit.y + Math.sin(angle) * spread, "#7cffc4", 1);
+  }
+}
+
+function applyGuardianRegen(unit, dt) {
+  if (unit.hp <= 0 || unit.hp >= unit.maxHp) return;
+  const hpBefore = unit.hp;
+  unit.hp = clamp(unit.hp + (unit.guardianRegenRate || 5) * dt, 1, unit.maxHp);
+  if (unit.hp > hpBefore) unit.regenGlow = Math.max(unit.regenGlow || 0, 0.3);
+}
+
+function applyGnField(unit, dt) {
+  const radius = unit.gnFieldRadius || 170;
+  const push = unit.gnPush || 210;
+  enemies
+    .filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius)
+    .forEach((enemy) => {
+      moveAwayFrom(enemy, unit, push * dt);
+      enemy.slowTime = Math.max(enemy.slowTime || 0, 0.22);
+      enemy.aim = { x: unit.x, y: unit.y };
+      clampUnitAfterSeparation(enemy);
+      if (Math.random() < dt * 14) burst(enemy.x, enemy.y, "#8bd7ff", 1);
+    });
+}
+
+function updateGravityFields(dt) {
+  gravityFields.forEach((field) => {
+    field.life -= dt;
+    enemies
+      .filter((enemy) => enemy.hp > 0 && dist(enemy, field) < field.radius)
+      .forEach((enemy) => {
+        moveToward(enemy, field, field.pull * dt);
+        enemy.slowTime = Math.max(enemy.slowTime || 0, 0.28);
+        clampUnitAfterSeparation(enemy);
+        if (Math.random() < dt * 16) burst(enemy.x, enemy.y, field.color, 1);
+      });
+  });
+  gravityFields = gravityFields.filter((field) => field.life > 0);
 }
 
 function burst(x, y, color, count) {
@@ -1098,6 +1236,14 @@ function stepUnit(unit, dt) {
   unit.attackPulse = Math.max(0, (unit.attackPulse || 0) - dt);
   unit.buttonPulse = Math.max(0, (unit.buttonPulse || 0) - dt);
   unit.speedBoost = Math.max(0, (unit.speedBoost || 0) - dt);
+  unit.stealthTime = Math.max(0, (unit.stealthTime || 0) - dt);
+  unit.regenAuraTime = Math.max(0, (unit.regenAuraTime || 0) - dt);
+  unit.regenGlow = Math.max(0, (unit.regenGlow || 0) - dt);
+  unit.guardianRegenTime = Math.max(0, (unit.guardianRegenTime || 0) - dt);
+  unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
+  if (unit.name === "Asterion" && unit.guardianRegenTime > 0) applyGuardianRegen(unit, dt);
+  if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
+  if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1);
 
@@ -1256,7 +1402,7 @@ function resolveBodyOverlaps() {
 }
 
 function stepEnemy(enemy, dt) {
-  const living = squad.filter((u) => u.hp > 0);
+  const living = squad.filter((u) => u.hp > 0 && (u.stealthTime || 0) <= 0);
   if (!living.length) return;
   enemy.cooldown = Math.max(0, enemy.cooldown - dt);
   enemy.attackPulse = Math.max(0, (enemy.attackPulse || 0) - dt);
@@ -1302,6 +1448,7 @@ function update(dt) {
   if (!running || paused) return;
   squad.forEach((u) => stepUnit(u, dt));
   enemies.forEach((e) => stepEnemy(e, dt));
+  updateGravityFields(dt);
   resolveBodyOverlaps();
 
   shots.forEach((shot) => {
@@ -1319,6 +1466,10 @@ function update(dt) {
     s.life -= dt;
   });
   sparks = sparks.filter((s) => s.life > 0);
+  skillEffects.forEach((effect) => {
+    effect.life -= dt;
+  });
+  skillEffects = skillEffects.filter((effect) => effect.life > 0);
   enemies = enemies.filter((e) => e.hp > 0);
 
   if (!enemies.length && now() > nextWaveAt) {
@@ -1361,7 +1512,7 @@ function showReward() {
   rewardChoices = pickRewards();
   rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
     <button class="reward-card" data-reward-index="${index}">
-      <img src="${reward.icon}?v=12" alt="${reward.name} icon" />
+      <img src="${reward.icon}?v=15" alt="${reward.name} icon" />
       <div class="reward-copy">
         <div class="reward-type">${reward.type}</div>
         <h3>${reward.name}</h3>
@@ -1375,7 +1526,23 @@ function showReward() {
 
 function pickRewards() {
   const activeNames = new Set(squad.map((unit) => unit.name));
-  const pool = upgradePool.filter((reward) => !reward.unit || activeNames.has(reward.unit));
+  const generalRewards = upgradePool.filter((reward) => !reward.unit);
+  const groupedByUnit = new Map();
+  upgradePool
+    .filter((reward) => reward.unit && activeNames.has(reward.unit))
+    .forEach((reward) => {
+      if (!groupedByUnit.has(reward.unit)) groupedByUnit.set(reward.unit, []);
+      groupedByUnit.get(reward.unit).push(reward);
+    });
+
+  const unitCandidates = [...activeNames]
+    .map((name) => {
+      const rewards = groupedByUnit.get(name) || [];
+      return rewards.length ? rewards[Math.floor(Math.random() * rewards.length)] : null;
+    })
+    .filter(Boolean);
+
+  const pool = [...generalRewards, ...unitCandidates];
   const picks = [];
   while (picks.length < 3 && pool.length) {
     const index = Math.floor(Math.random() * pool.length);
@@ -1434,7 +1601,7 @@ function renderHudCardsShell() {
   hudCardsSignature = signature;
   cardsEl.innerHTML = squad.map((u) => `
     <article class="unit-card" data-unit-id="${u.id}">
-      <img src="${u.sprite || u.art}?v=31" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
+      <img src="${u.sprite || u.art}?v=32" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
       <div class="unit-info">
         <h3>${u.name}</h3>
         <div class="role">${u.role}</div>
@@ -1480,13 +1647,13 @@ function renderSkillBarShell() {
     return `
       <div class="skill-pair" data-unit-id="${unit.id}">
         <button class="skill-button active" data-unit-id="${unit.id}" data-skill-kind="active" title="${unit.name}: ${unit.skill} - ${unit.activeDesc}">
-          <img src="${unit.activeIcon}?v=31" alt="${unit.skill}" draggable="false" decoding="async" loading="eager" />
+          <img src="${unit.activeIcon}?v=32" alt="${unit.skill}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.skill}</span>
           <small data-skill-status>${unit.name}</small>
           <em>${unit.activeDesc}</em>
         </button>
         <button class="skill-button ultimate" data-unit-id="${unit.id}" data-skill-kind="ultimate" title="${unit.name}: ${unit.ultimate} - ${unit.ultimateDesc}">
-          <img src="${unit.ultimateIcon}?v=31" alt="${unit.ultimate}" draggable="false" decoding="async" loading="eager" />
+          <img src="${unit.ultimateIcon}?v=32" alt="${unit.ultimate}" draggable="false" decoding="async" loading="eager" />
           <span>${unit.ultimate}</span>
           <small data-ultimate-charge>0%</small>
           <em>${unit.ultimateDesc}</em>
@@ -1536,7 +1703,7 @@ function renderIntel(unit) {
   intelEl.innerHTML = `
     <p class="kicker">戰術情報</p>
     <div class="intel-layout">
-      <img src="${unit.art || unit.sprite}?v=31" alt="${unit.name} profile" />
+      <img src="${unit.art || unit.sprite}?v=32" alt="${unit.name} profile" />
       <div>
         <h3>${unit.name}</h3>
         <div class="role">${labelFaction(unit.faction)} / ${unit.role}</div>
@@ -1568,7 +1735,7 @@ function renderFormation() {
     return `
       <article class="formation-slot" data-unit-name="${unit.name}">
         <span>${index + 1}</span>
-        <img src="${unit.sprite || unit.art}?v=31" alt="${unit.name} SD sprite" />
+        <img src="${unit.sprite || unit.art}?v=32" alt="${unit.name} SD sprite" />
         <div>
           <strong>${unit.name}</strong>
           <small>${unit.role}</small>
@@ -1582,7 +1749,7 @@ function renderFormation() {
     const focusedClass = unit.name === focused.name ? "focused" : "";
     return `
       <article class="formation-card ${selectedForBattle ? "selected" : ""} ${focusedClass}" data-unit-name="${unit.name}">
-        <img src="${unit.sprite || unit.art}?v=31" alt="${unit.name} SD sprite" />
+        <img src="${unit.sprite || unit.art}?v=32" alt="${unit.name} SD sprite" />
         <div class="formation-card-copy">
           <div class="formation-card-title">
             <h3>${unit.name}</h3>
@@ -1648,7 +1815,7 @@ function startBattleFromFormation() {
 function renderDatabase() {
   const renderRows = (entries, className) => entries.map((unit) => `
     <article class="db-row ${className}">
-      <img src="${unit.art || unit.sprite}?v=31" alt="${unit.name} design" />
+      <img src="${unit.art || unit.sprite}?v=32" alt="${unit.name} design" />
       <div>
         <h3>${unit.name}</h3>
         <p>${labelFaction(unit.faction)} / ${unit.role}</p>
@@ -1772,22 +1939,81 @@ function drawSheetSprite(unit, width, height, yOffset = 0) {
   return true;
 }
 
+function tracePolygon(cx, cy, radius, sides, rotation = -Math.PI / 2) {
+  ctx.beginPath();
+  for (let i = 0; i < sides; i++) {
+    const angle = rotation + (i / sides) * Math.PI * 2;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function drawShieldBubble(cx, cy, radius) {
+  const pulse = Math.sin(now() * 8) * 2.5;
+  ctx.save();
+  ctx.shadowColor = "#4be4ff";
+  ctx.shadowBlur = 14;
+  ctx.strokeStyle = "rgba(220,255,255,0.78)";
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + pulse, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.16;
+  const gradient = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.32, radius * 0.2, cx, cy, radius);
+  gradient.addColorStop(0, "rgba(255,255,255,0.5)");
+  gradient.addColorStop(0.42, "rgba(75,228,255,0.2)");
+  gradient.addColorStop(1, "rgba(75,228,255,0.02)");
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalAlpha = 0.62;
+  ctx.strokeStyle = "rgba(75,228,255,0.78)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.78 + pulse * 0.4, -0.28 * Math.PI, 0.18 * Math.PI);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.78 + pulse * 0.4, 0.72 * Math.PI, 1.18 * Math.PI);
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.48;
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 4; i++) {
+    const angle = -Math.PI / 2 + (i / 4) * Math.PI * 2 + pulse * 0.01;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * (radius * 0.64), cy + Math.sin(angle) * (radius * 0.64));
+    ctx.lineTo(cx + Math.cos(angle) * (radius + 6), cy + Math.sin(angle) * (radius + 6));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawMech(unit) {
   const alive = unit.hp > 0;
   const offset = attackOffset(unit);
   ctx.save();
   ctx.translate(unit.x + offset.x, unit.y + offset.y);
-  ctx.globalAlpha = alive ? 1 : 0.18;
+  ctx.globalAlpha = alive ? (unit.stealthTime > 0 ? 0.34 : 1) : 0.18;
   const bob = Math.sin(now() * 3 + unit.x * 0.02) * 3;
   if (drawSheetSprite(unit, 108, 108, bob - 4)) {
     ctx.restore();
     if (!alive) return;
-    if (unit.shield > 0) {
-      ctx.strokeStyle = "rgba(75,228,255,0.55)";
-      ctx.lineWidth = 4;
+    if (unit.regenGlow > 0) {
+      ctx.strokeStyle = "rgba(124,255,196,0.48)";
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(unit.x, unit.y - 8, 50, 0, Math.PI * 2);
+      ctx.arc(unit.x, unit.y - 6, 44 + unit.regenGlow * 18, 0, Math.PI * 2);
       ctx.stroke();
+    }
+    if (unit.shield > 0) {
+      drawShieldBubble(unit.x, unit.y - 8, 50);
     }
     drawBar(unit.x - 34, unit.y + 44, 68, unit.hp / unit.maxHp, "#62e6a7");
     return;
@@ -1814,13 +2040,17 @@ function drawMech(unit) {
   ctx.lineTo(46, 18);
   ctx.stroke();
   if (unit.shield > 0) {
-    ctx.strokeStyle = "rgba(75,228,255,0.55)";
-    ctx.beginPath();
-    ctx.arc(0, 0, 44, 0, Math.PI * 2);
-    ctx.stroke();
+    drawShieldBubble(0, 0, 44);
   }
   ctx.restore();
   if (!alive) return;
+  if (unit.regenGlow > 0) {
+    ctx.strokeStyle = "rgba(124,255,196,0.48)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(unit.x, unit.y - 6, 44 + unit.regenGlow * 18, 0, Math.PI * 2);
+    ctx.stroke();
+  }
   drawBar(unit.x - 34, unit.y + 42, 68, unit.hp / unit.maxHp, "#62e6a7");
 }
 
@@ -1947,11 +2177,351 @@ function drawPointer() {
   ctx.setLineDash([]);
 }
 
+function effectPosition(effect) {
+  const actor = effect.follow ? [...squad, ...enemies].find((item) => item.id === effect.sourceId && item.hp > 0) : null;
+  return actor ? { x: actor.x, y: actor.y } : { x: effect.x, y: effect.y };
+}
+
+function drawPlusMark(x, y, size, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(2, size * 0.18);
+  ctx.beginPath();
+  ctx.moveTo(x - size, y);
+  ctx.lineTo(x + size, y);
+  ctx.moveTo(x, y - size);
+  ctx.lineTo(x, y + size);
+  ctx.stroke();
+}
+
+function drawSkillEffects() {
+  skillEffects.forEach((effect) => {
+    const point = effectPosition(effect);
+    const alpha = clamp(effect.life / effect.maxLife, 0, 1);
+    const age = 1 - alpha;
+    const radius = effect.radius;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = effect.color;
+    ctx.shadowBlur = 18;
+
+    if (effect.type === "guardian") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(75,228,255,0.16)";
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 4; i++) {
+        ctx.save();
+        ctx.translate(point.x, point.y - 8);
+        ctx.rotate(effect.rotation + i * Math.PI / 2 + age * 0.5);
+        ctx.fillRect(radius * 0.28, -18, 48, 36);
+        ctx.strokeRect(radius * 0.28, -18, 48, 36);
+        ctx.restore();
+      }
+      for (let i = 0; i < 5; i++) drawPlusMark(point.x - 36 + i * 18, point.y - 64 + Math.sin(now() * 5 + i) * 5, 5, "#7cffc4");
+    } else if (effect.type === "slash" || effect.type === "blade-storm") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = effect.type === "blade-storm" ? 7 : 5;
+      for (let i = 0; i < (effect.type === "blade-storm" ? 6 : 3); i++) {
+        const angle = effect.rotation + i * 0.72 + age * 2.4;
+        const px = Math.cos(angle);
+        const py = Math.sin(angle);
+        ctx.beginPath();
+        ctx.moveTo(point.x - px * radius * 0.18 - py * 24, point.y - py * radius * 0.18 + px * 24);
+        ctx.lineTo(point.x + px * radius * (0.72 + age * 0.2), point.y + py * radius * (0.72 + age * 0.2));
+        ctx.stroke();
+      }
+    } else if (effect.type === "repair-shield" || effect.type === "revive") {
+      const marks = effect.type === "revive" ? 14 : 9;
+      for (let i = 0; i < marks; i++) {
+        const angle = i * 2.399 + effect.rotation;
+        const spread = (radius * 0.18) + (i / marks) * radius * 0.65;
+        drawPlusMark(point.x + Math.cos(angle) * spread, point.y + Math.sin(angle) * spread - age * 22, 6, effect.color);
+      }
+      if (effect.type === "revive") {
+        ctx.strokeStyle = "rgba(220,255,235,0.9)";
+        ctx.lineWidth = 5;
+        squad.filter((unit) => unit.hp > 0).forEach((unit) => {
+          ctx.beginPath();
+          ctx.moveTo(unit.x, unit.y - 92);
+          ctx.lineTo(unit.x, unit.y + 42);
+          ctx.stroke();
+        });
+      }
+    } else if (effect.type === "volley" || effect.type === "orbital") {
+      const rays = effect.type === "orbital" ? 12 : 7;
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = effect.type === "orbital" ? 4 : 3;
+      for (let i = 0; i < rays; i++) {
+        const angle = -0.95 + (i / Math.max(1, rays - 1)) * 1.9;
+        ctx.beginPath();
+        ctx.moveTo(point.x + 18, point.y - 10);
+        ctx.lineTo(point.x + Math.cos(angle) * radius * (1 + age * 0.4), point.y + Math.sin(angle) * radius * (1 + age * 0.4));
+        ctx.stroke();
+      }
+    } else if (effect.type === "taunt") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      tracePolygon(point.x, point.y - 8, 52 + age * 34, 4, Math.PI / 4);
+      ctx.stroke();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      tracePolygon(point.x, point.y - 8, 32 + age * 18, 4, Math.PI / 4);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(139,215,255,0.22)";
+      ctx.fillRect(point.x - 9, point.y - 86, 18, 44);
+    } else if (effect.type === "rail") {
+      const tx = effect.tx ?? point.x + 220;
+      const ty = effect.ty ?? point.y;
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y - 10);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "rgba(230,248,255,0.92)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(tx - 22 - age * 16, ty - 22 - age * 16, 44 + age * 32, 44 + age * 32);
+    } else if (effect.type === "dash") {
+      ctx.fillStyle = effect.color;
+      for (let i = 0; i < 5; i++) {
+        const back = 34 + i * 28 + age * 42;
+        ctx.globalAlpha = alpha * (0.78 - i * 0.1);
+        ctx.beginPath();
+        ctx.moveTo(point.x - back, point.y - 28);
+        ctx.lineTo(point.x - back - 42, point.y);
+        ctx.lineTo(point.x - back, point.y + 28);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if (effect.type === "regen-rain") {
+      ctx.strokeStyle = "rgba(124,255,196,0.92)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([22, 14]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.96 + age * 0.08), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = alpha * 0.14;
+      ctx.fillStyle = "#7cffc4";
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = alpha;
+      for (let i = 0; i < 16; i++) {
+        const angle = i * 2.1 + effect.rotation;
+        const spread = (i % 4) * radius * 0.18 + radius * 0.22;
+        drawPlusMark(point.x + Math.cos(angle) * spread, point.y + Math.sin(angle) * spread + age * 26, 5, effect.color);
+      }
+    } else if (effect.type === "impact-grid" || effect.type === "artillery") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      const size = radius * (0.48 + age * 0.28);
+      ctx.strokeRect(point.x - size / 2, point.y - size / 2, size, size);
+      ctx.beginPath();
+      ctx.moveTo(point.x - size * 0.68, point.y);
+      ctx.lineTo(point.x + size * 0.68, point.y);
+      ctx.moveTo(point.x, point.y - size * 0.68);
+      ctx.lineTo(point.x, point.y + size * 0.68);
+      ctx.stroke();
+      if (effect.type === "artillery") {
+        for (let i = 0; i < 4; i++) ctx.strokeRect(point.x - size * (0.25 + i * 0.18), point.y - size * (0.25 + i * 0.18), size * (0.5 + i * 0.36), size * (0.5 + i * 0.36));
+      }
+    } else if (effect.type === "jam" || effect.type === "cloak") {
+      ctx.fillStyle = effect.color;
+      for (let i = 0; i < 12; i++) {
+        const angle = i * 1.73 + effect.rotation;
+        const spread = radius * (0.18 + (i % 5) * 0.12);
+        const w = 14 + (i % 3) * 10;
+        const h = 4 + (i % 4) * 3;
+        ctx.globalAlpha = alpha * (effect.type === "cloak" ? 0.34 : 0.58);
+        ctx.fillRect(point.x + Math.cos(angle) * spread, point.y + Math.sin(angle) * spread, w, h);
+      }
+    } else if (effect.type === "gn-cast") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      for (let i = 0; i < 6; i++) {
+        const angle = effect.rotation + i * Math.PI / 3;
+        ctx.save();
+        ctx.translate(point.x + Math.cos(angle) * radius * 0.42, point.y + Math.sin(angle) * radius * 0.42);
+        ctx.rotate(angle + Math.PI / 6);
+        tracePolygon(0, 0, 28 + age * 12, 6);
+        ctx.stroke();
+        ctx.restore();
+      }
+    } else if (effect.type === "gravity-cast") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        for (let j = 0; j < 36; j++) {
+          const t = j / 35;
+          const angle = effect.rotation + i * 2.1 + t * 5.4 + age * 2.8;
+          const r = 18 + t * radius * 0.45;
+          const x = point.x + Math.cos(angle) * r;
+          const y = point.y + Math.sin(angle) * r;
+          if (j === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  });
+}
+
+function drawSupportAuras() {
+  gravityFields.forEach((field) => {
+    const alpha = clamp(field.life / field.maxLife, 0, 1);
+    ctx.save();
+    ctx.globalAlpha = 0.18 + alpha * 0.26;
+    ctx.shadowColor = field.color;
+    ctx.shadowBlur = 28;
+    ctx.globalAlpha = 0.08 + alpha * 0.12;
+    ctx.fillStyle = field.color;
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      for (let j = 0; j < 44; j++) {
+        const t = j / 43;
+        const angle = i * 1.257 + t * 6.2 + now() * 1.9;
+        const r = 14 + t * field.radius;
+        const x = field.x + Math.cos(angle) * r;
+        const y = field.y + Math.sin(angle) * r;
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(field.x, field.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 0.55 + alpha * 0.25;
+    ctx.strokeStyle = "rgba(220,255,255,0.86)";
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      for (let j = 0; j < 38; j++) {
+        const t = j / 37;
+        const angle = field.life * 2.4 + i * 2.1 + t * 5.6;
+        const r = 18 + t * field.radius * 0.62;
+        const x = field.x + Math.cos(angle) * r;
+        const y = field.y + Math.sin(angle) * r;
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+
+  squad.forEach((unit) => {
+    if (unit.hp <= 0) return;
+    if (unit.name === "Asterion" && unit.guardianRegenTime > 0) {
+      const alpha = clamp(unit.guardianRegenTime / (unit.guardianRegenDuration || 5), 0.24, 0.68);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "rgba(124,255,196,0.82)";
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 4; i++) {
+        ctx.save();
+        ctx.translate(unit.x, unit.y - 8);
+        ctx.rotate(i * Math.PI / 2 + now() * 0.8);
+        ctx.strokeRect(48, -12, 26, 24);
+        ctx.restore();
+      }
+      for (let i = 0; i < 4; i++) drawPlusMark(unit.x - 27 + i * 18, unit.y - 70 + Math.sin(now() * 4 + i) * 4, 4, "#7cffc4");
+      ctx.restore();
+    }
+
+    if (unit.name === "Valkyr" && unit.gnFieldTime > 0) {
+      const radius = unit.gnFieldRadius || 170;
+      const alpha = clamp(unit.gnFieldTime / (unit.gnFieldDuration || 5.5), 0.24, 0.74);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = "#8bd7ff";
+      ctx.shadowBlur = 24;
+      ctx.strokeStyle = "rgba(139,215,255,0.9)";
+      ctx.lineWidth = 5;
+      tracePolygon(unit.x, unit.y, radius + Math.sin(now() * 10) * 6, 6);
+      ctx.stroke();
+      ctx.globalAlpha = alpha * 0.16;
+      ctx.fillStyle = "#8bd7ff";
+      tracePolygon(unit.x, unit.y, radius, 6);
+      ctx.fill();
+      ctx.globalAlpha = alpha * 0.82;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 6; i++) {
+        const angle = -Math.PI / 2 + i * Math.PI / 3;
+        ctx.beginPath();
+        ctx.moveTo(unit.x + Math.cos(angle) * 56, unit.y + Math.sin(angle) * 56);
+        ctx.lineTo(unit.x + Math.cos(angle) * radius, unit.y + Math.sin(angle) * radius);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    if (unit.name === "Helix" && unit.regenAuraTime > 0) {
+      const radius = unit.regenRadius || 260;
+      const alpha = clamp(unit.regenAuraTime / (unit.regenDuration || 6), 0.22, 0.72);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = "#7cffc4";
+      ctx.shadowBlur = 16;
+      ctx.strokeStyle = "rgba(124,255,196,0.9)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([26, 14]);
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = alpha * 0.18;
+      ctx.fillStyle = "#7cffc4";
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = alpha * 0.74;
+      ctx.strokeStyle = "rgba(220,255,235,0.62)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius * 0.64 + Math.sin(now() * 3.4) * 7, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const angle = i * 2.1 + now() * 0.35;
+        const spread = radius * (0.2 + (i % 5) * 0.13);
+        drawPlusMark(unit.x + Math.cos(angle) * spread, unit.y + Math.sin(angle) * spread, 5 + (i % 3), "#7cffc4");
+      }
+      ctx.globalAlpha = alpha * 0.1;
+      ctx.fillStyle = "#7cffc4";
+      for (let i = 0; i < 5; i++) {
+        const y = unit.y - radius * 0.45 + i * radius * 0.22 + Math.sin(now() * 2 + i) * 7;
+        ctx.fillRect(unit.x - radius * 0.58, y, radius * 1.16, 8);
+      }
+      ctx.restore();
+    }
+
+    if (unit.stealthTime > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.48 + Math.sin(now() * 10) * 0.12;
+      ctx.strokeStyle = "rgba(124,255,196,0.9)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 7; i++) {
+        const x = unit.x - 48 + i * 16 + Math.sin(now() * 6 + i) * 5;
+        ctx.beginPath();
+        ctx.moveTo(x, unit.y - 62);
+        ctx.lineTo(x + Math.sin(now() * 4 + i) * 8, unit.y + 42);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  });
+}
+
 function render() {
   drawBackground();
+  drawSupportAuras();
   enemies.forEach(drawEnemy);
   squad.filter((unit) => unit.hp <= 0).forEach(drawMech);
   squad.filter((unit) => unit.hp > 0).forEach(drawMech);
+  drawSkillEffects();
   drawShots();
   drawSparks();
   drawPointer();
