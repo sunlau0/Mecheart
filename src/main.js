@@ -47,8 +47,8 @@ const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 35;
-const REWARD_ICON_VERSION = 18;
-const SKILL_ICON_VERSION = 35;
+const REWARD_ICON_VERSION = 21;
+const SKILL_ICON_VERSION = 37;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
@@ -96,10 +96,10 @@ const squadSeeds = [
   { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
   { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
-  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "熱能刃 / 短距離爆發推進器", trait: "速度最快，可快速切入敵群，但耐久中等。", tactic: "用來追擊後排或清理密集小兵，避免單獨承受 Boss 火力。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "熱刃旋風", activeDesc: "對附近敵人造成範圍斬擊。", ultimate: "突擊超載", ultimateDesc: "短時間高速突入，重創周圍多名敵軍。", activeIcon: "assets/upgrade-seed-rush.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
+  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-equipment-v4.webp", ultimateIcon: "assets/skill-nova-phase-equipment-v4.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
-  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 1.18, speed: 104, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
-  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "????", activeDesc: "????????????????????", ultimate: "?????", ultimateDesc: "???????????????????????", activeIcon: "assets/upgrade-dragoon-pods.webp", ultimateIcon: "assets/skill-orion-active.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
+  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 2.36, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
+  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-equipment-v4.webp", ultimateIcon: "assets/skill-mirage-domain-equipment-v4.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -345,10 +345,10 @@ const upgradePool = [
   {
     id: "nova-assault-wing",
     unit: "Nova",
-    type: "Nova 機動",
-    name: "突擊推進翼",
-    icon: "assets/upgrade-nova-assault-wing.webp",
-    text: "Nova 傷害 +8、射程 +30、速度 +24，範圍斬擊更大。",
+    type: "Nova 量子",
+    name: "量子相位核心",
+    icon: "assets/upgrade-nova-quantum-equipment-v4.webp",
+    text: "Nova 傷害 +8、射程 +30、速度 +24、量子背刺範圍更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Nova");
       if (!u) return;
@@ -415,7 +415,7 @@ const upgradePool = [
     unit: "Mirage",
     type: "Mirage 干擾",
     name: "幻象干擾核心",
-    icon: "assets/upgrade-mirage-phantom-core.webp",
+    icon: "assets/upgrade-mirage-core-equipment-v4.webp",
     text: "Mirage 傷害 +8、射程 +25，干擾持續時間和範圍提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Mirage");
@@ -909,10 +909,25 @@ function activateSkill(unit) {
       setMessage("穿甲狙擊");
     }
   } else if (unit.name === "Nova") {
-    enemies.filter((e) => e.hp > 0 && dist(unit, e) < (unit.rushRadius || 205)).forEach((e) => hit(e, unit.rushDamage || 58, "#ff9b38", unit.id));
-    unit.speedBoost = 4;
-    burst(unit.x, unit.y, "#ff9b38", 46);
-    addSkillEffect("dash", unit, { radius: unit.rushRadius || 205, color: "#ff9b38", life: 0.8 });
+    const target = enemies
+      .filter((e) => e.hp > 0)
+      .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : dist(unit, a) - dist(unit, b)))[0];
+    if (target) {
+      const radius = unit.rushRadius || 210;
+      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, ALLIED_MAX_X);
+      const offsetY = target.y > H * 0.5 ? -28 : 28;
+      const from = { x: unit.x, y: unit.y };
+      unit.x = behindX;
+      unit.y = clamp(target.y + offsetY, ALLIED_MIN_Y, ALLIED_MAX_Y);
+      unit.target = target.id;
+      enemies
+        .filter((e) => e.hp > 0 && dist(unit, e) < radius)
+        .forEach((e) => hit(e, unit.rushDamage || 72, "#ff9b38", unit.id));
+      burst(unit.x, unit.y, "#ff9b38", 56);
+      addSkillEffect("quantum-backstab", unit, { x: unit.x, y: unit.y, fromX: from.x, fromY: from.y, radius, color: "#ff9b38", life: 0.9, follow: false });
+      setMessage("量子背刺");
+      return;
+    }
     setMessage("熱刃旋風");
   } else if (unit.name === "Helix") {
     unit.regenAuraTime = unit.regenDuration || 6;
@@ -929,8 +944,8 @@ function activateSkill(unit) {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
       const radius = unit.splashRadius || 92;
-      hit(target, 70 + unit.damage + (unit.bastionBonus || 0), "#f6c34f", unit.id);
-      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 32 + Math.floor(unit.damage * 0.45), "#f6c34f", unit.id));
+      hit(target, (70 + unit.damage + (unit.bastionBonus || 0)) * 2, "#f6c34f", unit.id);
+      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, (32 + Math.floor(unit.damage * 0.45)) * 2, "#f6c34f", unit.id));
       burst(target.x, target.y, "#f6c34f", 56);
       addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius: 120, color: "#f6c34f", life: 0.8 });
     }
@@ -942,7 +957,7 @@ function activateSkill(unit) {
     applyMirageAura(unit, 0.18);
     burst(unit.x, unit.y, "#c37bff", 52);
     addSkillEffect("jam-aura", unit, { radius, color: "#c37bff", life: duration });
-    setMessage("??????");
+    setMessage("持續干擾");
   }
 }
 
@@ -1039,15 +1054,13 @@ function useUltimate(unit) {
   }
 
   if (unit.name === "Nova") {
-    const targets = enemies
-      .filter((e) => e.hp > 0)
-      .sort((a, b) => dist(unit, a) - dist(unit, b))
-      .slice(0, 8);
-    targets.forEach((e) => hit(e, 92 + Math.floor(unit.damage * 0.5), "#ff9b38", unit.id));
-    unit.speedBoost = 5;
+    const duration = unit.quantumDuration || 6;
+    unit.quantumTime = Math.max(unit.quantumTime || 0, duration);
+    unit.speedBoost = 0;
+    unit.shield = Math.max(unit.shield || 0, 2.5);
     burst(unit.x, unit.y, "#ff9b38", 88);
-    addSkillEffect("dash", unit, { radius: unit.rushRadius || 230, color: "#ff9b38", life: 1.0 });
-    setMessage("突擊超載");
+    addSkillEffect("quantum-phase", unit, { radius: 150, color: "#ff9b38", life: duration, follow: true });
+    setMessage("量子化");
     return;
   }
 
@@ -1082,7 +1095,7 @@ function useUltimate(unit) {
       .sort((a, b) => b.hp - a.hp)
       .slice(0, 8)
       .forEach((e) => {
-        hit(e, 90 + unit.damage + (unit.bastionBonus || 0), "#f6c34f", unit.id);
+        hit(e, (90 + unit.damage + (unit.bastionBonus || 0)) * 2, "#f6c34f", unit.id);
         burst(e.x, e.y, "#f6c34f", 24);
       });
     burst(unit.x, unit.y, "#f6c34f", 82);
@@ -1092,8 +1105,8 @@ function useUltimate(unit) {
   }
 
   if (unit.name === "Mirage") {
-    const duration = (unit.jamDuration || 4.5) + 3.5;
-    const radius = unit.mirageDomainRadius || 420;
+    const duration = unit.mirageDomainDuration || 4;
+    const radius = unit.mirageDomainRadius || 294;
     skillEffects.push({
       type: "mirage-domain",
       x: unit.x,
@@ -1103,7 +1116,7 @@ function useUltimate(unit) {
       life: duration,
       maxLife: duration,
       source: unit.id,
-      damagePerSecond: unit.mirageDomainDamage || 18 + unit.damage * 0.55,
+      damagePerSecond: unit.mirageDomainDamage || (18 + unit.damage * 0.55) * 0.5,
       rotation: Math.random() * Math.PI * 2,
       follow: false,
       tick: 0
@@ -1114,7 +1127,7 @@ function useUltimate(unit) {
       e.fireControlTime = Math.max(e.fireControlTime || 0, duration);
     });
     burst(unit.x, unit.y, "#c37bff", 84);
-    setMessage("???????");
+    setMessage("海市蜃樓域");
     return;
   }
 
@@ -1149,6 +1162,20 @@ function chargeUltimate(sourceId, amount) {
 function chargeUltimateByHealing(unit, amount) {
   if (!unit || unit.hp <= 0 || amount <= 0) return;
   chargeUltimate(unit.id, Math.max(1, amount * 0.42));
+}
+
+function attackMultiplier(unit) {
+  return unit?.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
+}
+
+function performNovaQuantumSlash(unit) {
+  const radius = unit.quantumSlashRadius || 132;
+  const damage = unit.damage * attackMultiplier(unit);
+  enemies
+    .filter((enemy) => enemy.hp > 0 && dist(enemy, unit) < radius)
+    .forEach((enemy) => hit(enemy, damage, "#ff9b38", unit.id));
+  burst(unit.x, unit.y, "#ff9b38", 18);
+  addSkillEffect("quantum-slash", unit, { radius, color: "#ff9b38", life: 0.46, follow: true });
 }
 
 function applyHelixRegen(unit, dt) {
@@ -1296,12 +1323,14 @@ function stepUnit(unit, dt) {
   unit.guardianRegenTime = Math.max(0, (unit.guardianRegenTime || 0) - dt);
   unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
   unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
+  unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
   if (unit.name === "Asterion" && unit.guardianRegenTime > 0) applyGuardianRegen(unit, dt);
   if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
   if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
   if (unit.name === "Mirage" && unit.mirageAuraTime > 0) applyMirageAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
-  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1);
+  const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
+  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost;
 
   let target = syncAssistTarget(unit) || (unit.damage < 0
     ? squad.find((u) => u.id === unit.target && u.hp > 0)
@@ -1360,7 +1389,11 @@ function stepUnit(unit, dt) {
       unit.cooldown = unit.rate;
       unit.attackPulse = 0.22;
       unit.aim = { x: target.x, y: target.y };
-      shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
+      if (unit.name === "Nova" && unit.quantumTime > 0) {
+        performNovaQuantumSlash(unit);
+      } else {
+        shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
+      }
     }
     return;
   }
@@ -1431,6 +1464,7 @@ function resolveBodyOverlaps() {
       for (let j = i + 1; j < bodies.length; j++) {
         const a = bodies[i];
         const b = bodies[j];
+        if ((a.name === "Nova" && a.quantumTime > 0) || (b.name === "Nova" && b.quantumTime > 0)) continue;
         let dx = b.x - a.x;
         let dy = b.y - a.y;
         let d = Math.hypot(dx, dy);
@@ -2071,7 +2105,7 @@ function drawMech(unit) {
   const offset = attackOffset(unit);
   ctx.save();
   ctx.translate(unit.x + offset.x, unit.y + offset.y);
-  ctx.globalAlpha = alive ? (unit.stealthTime > 0 ? 0.34 : 1) : 0.18;
+  ctx.globalAlpha = alive ? (unit.stealthTime > 0 ? 0.34 : (unit.name === "Nova" && unit.quantumTime > 0 ? 0.62 + Math.sin(now() * 16) * 0.16 : 1)) : 0.18;
   const bob = Math.sin(now() * 3 + unit.x * 0.02) * 3;
   if (drawSheetSprite(unit, 108, 108, bob - 4)) {
     ctx.restore();
@@ -2352,6 +2386,73 @@ function drawSkillEffects() {
       ctx.strokeStyle = "rgba(230,248,255,0.92)";
       ctx.lineWidth = 2;
       ctx.strokeRect(tx - 22 - age * 16, ty - 22 - age * 16, 44 + age * 32, 44 + age * 32);
+    } else if (effect.type === "quantum-slash") {
+      const pulse = 0.8 + Math.sin(now() * 18 + effect.rotation) * 0.14;
+      ctx.globalAlpha = alpha * pulse;
+      ctx.strokeStyle = "#fff1be";
+      ctx.lineWidth = 7;
+      for (let i = 0; i < 3; i++) {
+        const start = effect.rotation + i * 2.1 - 0.75;
+        const end = start + 1.55;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, radius * (0.38 + i * 0.16 + age * 0.16), start, end);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.82 + age * 0.08), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else if (effect.type === "quantum-backstab") {
+      const fromX = effect.fromX ?? point.x;
+      const fromY = effect.fromY ?? point.y;
+      const flicker = 0.72 + Math.sin(now() * 28) * 0.2;
+      ctx.globalAlpha = alpha * flicker;
+      ctx.strokeStyle = "#ffe6a3";
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.32 + age * 0.2), -0.9, Math.PI + 0.9);
+      ctx.stroke();
+      for (let i = 0; i < 5; i++) {
+        const angle = effect.rotation + i * 1.26;
+        ctx.beginPath();
+        ctx.moveTo(point.x + Math.cos(angle) * 24, point.y + Math.sin(angle) * 24);
+        ctx.lineTo(point.x + Math.cos(angle + 0.22) * radius * 0.72, point.y + Math.sin(angle + 0.22) * radius * 0.72);
+        ctx.stroke();
+      }
+    } else if (effect.type === "quantum-phase") {
+      const pulse = 0.68 + Math.sin(now() * 8.5) * 0.18;
+      ctx.globalAlpha = pulse * 0.65;
+      ctx.strokeStyle = "#ffcf5f";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 12]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.7 + Math.sin(now() * 4) * 0.04), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = pulse * 0.16;
+      ctx.fillStyle = "#ff9b38";
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * 0.74, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = "#fff1be";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 6; i++) {
+        const y = point.y - radius * 0.45 + i * radius * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(point.x - radius * 0.48, y);
+        ctx.lineTo(point.x + radius * 0.48, y + Math.sin(now() * 5 + i) * 8);
+        ctx.stroke();
+      }
     } else if (effect.type === "dash") {
       ctx.strokeStyle = effect.color;
       ctx.lineWidth = 5;
