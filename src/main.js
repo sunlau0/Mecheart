@@ -49,6 +49,7 @@ const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 35;
 const REWARD_ICON_VERSION = 23;
 const SKILL_ICON_VERSION = 39;
+const IMAGE_LOAD_TIMEOUT_MS = 8000;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
@@ -2785,9 +2786,17 @@ function loadImageAsset(path) {
   }
 
   const promise = new Promise((resolve) => {
+    let settled = false;
     const finish = async () => {
+      if (settled) return;
+      settled = true;
       try {
-        if (img.decode) await img.decode();
+        if (img.decode) {
+          await Promise.race([
+            img.decode(),
+            new Promise((decodeResolve) => setTimeout(decodeResolve, 1200))
+          ]);
+        }
       } catch {
         // Decoding failure should not trap the player on the loading overlay.
       }
@@ -2797,6 +2806,7 @@ function loadImageAsset(path) {
     img.onerror = finish;
     img.src = src;
     if (img.complete) finish();
+    setTimeout(finish, IMAGE_LOAD_TIMEOUT_MS);
   });
   artLoadPromises.set(path, promise);
   return promise;
@@ -2849,14 +2859,21 @@ function warmGameArt() {
 function hydrateDeferredImages(root = document) {
   const images = [...root.querySelectorAll("img[data-src]")];
   return Promise.all(images.map((img) => new Promise((resolve) => {
-    if (img.getAttribute("src") && img.complete) {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
       resolve(img);
+    };
+    if (img.getAttribute("src") && img.complete) {
+      finish();
       return;
     }
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(img);
+    img.onload = finish;
+    img.onerror = finish;
     img.src = img.dataset.src;
-    if (img.complete) resolve(img);
+    if (img.complete) finish();
+    setTimeout(finish, IMAGE_LOAD_TIMEOUT_MS);
   })));
 }
 
