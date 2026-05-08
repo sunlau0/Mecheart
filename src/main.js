@@ -94,12 +94,12 @@ const squadSeeds = [
   { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp" },
   { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/caliburn-profile.webp", sprite: "assets/sd-caliburn.webp" },
   { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp" },
-  { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
+  { name: "Orion", faction: "Allied", role: "龍騎兵清場炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。單發較低但攻速快，擅長掃走大量低血敵機。", tactic: "放在安全側翼清小怪。主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
   { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
-  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 2.36, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
+  { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 265, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
 ];
 
@@ -299,11 +299,12 @@ const upgradePool = [
     type: "Orion 武器",
     name: "龍騎兵炮莢擴充",
     icon: "assets/upgrade-dragoon-pods.webp",
-    text: "Orion 傷害 +9、射程 +35，主動技發射更多炮莢。",
+    text: "Orion 攻速更快、射程 +35，主動技發射更多清場炮莢。",
     apply() {
       const u = squad.find((unit) => unit.name === "Orion");
       if (!u) return;
-      u.damage += 9;
+      u.damage += 5;
+      u.rate = Math.max(0.78, u.rate - 0.08);
       u.range += 35;
       u.volleyCount = (u.volleyCount || 7) + 3;
       u.volleyDamage = (u.volleyDamage || 34) + 8;
@@ -401,11 +402,11 @@ const upgradePool = [
     type: "Bastion 重炮",
     name: "重炮穩定器",
     icon: "assets/upgrade-bastion-stabilizer-green-v2.webp",
-    text: "Bastion 傷害 +10、射程 +30，重炮壓制範圍擴大。",
+    text: "Bastion 傷害 +16、射程 +30，重炮壓制範圍擴大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Bastion");
       if (!u) return;
-      u.damage += 10;
+      u.damage += 16;
       u.range += 30;
       u.splashRadius = (u.splashRadius || 92) + 28;
       u.bastionBonus = (u.bastionBonus || 0) + 22;
@@ -883,8 +884,13 @@ function activateSkill(unit) {
     addSkillEffect("repair-shield", unit, { radius, color: "#62e6a7", life: 1.2 });
     setMessage("幻象修復與護盾已部署");
   } else if (unit.name === "Orion") {
-    enemies.slice(0, unit.volleyCount || 7).forEach((e) => {
-      shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.28, maxLife: 0.28, damage: unit.volleyDamage || 34, target: e.id, source: unit.id });
+    enemies
+      .filter((e) => e.hp > 0)
+      .sort((a, b) => a.hp - b.hp)
+      .slice(0, unit.volleyCount || 8)
+      .forEach((e) => {
+        const damage = e.boss ? 18 + unit.damage * 0.45 : unit.volleyDamage || 30;
+        shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.28, maxLife: 0.28, damage, target: e.id, source: unit.id });
     });
     setMessage("全方位齊射");
     addSkillEffect("volley", unit, { radius: 170, color: "#ffd166", life: 0.72 });
@@ -945,10 +951,11 @@ function activateSkill(unit) {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
       const radius = unit.splashRadius || 92;
-      hit(target, (70 + unit.damage + (unit.bastionBonus || 0)) * 2, "#f6c34f", unit.id);
-      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, (32 + Math.floor(unit.damage * 0.45)) * 2, "#f6c34f", unit.id));
+      const bossBonus = target.boss ? 1.65 : 1;
+      hit(target, (92 + unit.damage + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
+      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 30 + Math.floor(unit.damage * 0.5), "#f6c34f", unit.id));
       burst(target.x, target.y, "#f6c34f", 56);
-      addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius: 120, color: "#f6c34f", life: 0.8 });
+      addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 0.95 });
     }
     setMessage("重炮壓制");
   } else if (unit.name === "Mirage") {
@@ -1025,7 +1032,8 @@ function useUltimate(unit) {
 
   if (unit.name === "Orion") {
     enemies.forEach((e) => {
-      shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.38, maxLife: 0.38, damage: 105 + unit.damage, target: e.id, source: unit.id });
+      const damage = e.boss ? 38 + unit.damage : 86 + unit.damage;
+      shots.push({ x: unit.x, y: unit.y, tx: e.x, ty: e.y, color: "#ffd166", life: 0.38, maxLife: 0.38, damage, target: e.id, source: unit.id });
     });
     burst(unit.x, unit.y, "#ffd166", 72);
     addSkillEffect("orbital", unit, { radius: 260, color: "#ffd166", life: 1.0 });
@@ -1091,16 +1099,15 @@ function useUltimate(unit) {
   }
 
   if (unit.name === "Bastion") {
-    enemies
-      .filter((e) => e.hp > 0)
-      .sort((a, b) => b.hp - a.hp)
-      .slice(0, 8)
-      .forEach((e) => {
-        hit(e, (90 + unit.damage + (unit.bastionBonus || 0)) * 2, "#f6c34f", unit.id);
-        burst(e.x, e.y, "#f6c34f", 24);
-      });
-    burst(unit.x, unit.y, "#f6c34f", 82);
-    addSkillEffect("artillery", unit, { radius: 260, color: "#f6c34f", life: 1.0 });
+    const target = enemies.filter((e) => e.hp > 0).sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || b.hp - a.hp)[0];
+    if (target) {
+      const radius = unit.ultimateSplashRadius || 118;
+      const bossBonus = target.boss ? 1.85 : 1;
+      hit(target, (185 + unit.damage * 1.8 + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
+      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 72 + unit.damage * 0.75, "#f6c34f", unit.id));
+      burst(target.x, target.y, "#f6c34f", 96);
+      addSkillEffect("artillery", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 1.15, follow: false });
+    }
     setMessage("要塞齊射");
     return;
   }
@@ -1391,7 +1398,20 @@ function stepUnit(unit, dt) {
       if (unit.name === "Nova" && unit.quantumTime > 0) {
         performNovaQuantumSlash(unit);
       } else {
-        shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
+        if (unit.name === "Orion") {
+          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.22, maxLife: 0.22, damage: target.boss ? unit.damage * 0.65 : unit.damage, target: target.id, source: unit.id });
+          const extra = enemies
+            .filter((e) => e.hp > 0 && e.id !== target.id && dist(unit, e) <= unit.range + 70)
+            .sort((a, b) => a.hp - b.hp)[0];
+          if (extra && Math.random() < (unit.dragoonSplitChance || 0.42)) {
+            shots.push({ x: unit.x, y: unit.y, tx: extra.x, ty: extra.y, color: unit.color, life: 0.26, maxLife: 0.26, damage: Math.max(8, unit.damage * 0.62), target: extra.id, source: unit.id });
+          }
+        } else if (unit.name === "Bastion") {
+          const damage = (unit.damage + (unit.bastionBonus || 0) * 0.35) * (target.boss ? 1.7 : 1.1);
+          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.34, maxLife: 0.34, damage, target: target.id, source: unit.id, splashRadius: 62, splashDamage: unit.damage * 0.32 });
+        } else {
+          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
+        }
       }
     }
     return;
@@ -1546,7 +1566,15 @@ function update(dt) {
     shot.life -= dt;
     if (shot.life <= 0 && shot.damage) {
       const target = enemies.find((e) => e.id === shot.target);
-      if (target) hit(target, shot.damage, shot.color, shot.source);
+      if (target) {
+        hit(target, shot.damage, shot.color, shot.source);
+        if (shot.splashRadius) {
+          enemies
+            .filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < shot.splashRadius)
+            .forEach((e) => hit(e, shot.splashDamage || shot.damage * 0.35, shot.color, shot.source));
+          addSkillEffect("impact-grid", null, { x: target.x, y: target.y, radius: shot.splashRadius, color: shot.color, life: 0.45, follow: false });
+        }
+      }
     }
   });
   shots = shots.filter((s) => s.life > -0.02);
@@ -2516,6 +2544,19 @@ function drawSkillEffects() {
       ctx.strokeStyle = effect.color;
       ctx.lineWidth = 3;
       const size = radius * (0.48 + age * 0.28);
+      ctx.globalAlpha = alpha * 0.2;
+      ctx.fillStyle = effect.color;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.86 + age * 0.1), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = alpha;
+      ctx.setLineDash([14, 8]);
+      ctx.lineWidth = effect.type === "artillery" ? 5 : 4;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.92 + age * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 3;
       ctx.strokeRect(point.x - size / 2, point.y - size / 2, size, size);
       ctx.beginPath();
       ctx.moveTo(point.x - size * 0.68, point.y);
