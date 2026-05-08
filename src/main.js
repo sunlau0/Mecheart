@@ -49,7 +49,7 @@ const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 35;
 const REWARD_ICON_VERSION = 26;
 const SKILL_ICON_VERSION = 42;
-const IMAGE_LOAD_TIMEOUT_MS = 8000;
+const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
