@@ -47,9 +47,9 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
-const UNIT_ART_VERSION = 39;
-const REWARD_ICON_VERSION = 28;
-const SKILL_ICON_VERSION = 42;
+const UNIT_ART_VERSION = 42;
+const REWARD_ICON_VERSION = 29;
+const SKILL_ICON_VERSION = 43;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
@@ -102,7 +102,8 @@ const squadSeeds = [
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
   { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 265, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
-  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。EK 光環是開關式光環，會持續拉住附近敵機；EK 定律可鎖定全場敵人，1 秒後爆炸並波及附近機體。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "鎖定全場最高威脅敵人植入 EK 定律，1 秒後爆炸並波及附近機體。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" }
+  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。EK 光環是開關式光環，會持續拉住附近敵機；EK 定律可鎖定全場敵人，1 秒後爆炸並波及附近機體。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "鎖定全場最高威脅敵人植入 EK 定律，1 秒後爆炸並波及附近機體。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
+  { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形擴散炮 / 粉紫毒素投餵裝置", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；被動會隨機幫友方上強化或干擾狀態。", tactic: "放在中後排用扇形 AOE 清線。美女廚房適合毒殺厚血目標；發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -436,6 +437,23 @@ const upgradePool = [
     }
   },
   {
+    id: "himawari-helping-core",
+    unit: "Himawari (Candy專用機)",
+    type: "Himawari 支援",
+    name: "我幫緊你增幅核心",
+    icon: "assets/upgrade-himawari-helping.webp",
+    text: "Himawari 最大 HP +35；美女廚房毒素更強，被動觸發更頻密，發脾氣雷射傷害提升。",
+    apply() {
+      const u = squad.find((unit) => unit.name === "Himawari (Candy專用機)");
+      if (!u) return;
+      u.maxHp += 35;
+      u.hp = clamp(u.hp + 35, 1, u.maxHp);
+      u.himawariPoisonRate = (u.himawariPoisonRate || 0.04) + 0.008;
+      u.himawariPassiveMin = Math.max(4.5, (u.himawariPassiveMin || 7) - 1.2);
+      u.himawariLaserDamage = (u.himawariLaserDamage || 72) + 24;
+    }
+  },
+  {
     id: "overclocked-servos",
     type: "機動",
     name: "超頻 AMBAC 伺服系統",
@@ -518,7 +536,9 @@ function reset() {
     lostTime: 0,
     lostCooldown: u.name === "MEGA(EK專用機)" ? 6 + Math.random() * 8 : 0,
     lostPoint: null,
-    lostRetarget: 0
+    lostRetarget: 0,
+    himawariPassiveCooldown: u.name === "Himawari (Candy專用機)" ? 5 + Math.random() * 6 : 0,
+    himawariStatus: null
     });
   });
   enemies = [];
@@ -854,7 +874,9 @@ function addSkillEffect(type, source, options = {}) {
     life,
     maxLife: life,
     rotation: options.rotation ?? Math.random() * Math.PI * 2,
-    follow: options.follow ?? (options.x === undefined && options.y === undefined)
+    follow: options.follow ?? (options.x === undefined && options.y === undefined),
+    label: options.label,
+    buff: options.buff
   });
 }
 
@@ -965,6 +987,36 @@ function activateSkill(unit) {
       return;
     }
     setMessage("熱刃旋風");
+  } else if (unit.name === "Himawari (Candy專用機)") {
+    const target = enemies
+      .filter((enemy) => enemy.hp > 0)
+      .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : b.maxHp - a.maxHp || b.hp - a.hp))[0];
+    if (!target) {
+      setMessage("美女廚房: 沒有目標");
+      unit.skillCooldown = 0;
+      return;
+    }
+    const duration = unit.himawariPoisonDuration || 6;
+    const percentPerSecond = unit.himawariPoisonRate || 0.04;
+    unit.target = target.id;
+    skillEffects.push({
+      type: "himawari-poison",
+      sourceId: unit.id,
+      source: unit.id,
+      targetId: target.id,
+      x: target.x,
+      y: target.y,
+      radius: bodyRadius(target) + 42,
+      color: "#ff62d6",
+      life: duration,
+      maxLife: duration,
+      percentPerSecond,
+      follow: false,
+      rotation: Math.random() * Math.PI * 2
+    });
+    burst(target.x, target.y, "#ff62d6", 34);
+    addSkillEffect("himawari-kitchen", null, { x: target.x, y: target.y, radius: bodyRadius(target) + 90, color: "#ff62d6", life: 1.1, follow: false });
+    setMessage("美女廚房: 有毒食物投餵");
   } else if (unit.name === "Helix") {
     unit.regenAuraTime = unit.regenDuration || 6;
     unit.regenPulse = 0.45;
@@ -1120,6 +1172,22 @@ function useUltimate(unit) {
     return;
   }
 
+  if (unit.name === "Himawari (Candy專用機)") {
+    const knockRadius = unit.himawariTantrumRadius || 205;
+    [...squad, ...enemies].filter((actor) => actor.hp > 0 && actor.id !== unit.id && dist(unit, actor) < knockRadius).forEach((actor) => {
+      moveAwayFrom(actor, unit, 180);
+      if (actor.faction === "Enemy") hit(actor, 28 + unit.damage * 0.5, "#ff62d6", unit.id);
+    });
+    const damage = unit.himawariLaserDamage || 72;
+    enemies.filter((enemy) => enemy.hp > 0).forEach((enemy) => {
+      shots.push({ x: unit.x, y: unit.y, tx: enemy.x, ty: enemy.y, color: "#ff62d6", life: 0.42, maxLife: 0.42, damage: enemy.boss ? damage * 0.72 : damage, target: enemy.id, source: unit.id });
+    });
+    burst(unit.x, unit.y, "#ff62d6", 90);
+    addSkillEffect("himawari-tantrum", unit, { radius: knockRadius, color: "#ff62d6", life: 1.15, follow: true });
+    setMessage("發脾氣: 全場粗雷射掃射");
+    return;
+  }
+
   if (unit.name === "Helix") {
     const liveBefore = squad.filter((ally) => ally.hp > 0);
     const duration = unit.stealthDuration || 5.5;
@@ -1195,7 +1263,8 @@ function useUltimate(unit) {
 
 function hit(target, amount, color, sourceId = null) {
   const wasAlive = target.hp > 0;
-  target.hp -= amount;
+  const source = squad.find((u) => u.id === sourceId && u.hp > 0);
+  target.hp -= amount * himawariAttackFactor(source);
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
     chargeUltimate(sourceId, target.boss ? 55 : 28);
@@ -1217,6 +1286,82 @@ function chargeUltimate(sourceId, amount) {
 function chargeUltimateByHealing(unit, amount) {
   if (!unit || unit.hp <= 0 || amount <= 0) return;
   chargeUltimate(unit.id, Math.max(1, amount * 0.42));
+}
+
+function himawariAttackFactor(unit) {
+  const status = unit?.himawariStatus;
+  if (!status || status.life <= 0) return 1;
+  if (status.kind === "atk-up") return 1.8;
+  if (status.kind === "atk-down") return 0.2;
+  return 1;
+}
+
+function himawariDefenseFactor(unit) {
+  const status = unit?.himawariStatus;
+  if (!status || status.life <= 0) return 1;
+  if (status.kind === "def-up") return 0.2;
+  if (status.kind === "def-down") return 1.8;
+  return 1;
+}
+
+function himawariSpeedFactor(unit) {
+  const status = unit?.himawariStatus;
+  return status?.kind === "speed-down" && status.life > 0 ? 0.2 : 1;
+}
+
+function applyHimawariPassive(unit) {
+  const allies = squad.filter((ally) => ally.hp > 0 && ally.id !== unit.id);
+  if (!allies.length) return;
+  const target = allies[Math.floor(Math.random() * allies.length)];
+  const options = [
+    { kind: "atk-up", label: "攻擊 +80%", shortLabel: "攻+", buff: true, color: "#ff8be8" },
+    { kind: "def-up", label: "防禦 +80%", shortLabel: "防+", buff: true, color: "#ff8be8" },
+    { kind: "speed-down", label: "速度 -80%", shortLabel: "速-", buff: false, color: "#6b3dff" },
+    { kind: "atk-down", label: "攻擊 -80%", shortLabel: "攻-", buff: false, color: "#7a2cff" },
+    { kind: "def-down", label: "防禦 -80%", shortLabel: "防-", buff: false, color: "#4d2a9f" }
+  ];
+  const status = options[Math.floor(Math.random() * options.length)];
+  target.himawariStatus = { ...status, life: 5, maxLife: 5 };
+  target.buttonPulse = 0.25;
+  burst(target.x, target.y, status.color, 18);
+  addSkillEffect("himawari-status", target, { radius: 76, color: status.color, life: 5, follow: true, buff: status.buff, label: status.shortLabel });
+  setMessage(`我幫緊你: ${target.name} ${status.label}`);
+}
+
+function performHimawariFanAttack(unit, target) {
+  const range = unit.range + 35;
+  const cone = unit.himawariCone || 0.82;
+  const base = Math.atan2(target.y - unit.y, target.x - unit.x);
+  const targets = enemies.filter((enemy) => {
+    if (enemy.hp <= 0 || dist(unit, enemy) > range + bodyRadius(enemy) * 0.4) return false;
+    let diff = Math.atan2(enemy.y - unit.y, enemy.x - unit.x) - base;
+    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+    return Math.abs(diff) <= cone;
+  });
+  targets.forEach((enemy) => hit(enemy, unit.damage * 0.92, "#ff7bd6", unit.id));
+  burst(unit.x, unit.y, "#ff7bd6", 18);
+  addSkillEffect("himawari-fan", unit, { tx: target.x, ty: target.y, radius: range, color: "#ff7bd6", life: 0.46 });
+}
+
+function updateHimawariPoison(dt) {
+  skillEffects
+    .filter((effect) => effect.type === "himawari-poison")
+    .forEach((effect) => {
+      const target = enemies.find((enemy) => enemy.id === effect.targetId && enemy.hp > 0);
+      if (!target) {
+        effect.life = 0;
+        return;
+      }
+      effect.x = target.x;
+      effect.y = target.y;
+      effect.tick = (effect.tick || 0) + dt;
+      if (effect.tick >= 0.25) {
+        const damage = target.maxHp * effect.percentPerSecond * effect.tick;
+        hit(target, damage, effect.color, effect.source);
+        effect.tick = 0;
+        burst(target.x, target.y, effect.color, 2);
+      }
+    });
 }
 
 function attackMultiplier(unit) {
@@ -1391,6 +1536,17 @@ function stepUnit(unit, dt) {
   unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
   unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
   unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
+  if (unit.himawariStatus) {
+    unit.himawariStatus.life = Math.max(0, unit.himawariStatus.life - dt);
+    if (unit.himawariStatus.life <= 0) unit.himawariStatus = null;
+  }
+  if (unit.name === "Himawari (Candy專用機)") {
+    unit.himawariPassiveCooldown = Math.max(0, (unit.himawariPassiveCooldown || 0) - dt);
+    if (unit.himawariPassiveCooldown <= 0) {
+      applyHimawariPassive(unit);
+      unit.himawariPassiveCooldown = (unit.himawariPassiveMin || 7) + Math.random() * 7;
+    }
+  }
   if (unit.name === "Asterion" && unit.guardianRegenTime > 0) applyGuardianRegen(unit, dt);
   if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
   if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
@@ -1398,7 +1554,7 @@ function stepUnit(unit, dt) {
   if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) applyEkAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
-  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost;
+  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost * himawariSpeedFactor(unit);
 
   if (unit.name === "MEGA(EK專用機)") {
     unit.lostTime = Math.max(0, (unit.lostTime || 0) - dt);
@@ -1485,7 +1641,9 @@ function stepUnit(unit, dt) {
       if (unit.name === "Nova" && unit.quantumTime > 0) {
         performNovaQuantumSlash(unit);
       } else {
-        if (unit.name === "MEGA(EK專用機)") {
+        if (unit.name === "Himawari (Candy專用機)") {
+          performHimawariFanAttack(unit, target);
+        } else if (unit.name === "MEGA(EK專用機)") {
           const radius = unit.omniSlashRadius || 132;
           const targets = enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius + bodyRadius(enemy) * 0.45);
           const damage = unit.damage * (targets.length > 1 ? 0.92 : 1.15);
@@ -1623,7 +1781,7 @@ function stepEnemy(enemy, dt) {
     enemy.attackPulse = 0.2;
     enemy.aim = { x: target.x, y: target.y };
     const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1);
-    const damage = target.shield > 0 ? baseDamage * 0.45 : baseDamage;
+    const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target);
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
     shots.push({ x: enemy.x, y: enemy.y, tx: target.x, ty: target.y, color: enemy.color, life: 0.26, maxLife: 0.26 });
     burst(target.x, target.y, enemy.color, 5);
@@ -1654,6 +1812,7 @@ function update(dt) {
   enemies.forEach((e) => stepEnemy(e, dt));
   updateGravityFields(dt);
   updateMirageDomains(dt);
+  updateHimawariPoison(dt);
   resolveBodyOverlaps();
 
   shots.forEach((shot) => {
@@ -2230,7 +2389,8 @@ function drawMech(unit) {
   ctx.translate(unit.x + offset.x, unit.y + offset.y);
   ctx.globalAlpha = alive ? (unit.stealthTime > 0 ? 0.34 : (unit.name === "Nova" && unit.quantumTime > 0 ? 0.62 + Math.sin(now() * 16) * 0.16 : 1)) : 0.18;
   const bob = Math.sin(now() * 3 + unit.x * 0.02) * 3;
-  if (drawSheetSprite(unit, 108, 108, bob - 4)) {
+  const spriteScale = unit.spriteScale || 1;
+  if (drawSheetSprite(unit, 108 * spriteScale, 108 * spriteScale, bob - 4)) {
     ctx.restore();
     if (!alive) return;
     if (unit.regenGlow > 0) {
@@ -2550,6 +2710,73 @@ function drawSkillEffects() {
         ctx.stroke();
       }
       ctx.setLineDash([]);
+    } else if (effect.type === "himawari-fan") {
+      const tx = effect.tx ?? point.x + radius;
+      const ty = effect.ty ?? point.y;
+      const base = Math.atan2(ty - point.y, tx - point.x);
+      ctx.fillStyle = "rgba(255,98,214,0.16)";
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y);
+      ctx.arc(point.x, point.y, radius * (0.45 + age * 0.55), base - 0.82, base + 0.82);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      for (let i = -2; i <= 2; i++) {
+        const angle = base + i * 0.32;
+        ctx.beginPath();
+        ctx.moveTo(point.x, point.y);
+        ctx.lineTo(point.x + Math.cos(angle) * radius, point.y + Math.sin(angle) * radius);
+        ctx.stroke();
+      }
+    } else if (effect.type === "himawari-kitchen" || effect.type === "himawari-poison") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(255,98,214,0.14)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.72 + Math.sin(now() * 8) * 0.05), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (let i = 0; i < 7; i++) {
+        const angle = effect.rotation + i * 0.9 + age * 1.6;
+        ctx.beginPath();
+        ctx.arc(point.x + Math.cos(angle) * radius * 0.42, point.y - 8 + Math.sin(angle) * radius * 0.34, 5 + (i % 3), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (effect.type === "himawari-status") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = effect.buff ? 5 : 3;
+      ctx.setLineDash(effect.buff ? [] : [7, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.86 + age * 0.14), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = effect.color;
+      ctx.font = "900 28px Impact, 'Microsoft JhengHei', sans-serif";
+      ctx.textAlign = "center";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(5,8,14,0.84)";
+      ctx.strokeText(effect.label || (effect.buff ? "+" : "-"), point.x, point.y - 84);
+      ctx.fillText(effect.label || (effect.buff ? "+" : "-"), point.x, point.y - 84);
+    } else if (effect.type === "himawari-tantrum") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(255,98,214,0.12)";
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.55 + age * 0.7), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.lineWidth = 10;
+      for (let i = 0; i < 5; i++) {
+        const y = point.y - 180 + i * 82;
+        ctx.beginPath();
+        ctx.moveTo(0, y + Math.sin(now() * 10 + i) * 8);
+        ctx.lineTo(W, y + Math.cos(now() * 8 + i) * 10);
+        ctx.stroke();
+      }
     } else if (effect.type === "rail") {
       const tx = effect.tx ?? point.x + 220;
       const ty = effect.ty ?? point.y;
@@ -2820,6 +3047,29 @@ function drawSupportAuras() {
 
   squad.forEach((unit) => {
     if (unit.hp <= 0) return;
+    if (unit.himawariStatus) {
+      const status = unit.himawariStatus;
+      const alpha = clamp(status.life / status.maxLife, 0.22, 0.82);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = status.color;
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = status.color;
+      ctx.lineWidth = status.buff ? 4 : 3;
+      ctx.setLineDash(status.buff ? [] : [8, 7]);
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y - 12, 70 + Math.sin(now() * 9) * 5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = status.color;
+      ctx.font = "900 24px Impact, 'Microsoft JhengHei', sans-serif";
+      ctx.textAlign = "center";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(5,8,14,0.82)";
+      ctx.strokeText(status.shortLabel || (status.buff ? "+" : "-"), unit.x, unit.y - 88);
+      ctx.fillText(status.shortLabel || (status.buff ? "+" : "-"), unit.x, unit.y - 88);
+      ctx.restore();
+    }
     if (unit.name === "Asterion" && unit.guardianRegenTime > 0) {
       const alpha = clamp(unit.guardianRegenTime / (unit.guardianRegenDuration || 5), 0.24, 0.68);
       ctx.save();
