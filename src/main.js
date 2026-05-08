@@ -47,8 +47,8 @@ const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 35;
-const REWARD_ICON_VERSION = 23;
-const SKILL_ICON_VERSION = 39;
+const REWARD_ICON_VERSION = 26;
+const SKILL_ICON_VERSION = 42;
 const IMAGE_LOAD_TIMEOUT_MS = 8000;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
@@ -96,10 +96,10 @@ const squadSeeds = [
   { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp" },
   { name: "Orion", faction: "Allied", role: "龍騎兵炮擊機", weapon: "長距離光束炮 / 遙控炮莢", trait: "射程最長。移動慢且脆，但收割能力極高。", tactic: "放在安全側翼輸出。主動技可同時打多個目標。", color: "#ffd166", x: 180, y: 150, maxHp: 105, range: 240, damage: 23, rate: 1.45, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢同時射擊多名敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人發射大型光束爆發。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
-  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
+  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
-  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 2.36, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/upgrade-beam-capacitors.webp", ultimateIcon: "assets/upgrade-overclocked-servos.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
+  { name: "Bastion", faction: "Allied", role: "中距離重炮機", weapon: "肩部重粒子炮 / 壓制榴彈", trait: "中距離火力穩定，擅長打厚血敵人和小範圍壓制。", tactic: "放在前線後一格，讓坦機吸火後持續炮擊。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 245, damage: 58, rate: 2.36, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "對全場多個敵人發射重炮轟擊。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
 ];
 
@@ -333,7 +333,7 @@ const upgradePool = [
     unit: "Lancer",
     type: "Lancer 武器",
     name: "軌道照準器",
-    icon: "assets/upgrade-lancer-rail-scope.webp",
+    icon: "assets/upgrade-lancer-rail-scope-v1.webp",
     text: "Lancer 傷害 +14、射程 +35，穿甲狙擊和軌道貫穿更痛。",
     apply() {
       const u = squad.find((unit) => unit.name === "Lancer");
@@ -400,7 +400,7 @@ const upgradePool = [
     unit: "Bastion",
     type: "Bastion 重炮",
     name: "重炮穩定器",
-    icon: "assets/upgrade-bastion-stabilizer.webp",
+    icon: "assets/upgrade-bastion-stabilizer-green-v2.webp",
     text: "Bastion 傷害 +10、射程 +30，重炮壓制範圍擴大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Bastion");
@@ -1365,11 +1365,9 @@ function stepUnit(unit, dt) {
   if (target) {
     if (unit.damage < 0) {
       const d = dist(unit, target);
-      const preferredHealDistance = Math.max(118, unit.range * 0.86);
       const followHealDistance = unit.range * 0.99;
       if (target.id !== unit.id) {
         if (d > followHealDistance) moveToward(unit, target, moveSpeed * dt);
-        else if (d < preferredHealDistance) moveAwayFrom(unit, target, moveSpeed * dt * 0.72);
       }
 
       if (target.hp < target.maxHp && d <= unit.range && unit.cooldown <= 0) {

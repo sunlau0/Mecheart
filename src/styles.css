@@ -1975,3 +1975,169 @@ h1 {
     -webkit-line-clamp: 3;
   }
 }
+
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 960px) {
+  body:not(.setup-mode) {
+    overflow: hidden;
+  }
+
+  body:not(.setup-mode) #game-shell {
+    display: block;
+    min-height: 100svh;
+    padding: 0;
+  }
+
+  body:not(.setup-mode) #stage-wrap {
+    border: 0;
+    border-radius: 0;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: 100svh;
+    width: 100vw;
+  }
+
+  body:not(.setup-mode) #game {
+    align-self: center;
+    height: auto;
+    max-height: calc(100svh - 92px);
+    width: 100vw;
+  }
+
+  body:not(.setup-mode) #hud {
+    background: transparent;
+    border: 0;
+    inset: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) auto max(8px, env(safe-area-inset-left));
+    max-height: none;
+    min-height: 0;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 7;
+  }
+
+  body:not(.setup-mode) .hud-head,
+  body:not(.setup-mode) .intel-panel,
+  body:not(.setup-mode) .database {
+    display: none;
+  }
+
+  body:not(.setup-mode) #cards {
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(4, minmax(82px, 1fr));
+    max-width: calc(100vw - 360px);
+    pointer-events: auto;
+  }
+
+  body:not(.setup-mode) .unit-card {
+    background: rgba(7, 12, 20, 0.58);
+    border-color: rgba(122, 242, 255, 0.28);
+    gap: 5px;
+    grid-template-columns: 30px minmax(0, 1fr);
+    min-height: 44px;
+    padding: 5px;
+  }
+
+  body:not(.setup-mode) .unit-card img {
+    border-radius: 5px;
+    padding: 1px;
+    width: 30px;
+  }
+
+  body:not(.setup-mode) .unit-card h3 {
+    font-size: 10px;
+    margin: 0 0 2px;
+  }
+
+  body:not(.setup-mode) .role {
+    display: none;
+  }
+
+  body:not(.setup-mode) .bar {
+    height: 5px;
+    margin-top: 3px;
+  }
+
+  body:not(.setup-mode) .score-panel {
+    background: rgba(8, 12, 20, 0.62);
+    border-color: rgba(255, 209, 102, 0.3);
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    min-height: 44px;
+    min-width: 218px;
+    padding: 7px 8px;
+    pointer-events: none;
+    position: absolute;
+    right: calc(max(8px, env(safe-area-inset-right)) + 118px);
+    top: 0;
+  }
+
+  body:not(.setup-mode) .score-panel .panel-title,
+  body:not(.setup-mode) .score-panel hr,
+  body:not(.setup-mode) .score-panel .stat-row:last-child {
+    display: none;
+  }
+
+  body:not(.setup-mode) .score-panel .stat-row,
+  body:not(.setup-mode) .score-row {
+    display: inline-grid;
+    gap: 3px;
+    margin: 0;
+  }
+
+  body:not(.setup-mode) .score-panel .stat-row span,
+  body:not(.setup-mode) .score-row span {
+    font-size: 9px;
+  }
+
+  body:not(.setup-mode) .score-panel .stat-row strong,
+  body:not(.setup-mode) .score-row strong {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  body:not(.setup-mode) .score-panel .score-row strong {
+    font-size: 18px;
+  }
+
+  body:not(.setup-mode) #skill-bar {
+    border-radius: 0;
+    margin: 0;
+    padding: 4px max(6px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  }
+
+  body:not(.setup-mode) #skill-buttons {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  body:not(.setup-mode) .skill-pair {
+    gap: 3px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 3px;
+  }
+
+  body:not(.setup-mode) .skill-button {
+    grid-template-rows: 24px auto auto;
+    min-height: 74px;
+    padding: 3px 2px;
+  }
+
+  body:not(.setup-mode) .skill-button img {
+    width: 26px;
+  }
+
+  body:not(.setup-mode) .skill-button span {
+    font-size: 9px;
+  }
+
+  body:not(.setup-mode) .skill-button small {
+    font-size: 8.5px;
+  }
+
+  body:not(.setup-mode) .skill-button em {
+    display: none;
+  }
+}
