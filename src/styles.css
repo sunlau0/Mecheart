@@ -882,6 +882,62 @@ body.paused-mode #game {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.ace-unit-panel {
+  border: 1px solid rgba(255, 209, 102, 0.34);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(15, 22, 33, 0.86), rgba(5, 8, 13, 0.92)),
+    radial-gradient(circle at 18% 12%, rgba(255, 209, 102, 0.18), transparent 34%),
+    radial-gradient(circle at 82% 86%, rgba(75, 228, 255, 0.1), transparent 36%);
+  box-shadow: inset 0 0 0 1px rgba(255, 209, 102, 0.08);
+  display: block;
+  min-height: 210px;
+  overflow: hidden;
+  padding: 18px;
+}
+
+.ace-unit-panel h3 {
+  color: #ffffff;
+  font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+  font-size: clamp(30px, 3vw, 48px);
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 1;
+  margin: 0 0 10px;
+  text-shadow: 0 0 18px rgba(255, 209, 102, 0.34), 0 8px 18px rgba(0, 0, 0, 0.72);
+}
+
+.ace-unit-panel p:not(.kicker) {
+  color: #dce8ff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 620px;
+}
+
+.ace-unit-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.ace-unit-list .formation-card {
+  border-color: rgba(255, 209, 102, 0.46);
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.ace-unit-list .formation-card > img {
+  width: 78px;
+}
+
+.ace-unit-list .formation-toggle {
+  grid-column: auto;
+  justify-self: end;
+}
+
 .formation-card {
   border: 1px solid rgba(122, 242, 255, 0.22);
   border-radius: 8px;
@@ -973,8 +1029,14 @@ body.paused-mode #game {
 }
 
 .formation-scroll .intel-panel,
-.formation-scroll .database {
+.formation-scroll .database,
+.formation-scroll .ace-unit-panel {
   margin-top: 0;
+}
+
+.formation-scroll .ace-unit-panel {
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .formation-scroll .intel-panel {
@@ -1576,7 +1638,8 @@ h1 {
   }
 
   .formation-scroll .intel-panel,
-  .formation-scroll .database {
+  .formation-scroll .database,
+  .formation-scroll .ace-unit-panel {
     grid-column: auto;
     grid-row: auto;
   }
@@ -1818,6 +1881,18 @@ h1 {
   .formation-card > img {
     width: 78px;
   }
+
+  .ace-unit-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .ace-unit-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ace-unit-list .formation-card {
+    grid-template-columns: 78px minmax(0, 1fr) auto;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2043,6 +2118,28 @@ h1 {
   }
 
   .formation-toggle {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .ace-unit-panel {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .ace-unit-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ace-unit-list .formation-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .ace-unit-list .formation-card > img {
+    width: 72px;
+  }
+
+  .ace-unit-list .formation-toggle {
     grid-column: 1 / -1;
     justify-self: stretch;
   }

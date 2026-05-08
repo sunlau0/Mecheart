@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
     <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=43" />
+    <link rel="stylesheet" href="src/styles.css?v=46" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -79,6 +79,14 @@
             </section>
             <div class="formation-scroll">
               <section id="formation-list" class="formation-list" aria-label="可選機體"></section>
+              <section class="ace-unit-panel" aria-label="皇牌機師專機">
+                <div>
+                  <p class="kicker">Ace Pilot Custom</p>
+                  <h3>皇牌機師專機</h3>
+                  <p>預留俾日後加入嘅個人化專用機。呢類機體會有獨立定位、專屬技能同更鮮明嘅機師風格。</p>
+                </div>
+                <div id="ace-unit-list" class="ace-unit-list" aria-label="可選皇牌機師專機"></div>
+              </section>
               <section id="intel" class="intel-panel"></section>
               <details class="database" open>
                 <summary>機體設計資料庫</summary>
@@ -140,6 +148,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=69"></script>
+    <script src="src/main.js?v=74"></script>
   </body>
 </html>

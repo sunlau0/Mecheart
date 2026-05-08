@@ -9,6 +9,7 @@ const commandEl = document.getElementById("command");
 const briefingEl = document.getElementById("briefing");
 const formationEl = document.getElementById("formation");
 const formationListEl = document.getElementById("formation-list");
+const aceUnitListEl = document.getElementById("ace-unit-list");
 const formationSlotsEl = document.getElementById("formation-slots");
 const formationCountEl = document.getElementById("formation-count");
 const formationStartEl = document.getElementById("formation-start");
@@ -46,8 +47,8 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
-const UNIT_ART_VERSION = 35;
-const REWARD_ICON_VERSION = 26;
+const UNIT_ART_VERSION = 39;
+const REWARD_ICON_VERSION = 28;
 const SKILL_ICON_VERSION = 42;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const assetVersion = (path) => {
@@ -100,7 +101,8 @@ const squadSeeds = [
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
   { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 265, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
-  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" }
+  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
+  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。EK 光環是開關式光環，會持續拉住附近敵機；EK 定律可鎖定全場敵人，1 秒後爆炸並波及附近機體。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "鎖定全場最高威脅敵人植入 EK 定律，1 秒後爆炸並波及附近機體。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -365,35 +367,21 @@ const upgradePool = [
     id: "helix-beacon-grid",
     unit: "Helix",
     type: "Helix 維修",
-    name: "再生力場矩陣",
+    name: "再生幻象矩陣",
     icon: "assets/upgrade-helix-beacon-grid.webp",
-    text: "Helix 治療量提升、射程 +35，再生力場範圍和持續時間增加。",
+    text: "Helix 治療量、射程和生存力提升；再生力場更持久，幻象粒子隱形和解鎖定範圍增加。",
     apply() {
       const u = squad.find((unit) => unit.name === "Helix");
       if (!u) return;
       u.damage -= 8;
       u.range += 35;
-      u.maxHp += 25;
-      u.hp = clamp(u.hp + 25, 1, u.maxHp);
+      u.maxHp += 38;
+      u.hp = clamp(u.hp + 38, 1, u.maxHp);
       u.regenRate = (u.regenRate || 13) + 5;
       u.regenDuration = (u.regenDuration || 6) + 2;
       u.regenRadius = (u.regenRadius || 260) + 35;
-    }
-  },
-  {
-    id: "helix-mirage-particles",
-    unit: "Helix",
-    type: "Helix 粒子",
-    name: "幻象粒子增幅器",
-    icon: "assets/upgrade-helix-mirage-particles.webp",
-    text: "幻象粒子隱形時間增加，發動時令附近敵機短暫失準。",
-    apply() {
-      const u = squad.find((unit) => unit.name === "Helix");
-      if (!u) return;
-      u.maxHp += 18;
-      u.hp = clamp(u.hp + 18, 1, u.maxHp);
-      u.stealthDuration = (u.stealthDuration || 5.5) + 2;
-      u.mirageDisruptRadius = (u.mirageDisruptRadius || 390) + 70;
+      u.stealthDuration = (u.stealthDuration || 5.5) + 1.4;
+      u.mirageDisruptRadius = (u.mirageDisruptRadius || 390) + 45;
     }
   },
   {
@@ -426,6 +414,25 @@ const upgradePool = [
       u.range += 25;
       u.jamRadius = (u.jamRadius || 250) + 45;
       u.jamDuration = (u.jamDuration || 4.5) + 1.5;
+    }
+  },
+  {
+    id: "miles-ek-aura-core",
+    unit: "MEGA(EK專用機)",
+    type: "MEGA 技能",
+    name: "EK 光環定律核心",
+    icon: "assets/upgrade-miles-ek-aura.webp",
+    text: "MEGA 最大 HP +45；EK 光環更穩定，EK 定律爆炸傷害和波及範圍提升。",
+    apply() {
+      const u = squad.find((unit) => unit.name === "MEGA(EK專用機)");
+      if (!u) return;
+      u.maxHp += 45;
+      u.hp = clamp(u.hp + 45, 1, u.maxHp);
+      u.ekAuraRange = (u.ekAuraRange || 235) + 18;
+      u.ekAuraShield = (u.ekAuraShield || 4.5) + 1.5;
+      u.ekLawDamage = (u.ekLawDamage || 136) + 26;
+      u.ekLawRadius = (u.ekLawRadius || 145) + 16;
+      u.ekLawSplashDamage = (u.ekLawSplashDamage || 64) + 12;
     }
   },
   {
@@ -506,7 +513,12 @@ function reset() {
     stealthTime: 0,
     regenGlow: 0,
     guardianRegenTime: 0,
-    gnFieldTime: 0
+    gnFieldTime: 0,
+    ekAuraActive: false,
+    lostTime: 0,
+    lostCooldown: u.name === "MEGA(EK專用機)" ? 6 + Math.random() * 8 : 0,
+    lostPoint: null,
+    lostRetarget: 0
     });
   });
   enemies = [];
@@ -848,12 +860,21 @@ function addSkillEffect(type, source, options = {}) {
 
 function activateSkill(unit) {
   if (!unit || unit.hp <= 0) return;
+  if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) {
+    unit.ekAuraActive = false;
+    unit.skillCooldown = 10;
+    unit.buttonPulse = 0.35;
+    burst(unit.x, unit.y, "#48a8ff", 26);
+    addSkillEffect("ek-aura", unit, { radius: unit.ekAuraRange || 235, color: "#48a8ff", life: 0.55 });
+    setMessage("MEGA: EK光環停止");
+    return;
+  }
   if (unit.skillCooldown > 0) {
     setMessage(`${unit.skill}: 冷卻 ${Math.ceil(unit.skillCooldown)} 秒`);
     unit.buttonPulse = 0.25;
     return;
   }
-  unit.skillCooldown = 10;
+  unit.skillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : 10;
   unit.buttonPulse = 0.35;
   unit.attackPulse = 0.26;
   if (unit.name === "Asterion") {
@@ -906,6 +927,14 @@ function activateSkill(unit) {
     burst(unit.x, unit.y, "#8bd7ff", 48);
     addSkillEffect("taunt", unit, { radius: tauntRange, color: "#8bd7ff", life: 1.0 });
     setMessage("挑釁信標展開");
+  } else if (unit.name === "MEGA(EK專用機)") {
+    const tauntRange = unit.ekAuraRange || 235;
+    unit.ekAuraActive = true;
+    unit.shield = Math.max(unit.shield || 0, unit.ekAuraShield || 4.5);
+    applyEkAura(unit, 0.2);
+    burst(unit.x, unit.y, "#48a8ff", 54);
+    addSkillEffect("ek-aura", unit, { radius: tauntRange, color: "#48a8ff", life: 1.0 });
+    setMessage("MEGA: EK光環啟動");
   } else if (unit.name === "Lancer") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
@@ -1047,6 +1076,24 @@ function useUltimate(unit) {
     burst(unit.x, unit.y, "#8bd7ff", 82);
     addSkillEffect("gn-cast", unit, { radius: unit.gnFieldRadius || 170, color: "#8bd7ff", life: 0.9 });
     setMessage("GN 力場展開");
+    return;
+  }
+
+  if (unit.name === "MEGA(EK專用機)") {
+    const target = enemies
+      .filter((enemy) => enemy.hp > 0)
+      .sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || b.hp - a.hp || dist(unit, a) - dist(unit, b))[0];
+    if (!target) {
+      setMessage("EK定律: 沒有目標");
+      unit.ultCharge = unit.ultMax || 100;
+      return;
+    }
+    const radius = unit.ekLawRadius || 145;
+    unit.target = target.id;
+    shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#48a8ff", life: 1, maxLife: 1, damage: unit.ekLawDamage || (112 + unit.damage), target: target.id, source: unit.id, splashRadius: radius, splashDamage: unit.ekLawSplashDamage || (46 + unit.damage * 0.75) });
+    burst(target.x, target.y, "#48a8ff", 58);
+    addSkillEffect("ek-law", unit, { x: target.x, y: target.y, radius, color: "#48a8ff", life: 1, follow: false });
+    setMessage("MEGA: EK定律成立");
     return;
   }
 
@@ -1214,6 +1261,18 @@ function applyMirageAura(unit, dt) {
     });
 }
 
+function applyEkAura(unit, dt) {
+  const radius = unit.ekAuraRange || 235;
+  enemies
+    .filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius)
+    .forEach((enemy) => {
+      enemy.tauntTarget = unit.id;
+      enemy.tauntTime = Math.max(enemy.tauntTime || 0, 0.48);
+      enemy.aim = { x: unit.x, y: unit.y };
+      if (Math.random() < dt * 8) burst(enemy.x, enemy.y, "#48a8ff", 1);
+    });
+}
+
 function updateMirageDomains(dt) {
   skillEffects
     .filter((effect) => effect.type === "mirage-domain")
@@ -1336,9 +1395,37 @@ function stepUnit(unit, dt) {
   if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
   if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
   if (unit.name === "Mirage" && unit.mirageAuraTime > 0) applyMirageAura(unit, dt);
+  if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) applyEkAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
   const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost;
+
+  if (unit.name === "MEGA(EK專用機)") {
+    unit.lostTime = Math.max(0, (unit.lostTime || 0) - dt);
+    unit.lostCooldown = Math.max(0, (unit.lostCooldown || 0) - dt);
+    unit.lostRetarget = Math.max(0, (unit.lostRetarget || 0) - dt);
+    if (unit.lostTime <= 0 && unit.lostCooldown <= 0) {
+      unit.lostTime = 3;
+      unit.lostCooldown = 10 + Math.random() * 12;
+      unit.lostRetarget = 0;
+      unit.target = null;
+      unit.move = null;
+      unit.command = "idle";
+      addSkillEffect("lost", unit, { radius: 94, color: "#48a8ff", life: 3, follow: true });
+      setMessage("MEGA: 迷路中");
+    }
+    if (unit.lostTime > 0) {
+      if (!unit.lostPoint || unit.lostRetarget <= 0 || dist(unit, unit.lostPoint) < 12) {
+        unit.lostPoint = {
+          x: clamp(unit.x + (Math.random() - 0.5) * 520, ALLIED_MIN_X, ALLIED_MAX_X),
+          y: clamp(unit.y + (Math.random() - 0.5) * 420, ALLIED_MIN_Y, ALLIED_MAX_Y)
+        };
+        unit.lostRetarget = 0.45 + Math.random() * 0.45;
+      }
+      moveToward(unit, unit.lostPoint, moveSpeed * 1.45 * dt);
+      return;
+    }
+  }
 
   let target = syncAssistTarget(unit) || (unit.damage < 0
     ? squad.find((u) => u.id === unit.target && u.hp > 0)
@@ -1398,7 +1485,14 @@ function stepUnit(unit, dt) {
       if (unit.name === "Nova" && unit.quantumTime > 0) {
         performNovaQuantumSlash(unit);
       } else {
-        if (unit.name === "Orion") {
+        if (unit.name === "MEGA(EK專用機)") {
+          const radius = unit.omniSlashRadius || 132;
+          const targets = enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius + bodyRadius(enemy) * 0.45);
+          const damage = unit.damage * (targets.length > 1 ? 0.92 : 1.15);
+          targets.forEach((enemy) => hit(enemy, damage, "#48a8ff", unit.id));
+          burst(unit.x, unit.y, "#48a8ff", 34);
+          addSkillEffect("omni-slash", unit, { radius, color: "#48a8ff", life: 0.42 });
+        } else if (unit.name === "Orion") {
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.22, maxLife: 0.22, damage: target.boss ? unit.damage * 0.65 : unit.damage, target: target.id, source: unit.id });
           const extra = enemies
             .filter((e) => e.hp > 0 && e.id !== target.id && dist(unit, e) <= unit.range + 70)
@@ -1799,9 +1893,9 @@ function updateSkillBar() {
 
     const activeButton = pair.querySelector('.skill-button[data-skill-kind="active"]');
     activeButton.classList.toggle("not-ready", activeCooling);
-    activeButton.classList.toggle("pulse", pulse);
+    activeButton.classList.toggle("pulse", pulse || (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive));
     activeButton.disabled = dead;
-    activeButton.querySelector("[data-skill-status]").textContent = activeCooling ? `${Math.ceil(unit.skillCooldown)}秒` : unit.name;
+    activeButton.querySelector("[data-skill-status]").textContent = activeCooling ? `${Math.ceil(unit.skillCooldown)}秒` : (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive ? "啟動中" : unit.name);
 
     const ultimateButton = pair.querySelector('.skill-button[data-skill-kind="ultimate"]');
     ultimateButton.classList.toggle("not-ready", ultCharging);
@@ -1866,7 +1960,7 @@ function renderFormation() {
     `;
   }).join("");
 
-  formationListEl.innerHTML = squadSeeds.map((unit) => {
+  const renderFormationCard = (unit) => {
     const selectedForBattle = selectedSquadNames.includes(unit.name);
     const focusedClass = unit.name === focused.name ? "focused" : "";
     return `
@@ -1888,7 +1982,9 @@ function renderFormation() {
         <button class="formation-toggle" data-unit-name="${unit.name}" type="button">${selectedForBattle ? "移除" : "加入"}</button>
       </article>
     `;
-  }).join("");
+  };
+  formationListEl.innerHTML = squadSeeds.filter((unit) => !unit.ace).map(renderFormationCard).join("");
+  if (aceUnitListEl) aceUnitListEl.innerHTML = squadSeeds.filter((unit) => unit.ace).map(renderFormationCard).join("");
   renderIntel(focused);
 }
 
@@ -2400,6 +2496,60 @@ function drawSkillEffects() {
       ctx.stroke();
       ctx.fillStyle = "rgba(139,215,255,0.22)";
       ctx.fillRect(point.x - 9, point.y - 86, 18, 44);
+    } else if (effect.type === "ek-aura") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(72,168,255,0.1)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([12, 10]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.68 + Math.sin(now() * 4) * 0.04), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (let i = 0; i < 8; i++) {
+        const angle = effect.rotation + i * Math.PI / 4 + age * 1.2;
+        ctx.beginPath();
+        ctx.moveTo(point.x + Math.cos(angle) * radius * 0.92, point.y - 8 + Math.sin(angle) * radius * 0.92);
+        ctx.lineTo(point.x + Math.cos(angle) * radius * 0.55, point.y - 8 + Math.sin(angle) * radius * 0.55);
+        ctx.stroke();
+      }
+    } else if (effect.type === "ek-law") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4 + age * 4;
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.35 + age * 0.65), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle = "rgba(230,248,255,0.92)";
+      tracePolygon(point.x, point.y, radius * (0.22 + age * 0.18), 6, effect.rotation + age * 2);
+      ctx.stroke();
+    } else if (effect.type === "omni-slash") {
+      ctx.strokeStyle = "#e7f7ff";
+      ctx.lineWidth = 6;
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y - 4, radius * (0.32 + i * 0.13 + age * 0.12), effect.rotation + i * 0.7, effect.rotation + i * 0.7 + Math.PI * 1.2);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 4, radius * (0.9 + age * 0.08), 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (effect.type === "lost") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([4, 10]);
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y - 52, 18 + i * 10 + Math.sin(now() * 8 + i) * 3, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
     } else if (effect.type === "rail") {
       const tx = effect.tx ?? point.x + 220;
       const ty = effect.ty ?? point.y;
@@ -2684,6 +2834,36 @@ function drawSupportAuras() {
         ctx.restore();
       }
       for (let i = 0; i < 4; i++) drawPlusMark(unit.x - 27 + i * 18, unit.y - 70 + Math.sin(now() * 4 + i) * 4, 4, "#7cffc4");
+      ctx.restore();
+    }
+
+    if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) {
+      const radius = unit.ekAuraRange || 235;
+      ctx.save();
+      ctx.globalAlpha = 0.58 + Math.sin(now() * 5) * 0.08;
+      ctx.shadowColor = "#48a8ff";
+      ctx.shadowBlur = 22;
+      ctx.strokeStyle = "rgba(72,168,255,0.9)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([18, 12]);
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius + Math.sin(now() * 7) * 5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = "#48a8ff";
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.78;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 10; i++) {
+        const angle = now() * 0.8 + i * Math.PI * 0.2;
+        ctx.beginPath();
+        ctx.moveTo(unit.x + Math.cos(angle) * radius * 0.92, unit.y + Math.sin(angle) * radius * 0.92);
+        ctx.lineTo(unit.x + Math.cos(angle) * radius * 0.62, unit.y + Math.sin(angle) * radius * 0.62);
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
@@ -2977,6 +3157,16 @@ skillButtonsEl.addEventListener("pointerdown", (event) => {
 });
 
 formationListEl.addEventListener("click", (event) => {
+  const toggle = event.target.closest(".formation-toggle");
+  const card = event.target.closest(".formation-card");
+  const name = toggle?.dataset.unitName || card?.dataset.unitName;
+  if (!name) return;
+  formationFocusName = name;
+  if (toggle) toggleFormationUnit(name);
+  else renderFormation();
+});
+
+aceUnitListEl?.addEventListener("click", (event) => {
   const toggle = event.target.closest(".formation-toggle");
   const card = event.target.closest(".formation-card");
   const name = toggle?.dataset.unitName || card?.dataset.unitName;
