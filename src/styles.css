@@ -1670,13 +1670,16 @@ h1 {
 
   body:not(.setup-mode) #stage-wrap {
     align-self: stretch;
-    grid-template-rows: minmax(0, 1fr) auto;
+    align-content: start;
+    grid-template-rows: auto auto;
     max-height: calc(100svh - 20px);
   }
 
   body:not(.setup-mode) #game {
-    height: 100%;
+    height: auto;
+    max-height: calc(100svh - 162px);
     object-fit: contain;
+    width: 100%;
   }
 
   body:not(.setup-mode) #hud {
