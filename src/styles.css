@@ -1654,6 +1654,109 @@ h1 {
   }
 }
 
+@media (min-width: 1181px) and (max-width: 1400px) and (orientation: landscape) {
+  body:not(.setup-mode) {
+    overflow: hidden;
+  }
+
+  body:not(.setup-mode) #game-shell {
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 27vw, 340px);
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  body:not(.setup-mode) #stage-wrap {
+    align-self: stretch;
+    grid-template-rows: minmax(0, 1fr) auto;
+    max-height: calc(100svh - 20px);
+  }
+
+  body:not(.setup-mode) #game {
+    height: 100%;
+    object-fit: contain;
+  }
+
+  body:not(.setup-mode) #hud {
+    align-self: stretch;
+    min-height: 0;
+    max-height: calc(100svh - 20px);
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  body:not(.setup-mode) .hud-head h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  body:not(.setup-mode) .hud-head p,
+  body:not(.setup-mode) .role {
+    font-size: 12px;
+  }
+
+  body:not(.setup-mode) #cards {
+    gap: 7px;
+  }
+
+  body:not(.setup-mode) .unit-card {
+    gap: 8px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    min-height: 64px;
+    padding: 8px;
+  }
+
+  body:not(.setup-mode) .unit-card img {
+    width: 44px;
+  }
+
+  body:not(.setup-mode) .unit-card h3 {
+    font-size: 15px;
+    margin-bottom: 3px;
+  }
+
+  body:not(.setup-mode) .bar {
+    height: 7px;
+    margin-top: 5px;
+  }
+
+  body:not(.setup-mode) .score-panel {
+    gap: 7px;
+    margin-top: 8px;
+    padding: 10px;
+  }
+
+  body:not(.setup-mode) .score-panel .panel-title,
+  body:not(.setup-mode) .score-panel hr,
+  body:not(.setup-mode) .score-panel .stat-row:last-child {
+    display: none;
+  }
+
+  body:not(.setup-mode) .stat-row {
+    gap: 10px;
+  }
+
+  body:not(.setup-mode) .round-row strong {
+    font-size: 28px;
+  }
+
+  body:not(.setup-mode) .score-row {
+    gap: 2px;
+    padding: 7px 0;
+  }
+
+  body:not(.setup-mode) .score-row strong {
+    font-size: clamp(42px, 4vw, 58px);
+  }
+
+  body:not(.setup-mode) .intel-panel,
+  body:not(.setup-mode) .database {
+    display: none;
+  }
+}
+
 @media (max-width: 820px) {
   #briefing {
     align-content: start;
@@ -1977,6 +2080,103 @@ h1 {
 }
 
 @media (orientation: landscape) and (max-height: 520px) and (max-width: 960px) {
+  body.setup-mode #briefing {
+    align-content: stretch;
+    align-items: center;
+    gap: 8px 14px;
+    grid-template-areas:
+      "title board"
+      "start board";
+    grid-template-columns: minmax(0, 1fr) minmax(236px, 320px);
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-items: center;
+    min-height: 100svh;
+    overflow: hidden;
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+
+  body.setup-mode .title-content {
+    align-self: end;
+    grid-area: title;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  body.setup-mode .title-logo {
+    margin: 0 0 6px;
+    max-width: 100%;
+  }
+
+  body.setup-mode .title-logo span {
+    font-size: clamp(34px, 9vw, 64px);
+    line-height: 0.82;
+    -webkit-text-stroke: 2px #061d55;
+  }
+
+  body.setup-mode .title-logo span:last-child {
+    font-size: clamp(42px, 11vw, 76px);
+  }
+
+  body.setup-mode .title-logo::after {
+    bottom: -6px;
+    height: 18px;
+  }
+
+  body.setup-mode .title-content .kicker,
+  body.setup-mode .title-content p:not(.kicker) {
+    font-size: 13px;
+  }
+
+  body.setup-mode .title-start {
+    align-self: start;
+    font-size: 20px;
+    grid-area: start;
+    min-height: 44px;
+    min-width: 196px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 3;
+  }
+
+  body.setup-mode .title-leaderboard {
+    align-self: stretch;
+    grid-area: board;
+    max-height: calc(100svh - 16px);
+    max-width: 100%;
+    overflow: hidden;
+    padding: 8px;
+    width: 100%;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-head h3 {
+    font-size: 24px;
+  }
+
+  body.setup-mode .title-leaderboard #title-leaderboard-message {
+    font-size: 11px;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-list {
+    gap: 4px;
+    max-height: calc(100svh - 96px);
+    overflow: hidden;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-list li {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    min-height: 28px;
+    padding: 4px 6px;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-list em {
+    font-size: 16px;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-list strong,
+  body.setup-mode .title-leaderboard .leaderboard-list span {
+    font-size: 12px;
+  }
+
   body:not(.setup-mode) {
     overflow: hidden;
   }
