@@ -1998,21 +1998,36 @@ h1 {
 
   body:not(.setup-mode) #game {
     align-self: center;
-    height: auto;
-    max-height: calc(100svh - 92px);
-    width: 100vw;
+    height: min(calc(100vw * 9 / 16), calc(100svh - 70px));
+    margin: 0 auto;
+    max-height: calc(100svh - 70px);
+    max-width: 100vw;
+    width: min(100vw, calc((100svh - 70px) * 16 / 9));
   }
 
   body:not(.setup-mode) #hud {
     background: transparent;
     border: 0;
-    inset: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) auto max(8px, env(safe-area-inset-left));
-    max-height: none;
+    display: grid;
+    gap: 5px;
+    grid-template-columns: 1fr;
+    inset: max(8px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) auto auto;
+    max-height: calc(100svh - 78px);
+    width: 116px;
     min-height: 0;
     padding: 0;
     pointer-events: none;
     position: absolute;
     z-index: 7;
+  }
+
+  body:not(.setup-mode) .pause-toggle {
+    left: max(8px, env(safe-area-inset-left));
+    min-height: 38px;
+    min-width: 82px;
+    padding: 0 10px;
+    right: auto;
+    top: max(8px, env(safe-area-inset-top));
   }
 
   body:not(.setup-mode) .hud-head,
@@ -2023,29 +2038,29 @@ h1 {
 
   body:not(.setup-mode) #cards {
     display: grid;
-    gap: 5px;
-    grid-template-columns: repeat(4, minmax(82px, 1fr));
-    max-width: calc(100vw - 360px);
+    gap: 4px;
+    grid-template-columns: 1fr;
+    max-width: none;
     pointer-events: auto;
   }
 
   body:not(.setup-mode) .unit-card {
     background: rgba(7, 12, 20, 0.58);
     border-color: rgba(122, 242, 255, 0.28);
-    gap: 5px;
-    grid-template-columns: 30px minmax(0, 1fr);
-    min-height: 44px;
-    padding: 5px;
+    gap: 4px;
+    grid-template-columns: 26px minmax(0, 1fr);
+    min-height: 34px;
+    padding: 4px;
   }
 
   body:not(.setup-mode) .unit-card img {
     border-radius: 5px;
     padding: 1px;
-    width: 30px;
+    width: 26px;
   }
 
   body:not(.setup-mode) .unit-card h3 {
-    font-size: 10px;
+    font-size: 9px;
     margin: 0 0 2px;
   }
 
@@ -2063,48 +2078,54 @@ h1 {
     border-color: rgba(255, 209, 102, 0.3);
     align-items: center;
     display: flex;
-    gap: 8px;
-    min-height: 44px;
-    min-width: 218px;
-    padding: 7px 8px;
+    gap: 6px;
+    min-height: 34px;
+    min-width: 0;
+    overflow: visible;
+    padding: 5px 6px;
     pointer-events: none;
-    position: absolute;
-    right: calc(max(8px, env(safe-area-inset-right)) + 118px);
-    top: 0;
+    position: static;
   }
 
   body:not(.setup-mode) .score-panel .panel-title,
   body:not(.setup-mode) .score-panel hr,
-  body:not(.setup-mode) .score-panel .stat-row:last-child {
+  body:not(.setup-mode) .score-panel .stat-row:not(.score-row):not(.round-row) {
     display: none;
   }
 
   body:not(.setup-mode) .score-panel .stat-row,
   body:not(.setup-mode) .score-row {
+    border: 0;
     display: inline-grid;
     gap: 3px;
     margin: 0;
+    padding: 0;
   }
 
   body:not(.setup-mode) .score-panel .stat-row span,
   body:not(.setup-mode) .score-row span {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   body:not(.setup-mode) .score-panel .stat-row strong,
   body:not(.setup-mode) .score-row strong {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1;
   }
 
   body:not(.setup-mode) .score-panel .score-row strong {
-    font-size: 18px;
+    font-family: var(--cjk-ui);
+    font-size: 19px;
+    font-style: normal;
+    text-align: left;
+    text-shadow: 0 0 10px rgba(75, 228, 255, 0.74);
+    -webkit-text-stroke: 0;
   }
 
   body:not(.setup-mode) #skill-bar {
     border-radius: 0;
     margin: 0;
-    padding: 4px max(6px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    padding: 3px max(5px, env(safe-area-inset-right)) max(3px, env(safe-area-inset-bottom)) max(5px, env(safe-area-inset-left));
   }
 
   body:not(.setup-mode) #skill-buttons {
@@ -2120,24 +2141,79 @@ h1 {
   }
 
   body:not(.setup-mode) .skill-button {
-    grid-template-rows: 24px auto auto;
-    min-height: 74px;
-    padding: 3px 2px;
+    grid-template-rows: 20px auto auto;
+    min-height: 58px;
+    padding: 2px;
   }
 
   body:not(.setup-mode) .skill-button img {
-    width: 26px;
+    width: 22px;
   }
 
   body:not(.setup-mode) .skill-button span {
-    font-size: 9px;
+    font-size: 8.5px;
   }
 
   body:not(.setup-mode) .skill-button small {
-    font-size: 8.5px;
+    font-size: 8px;
   }
 
   body:not(.setup-mode) .skill-button em {
     display: none;
+  }
+
+  body:not(.setup-mode) #reward {
+    align-content: start;
+    background:
+      linear-gradient(180deg, rgba(7, 12, 20, 0.9), rgba(4, 6, 10, 0.86)),
+      radial-gradient(circle at 100% 0, rgba(75, 228, 255, 0.16), transparent 46%);
+    border: 1px solid rgba(122, 242, 255, 0.42);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.52);
+    gap: 6px;
+    inset: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) auto auto;
+    justify-items: stretch;
+    max-height: calc(100svh - 86px);
+    overflow-y: auto;
+    padding: 8px;
+    width: min(54vw, 500px);
+  }
+
+  body:not(.setup-mode) #reward h2 {
+    font-size: 24px;
+  }
+
+  body:not(.setup-mode) #reward-options {
+    gap: 6px;
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  body:not(.setup-mode) .reward-card {
+    gap: 8px;
+    grid-template-columns: 64px minmax(0, 1fr);
+    min-height: 0;
+    padding: 8px;
+  }
+
+  body:not(.setup-mode) .reward-card img {
+    aspect-ratio: 1;
+    height: 64px;
+    width: 64px;
+  }
+
+  body:not(.setup-mode) .reward-card h3 {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  body:not(.setup-mode) .reward-card p {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  body:not(.setup-mode) .reward-type {
+    font-size: 10px;
+    margin-bottom: 3px;
   }
 }
