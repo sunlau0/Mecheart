@@ -2502,30 +2502,57 @@ function drawShots() {
 
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.shadowColor = s.color;
-    ctx.shadowBlur = s.heal ? 18 : 14;
-    ctx.strokeStyle = s.color;
-    ctx.lineWidth = s.heal ? 7 : 5;
-    ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(ex, ey);
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = s.heal ? "rgba(220,255,235,0.9)" : "rgba(255,255,255,0.92)";
-    ctx.lineWidth = s.heal ? 2 : 1.5;
+    const healColor = s.heal ? "#62f6b0" : s.color;
+    ctx.shadowColor = healColor;
+    ctx.shadowBlur = s.heal ? 24 : 14;
+    ctx.strokeStyle = healColor;
+    ctx.lineWidth = s.heal ? 10 : 5;
     ctx.beginPath();
     ctx.moveTo(sx, sy);
     ctx.lineTo(ex, ey);
     ctx.stroke();
 
     if (s.heal) {
-      ctx.strokeStyle = s.color;
+      const dx = ex - sx;
+      const dy = ey - sy;
+      const length = Math.hypot(dx, dy) || 1;
+      const nx = -dy / length;
+      const ny = dx / length;
+      ctx.shadowBlur = 18;
       ctx.lineWidth = 3;
-      ctx.globalAlpha = alpha * 0.8;
+      ctx.strokeStyle = "rgba(220,255,235,0.95)";
+      for (let lane = -1; lane <= 1; lane += 2) {
+        ctx.beginPath();
+        for (let i = 0; i <= 12; i++) {
+          const t = i / 12;
+          const wave = Math.sin(t * Math.PI * 4 + age * Math.PI * 5) * 8 * lane;
+          const x = sx + dx * t + nx * wave;
+          const y = sy + dy * t + ny * wave;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = s.heal ? "rgba(220,255,235,0.9)" : "rgba(255,255,255,0.92)";
+    ctx.lineWidth = s.heal ? 4 : 1.5;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+
+    if (s.heal) {
+      ctx.strokeStyle = healColor;
+      ctx.lineWidth = 4;
+      ctx.globalAlpha = alpha * 0.86;
       ctx.beginPath();
-      ctx.arc(s.tx, s.ty - 12, 18 + age * 36, 0, Math.PI * 2);
+      ctx.arc(s.tx, s.ty - 12, 22 + age * 42, 0, Math.PI * 2);
       ctx.stroke();
+      drawPlusMark(s.tx, s.ty - 54 - age * 18, 8, healColor);
+      drawPlusMark(s.tx + 24, s.ty - 34 - age * 12, 6, "rgba(220,255,235,0.95)");
+      drawPlusMark(s.tx - 24, s.ty - 28 - age * 14, 6, "rgba(220,255,235,0.95)");
       ctx.beginPath();
       ctx.arc(s.x, s.y - 8, 10 + age * 22, 0, Math.PI * 2);
       ctx.stroke();
