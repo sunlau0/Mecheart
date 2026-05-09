@@ -238,6 +238,73 @@ body.paused-mode #game {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+@media (min-width: 1181px) {
+  body:not(.setup-mode) {
+    overflow: hidden;
+  }
+
+  body:not(.setup-mode) #game-shell {
+    align-items: stretch;
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body:not(.setup-mode) #stage-wrap {
+    align-content: center;
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: calc(100svh - 32px);
+    max-height: calc(100svh - 32px);
+  }
+
+  body:not(.setup-mode) #game {
+    align-self: center;
+    height: auto;
+    justify-self: center;
+    max-height: calc(100svh - 190px);
+    width: min(100%, calc((100svh - 190px) * 16 / 9));
+  }
+
+  body:not(.setup-mode) #skill-bar {
+    justify-self: center;
+    margin: 0 12px 12px;
+    width: min(calc(100% - 24px), calc((100svh - 190px) * 16 / 9));
+  }
+
+  body:not(.setup-mode) #hud {
+    align-self: stretch;
+    min-height: 0;
+    max-height: calc(100svh - 32px);
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 900px) {
+  body:not(.setup-mode) #game {
+    max-height: calc(100svh - 164px);
+    width: min(100%, calc((100svh - 164px) * 16 / 9));
+  }
+
+  body:not(.setup-mode) #skill-bar {
+    padding: 6px;
+    width: min(calc(100% - 24px), calc((100svh - 164px) * 16 / 9));
+  }
+
+  body:not(.setup-mode) .skill-button {
+    grid-template-rows: 32px auto auto 1fr;
+    min-height: 96px;
+  }
+
+  body:not(.setup-mode) .skill-button img {
+    width: 36px;
+  }
+
+  body:not(.setup-mode) .skill-button em {
+    -webkit-line-clamp: 2;
+    font-size: 9px;
+  }
+}
+
 .skill-pair {
   border: 1px solid rgba(122, 242, 255, 0.18);
   border-radius: 8px;
