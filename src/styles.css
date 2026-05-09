@@ -439,15 +439,17 @@ body.paused-mode #game {
 }
 
 #result {
-  align-content: center;
+  align-content: start;
   align-items: start;
   background:
     linear-gradient(90deg, rgba(4, 6, 10, 0.88), rgba(4, 6, 10, 0.28)),
     url("../assets/game-over-screen.webp?v=21") center / cover no-repeat;
   grid-template-columns: minmax(320px, 620px) minmax(300px, 430px);
+  grid-template-rows: auto auto auto;
   justify-items: start;
   overflow-x: hidden;
   overflow-y: auto;
+  padding-block: clamp(16px, 4vh, 52px);
 }
 
 #result.won {
@@ -471,7 +473,7 @@ body.paused-mode #game {
   color: #fff4f6;
   filter: drop-shadow(0 0 22px rgba(255, 61, 84, 0.58));
   font-family: var(--cjk-display);
-  font-size: clamp(50px, 8vw, 108px);
+  font-size: clamp(44px, 7vw, 92px);
   font-style: normal;
   font-weight: 1000;
   letter-spacing: 0;
@@ -486,6 +488,22 @@ body.paused-mode #game {
   -webkit-font-smoothing: antialiased;
   -webkit-text-stroke: 0 transparent;
   grid-column: 1 / -1;
+}
+
+#result .result-copy,
+#result > .leaderboard-panel {
+  max-height: min(58vh, 560px);
+  overflow-y: auto;
+}
+
+#result .result-copy {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#result > .leaderboard-panel {
+  grid-column: 2;
+  grid-row: 2 / 4;
 }
 
 .result-copy {
@@ -693,7 +711,22 @@ body.paused-mode #game {
 }
 
 #result #restart-btn {
-  grid-column: 1 / -1;
+  align-self: start;
+  border-color: rgba(255, 209, 102, 0.78);
+  box-shadow:
+    0 0 26px rgba(255, 209, 102, 0.26),
+    0 0 34px rgba(75, 228, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: clamp(20px, 1.85vw, 28px);
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: start;
+  margin-top: -40px;
+  min-height: clamp(62px, 6.4vh, 78px);
+  min-width: min(360px, 100%);
+  padding: 0 clamp(28px, 3vw, 46px);
+  text-shadow: 0 0 14px rgba(75, 228, 255, 0.75);
 }
 
 #briefing {

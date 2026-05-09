@@ -1954,7 +1954,7 @@ function endMission(won) {
   leaderboardFormEl.querySelector("button").disabled = false;
   resultEl.classList.toggle("lost", !won);
   resultEl.classList.toggle("won", won);
-  resultTitleEl.textContent = won ? "作戰完成" : "作戰失敗";
+  resultTitleEl.textContent = won ? "作戰完成" : "作戰結束";
   resultCopyEl.innerHTML = `
     <div class="result-score">
       <span>最終分數</span>
