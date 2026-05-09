@@ -960,7 +960,6 @@ function activateSkill(unit) {
   } else if (unit.name === "Lancer") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
-      unit.target = target.id;
       shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.2, maxLife: 0.2, damage: 84 + unit.damage + (unit.lancerBonus || 0), target: target.id, source: unit.id });
       burst(unit.x, unit.y, "#4aa8ff", 24);
       addSkillEffect("rail", unit, { tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.55 });
@@ -1151,7 +1150,6 @@ function useUltimate(unit) {
   if (unit.name === "Lancer") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.maxHp - a.maxHp || b.hp - a.hp)[0];
     if (target) {
-      unit.target = target.id;
       shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.42, maxLife: 0.42, damage: 185 + unit.damage + (unit.lancerBonus || 0), target: target.id, source: unit.id });
       burst(target.x, target.y, "#4aa8ff", 72);
       addSkillEffect("rail", unit, { tx: target.x, ty: target.y, color: "#4aa8ff", life: 0.72 });
