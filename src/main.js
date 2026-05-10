@@ -624,10 +624,10 @@ const upgradePool = [
   {
     id: "frontline-suppression-order",
     tier: "rare",
-    type: "戰術",
+    type: "指令",
     name: "前線壓制指令",
     icon: "assets/upgrade-frontline-suppression-order.webp",
-    text: "坦機受到攻擊時，附近敵人短時間移速 -15%。",
+    text: "坦機受到攻擊時，附近敵人攻擊力 -15%。",
     apply() {
       squad.forEach((u) => {
         if (u.name === "Asterion" || u.name === "Valkyr" || u.name === "MEGA(EK專用機)") u.frontlineSuppression = true;
@@ -678,13 +678,14 @@ const upgradePool = [
     id: "genesis-jamming-wave",
     tier: "ultra",
     type: "Ultra Rare",
-    name: "創世紀干擾波",
+    name: "陽電子炮",
     icon: "assets/upgrade-genesis-jamming-wave.webp",
-    text: "每回合開始時，全場敵人攻擊力與移速 -25%，持續 8 秒；Boss 效果減半。",
+    text: "全體機體每次 HP 低於 35% 時觸發一次，對全場敵人掃射陽電子炮。",
     apply() {
-      genesisWaveActive = true;
-      enemies.forEach((enemy) => applyGenesisWave(enemy));
-      addSkillEffect("genesis-wave", null, { x: W * 0.5, y: H * 0.5, radius: W * 0.72, color: "#ff3d54", life: 1.25, follow: false });
+      squad.forEach((u) => {
+        u.positronProtocol = true;
+        addSkillEffect("positron-cannon", u, { radius: bodyRadius(u) + 86, color: "#ffd166", life: 0.9, follow: true });
+      });
     }
   },
   {
@@ -693,11 +694,12 @@ const upgradePool = [
     type: "Ultra Rare",
     name: "零距離突破命令",
     icon: "assets/upgrade-zero-range-breakthrough.webp",
-    text: "近戰/中距離攻擊機可穿透碰撞，移速 +45%、攻擊力 +25%，但受到傷害 +15%。",
+    text: "近戰/中距離機體被敵人推撞或擠壓時，位移影響降低 50%；移速 +45%、攻擊力 +25%，但受到傷害 +15%。",
     apply() {
       squad.forEach((u) => {
         if (u.damage <= 0 || u.range > 265) return;
         u.zeroBreak = true;
+        u.zeroBreakPushReduction = 0.5;
         u.speed = Math.round(u.speed * 1.45);
         addSkillEffect("zero-break", u, { radius: bodyRadius(u) + 64, color: "#4be4ff", life: 0.9, follow: true });
       });
@@ -1779,6 +1781,16 @@ function applyGenesisWave(enemy) {
   if (Math.random() < 0.55) burst(enemy.x, enemy.y, "#ff3d54", 3);
 }
 
+function firePositronCannon(unit) {
+  const damage = 90 + Math.max(0, unit.damage) * 2;
+  enemies.filter((enemy) => enemy.hp > 0).forEach((enemy) => {
+    const finalDamage = enemy.boss ? damage * 0.55 : damage;
+    shots.push({ x: unit.x, y: unit.y, tx: enemy.x, ty: enemy.y, color: "#ffd166", life: 0.45, maxLife: 0.45, damage: finalDamage, target: enemy.id, source: unit.id });
+  });
+  burst(unit.x, unit.y, "#ffd166", 64);
+  addSkillEffect("positron-cannon", unit, { radius: W * 0.7, color: "#ffd166", life: 1.1, follow: false });
+}
+
 function burst(x, y, color, count) {
   for (let i = 0; i < count; i++) {
     sparks.push({
@@ -1852,6 +1864,10 @@ function stepUnit(unit, dt) {
     unit.buttonPulse = 0.5;
     burst(unit.x, unit.y, "#ff3d54", 38);
     addSkillEffect("seed-awaken", unit, { radius: bodyRadius(unit) + 78, color: "#ff3d54", life: 1.2, follow: true });
+  }
+  if (unit.positronProtocol && !unit.positronFired && unit.hp <= unit.maxHp * 0.35) {
+    unit.positronFired = true;
+    firePositronCannon(unit);
   }
   if (unit.himawariStatus) {
     unit.himawariStatus.life = Math.max(0, unit.himawariStatus.life - dt);
@@ -2074,19 +2090,15 @@ function resolveBodyOverlaps() {
           d = 1;
         }
 
-        const aResist = a.pushResistance ? 1 - clamp(a.pushResistance, 0, 0.6) : 1;
-        const bResist = b.pushResistance ? 1 - clamp(b.pushResistance, 0, 0.6) : 1;
+        const aResist = (a.pushResistance ? 1 - clamp(a.pushResistance, 0, 0.6) : 1) * (a.zeroBreak ? 1 - (a.zeroBreakPushReduction || 0.5) : 1);
+        const bResist = (b.pushResistance ? 1 - clamp(b.pushResistance, 0, 0.6) : 1) * (b.zeroBreak ? 1 - (b.zeroBreakPushReduction || 0.5) : 1);
         const push = (minD - d) * 0.5;
         const nx = dx / d;
         const ny = dy / d;
-        if (!a.zeroBreak) {
-          a.x -= nx * push * aResist;
-          a.y -= ny * push * aResist;
-        }
-        if (!b.zeroBreak) {
-          b.x += nx * push * bResist;
-          b.y += ny * push * bResist;
-        }
+        a.x -= nx * push * aResist;
+        a.y -= ny * push * aResist;
+        b.x += nx * push * bResist;
+        b.y += ny * push * bResist;
         clampUnitAfterSeparation(a);
         clampUnitAfterSeparation(b);
       }
@@ -2104,6 +2116,7 @@ function stepEnemy(enemy, dt) {
   enemy.slowTime = Math.max(0, (enemy.slowTime || 0) - dt);
   enemy.fireControlTime = Math.max(0, (enemy.fireControlTime || 0) - dt);
   enemy.genesisTime = Math.max(0, (enemy.genesisTime || 0) - dt);
+  enemy.frontlineSuppressionTime = Math.max(0, (enemy.frontlineSuppressionTime || 0) - dt);
   const target = chooseEnemyTarget(enemy, living);
   const d = dist(enemy, target);
   const genesisFactor = enemy.genesisTime > 0 ? (enemy.boss ? 0.875 : 0.75) : 1;
@@ -2114,13 +2127,14 @@ function stepEnemy(enemy, dt) {
     enemy.cooldown = enemy.rate * jamFactor + Math.random() * 0.22;
     enemy.attackPulse = 0.2;
     enemy.aim = { x: target.x, y: target.y };
-    const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1) * genesisFactor;
+    const frontlineFactor = enemy.frontlineSuppressionTime > 0 ? 0.85 : 1;
+    const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1) * genesisFactor * frontlineFactor;
     const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target) * unitDefenseFactor(target);
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
     if (target.frontlineSuppression) {
       enemies
         .filter((other) => other.hp > 0 && dist(other, target) < 170)
-        .forEach((other) => { other.slowTime = Math.max(other.slowTime || 0, 1.2); });
+        .forEach((other) => { other.frontlineSuppressionTime = Math.max(other.frontlineSuppressionTime || 0, 1.8); });
     }
     shots.push({ x: enemy.x, y: enemy.y, tx: target.x, ty: target.y, color: enemy.color, life: 0.26, maxLife: 0.26 });
     burst(target.x, target.y, enemy.color, 5);
@@ -3383,12 +3397,13 @@ function drawSkillEffects() {
         ctx.lineTo(point.x + Math.cos(angle) * radius * 0.82, point.y - 6 + Math.sin(angle) * radius * 0.82);
         ctx.stroke();
       }
-    } else if (effect.type === "genesis-wave") {
+    } else if (effect.type === "genesis-wave" || effect.type === "positron-cannon") {
       ctx.strokeStyle = effect.color;
-      ctx.lineWidth = 8;
+      ctx.lineWidth = effect.type === "positron-cannon" ? 11 : 8;
       ctx.globalAlpha = alpha * 0.76;
-      for (let i = 0; i < 5; i++) {
-        const y = H * (i / 4) + Math.sin(now() * 4 + i) * 12;
+      const beams = effect.type === "positron-cannon" ? 7 : 5;
+      for (let i = 0; i < beams; i++) {
+        const y = H * (i / (beams - 1)) + Math.sin(now() * 4 + i) * 12;
         ctx.beginPath();
         ctx.moveTo(-80, y - age * 80);
         ctx.lineTo(W + 80, y + age * 40);
