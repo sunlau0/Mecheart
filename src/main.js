@@ -1282,6 +1282,7 @@ function activateSkill(unit) {
       burst(target.x, target.y, "#f6c34f", 56);
       addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 0.95 });
     }
+    holdPositionAfterCast(unit);
     setMessage("重炮壓制");
   } else if (unit.name === "Mirage") {
     const radius = unit.jamRadius || 270;
@@ -1290,8 +1291,16 @@ function activateSkill(unit) {
     applyMirageAura(unit, 0.18);
     burst(unit.x, unit.y, "#c37bff", 52);
     addSkillEffect("jam-aura", unit, { radius, color: "#c37bff", life: duration });
+    holdPositionAfterCast(unit);
     setMessage("持續干擾");
   }
+}
+
+function holdPositionAfterCast(unit, duration = 0.85) {
+  unit.target = null;
+  unit.move = null;
+  unit.command = "idle";
+  unit.postCastHold = Math.max(unit.postCastHold || 0, duration);
 }
 
 function useUltimate(unit) {
@@ -1466,6 +1475,7 @@ function useUltimate(unit) {
       burst(target.x, target.y, "#f6c34f", 96);
       addSkillEffect("artillery", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 1.15, follow: false });
     }
+    holdPositionAfterCast(unit);
     setMessage("要塞齊射");
     return;
   }
@@ -1493,6 +1503,7 @@ function useUltimate(unit) {
       e.fireControlTime = Math.max(e.fireControlTime || 0, duration);
     });
     burst(unit.x, unit.y, "#c37bff", 84);
+    holdPositionAfterCast(unit);
     setMessage("海市蜃樓域");
     return;
   }
@@ -1822,6 +1833,7 @@ function stepUnit(unit, dt) {
   if (unit.hp <= 0) return;
   unit.cooldown = Math.max(0, unit.cooldown - dt);
   unit.skillCooldown = Math.max(0, unit.skillCooldown - dt);
+  unit.postCastHold = Math.max(0, (unit.postCastHold || 0) - dt);
   unit.shield = Math.max(0, unit.shield - dt);
   unit.attackPulse = Math.max(0, (unit.attackPulse || 0) - dt);
   unit.buttonPulse = Math.max(0, (unit.buttonPulse || 0) - dt);
@@ -1856,6 +1868,11 @@ function stepUnit(unit, dt) {
   if (unit.name === "Valkyr" && unit.gnFieldTime > 0) applyGnField(unit, dt);
   if (unit.name === "Helix" && unit.regenAuraTime > 0) applyHelixRegen(unit, dt);
   if (unit.name === "Mirage" && unit.mirageAuraTime > 0) applyMirageAura(unit, dt);
+  if (unit.postCastHold > 0) {
+    unit.target = null;
+    unit.move = null;
+    return;
+  }
   if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) applyEkAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
@@ -1966,7 +1983,8 @@ function stepUnit(unit, dt) {
           }
         } else if (unit.name === "Bastion") {
           const damage = (unit.damage + (unit.bastionBonus || 0) * 0.35) * (target.boss ? 1.7 : 1.1);
-          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.34, maxLife: 0.34, damage, target: target.id, source: unit.id, splashRadius: 62, splashDamage: unit.damage * 0.32 });
+          const splashRadius = Math.max(unit.bastionBasicSplashRadius || 93, (unit.splashRadius || 92) * 0.85);
+          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.34, maxLife: 0.34, damage, target: target.id, source: unit.id, splashRadius, splashDamage: unit.damage * 0.32 });
         } else {
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
         }
