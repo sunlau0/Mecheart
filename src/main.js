@@ -1277,7 +1277,7 @@ function activateSkill(unit) {
   } else if (unit.name === "Bastion") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => b.hp - a.hp)[0];
     if (target) {
-      const radius = unit.splashRadius || 92;
+      const radius = unit.splashRadius || 138;
       const bossBonus = target.boss ? 1.65 : 1;
       hit(target, (92 + unit.damage + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
       enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 30 + Math.floor(unit.damage * 0.5), "#f6c34f", unit.id));
@@ -1470,7 +1470,7 @@ function useUltimate(unit) {
   if (unit.name === "Bastion") {
     const target = enemies.filter((e) => e.hp > 0).sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || b.hp - a.hp)[0];
     if (target) {
-      const radius = unit.ultimateSplashRadius || 118;
+      const radius = unit.ultimateSplashRadius || 177;
       const bossBonus = target.boss ? 1.85 : 1;
       hit(target, (185 + unit.damage * 1.8 + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
       enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 72 + unit.damage * 0.75, "#f6c34f", unit.id));
@@ -1678,7 +1678,8 @@ function triggerMeteorSupport(unit, target) {
     .filter((enemy) => enemy.hp > 0 && dist(enemy, target) <= radius + bodyRadius(enemy) * 0.35)
     .forEach((enemy) => hit(enemy, damage, "#ffd166", unit.id));
   burst(target.x, target.y, "#ffd166", 26);
-  addSkillEffect("meteor-strike", null, { x: target.x, y: target.y, radius, color: "#ffd166", life: 0.62, follow: false });
+  addSkillEffect("meteor-deploy", unit, { radius: bodyRadius(unit) + 86, color: "#ffd166", life: 0.72, follow: true });
+  addSkillEffect("meteor-strike", null, { x: target.x, y: target.y, radius, color: "#ffd166", life: 0.82, follow: false, rotation: Math.atan2(target.y - unit.y, target.x - unit.x) });
 }
 
 function applyHelixRegen(unit, dt) {
@@ -1999,7 +2000,7 @@ function stepUnit(unit, dt) {
           }
         } else if (unit.name === "Bastion") {
           const damage = (unit.damage + (unit.bastionBonus || 0) * 0.35) * (target.boss ? 1.7 : 1.1);
-          const splashRadius = Math.max(unit.bastionBasicSplashRadius || 93, (unit.splashRadius || 92) * 0.85);
+          const splashRadius = Math.max(unit.bastionBasicSplashRadius || 93, (unit.splashRadius || 138) * 0.85);
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.34, maxLife: 0.34, damage, target: target.id, source: unit.id, splashRadius, splashDamage: unit.damage * 0.32 });
         } else {
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
@@ -3368,20 +3369,67 @@ function drawSkillEffects() {
       if (effect.type === "artillery") {
         for (let i = 0; i < 4; i++) ctx.strokeRect(point.x - size * (0.25 + i * 0.18), point.y - size * (0.25 + i * 0.18), size * (0.5 + i * 0.36), size * (0.5 + i * 0.36));
       }
+    } else if (effect.type === "meteor-deploy") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      ctx.globalAlpha = alpha * 0.78;
+      ctx.setLineDash([16, 10]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.82 + age * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (let i = 0; i < 6; i++) {
+        const angle = effect.rotation + i * Math.PI * 2 / 6 + age * 1.6;
+        const px = point.x + Math.cos(angle) * radius * 0.68;
+        const py = point.y - 8 + Math.sin(angle) * radius * 0.38;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(angle + Math.PI * 0.5);
+        ctx.fillStyle = "rgba(255,209,102,0.88)";
+        ctx.strokeStyle = "#fff3b0";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, -15);
+        ctx.lineTo(8, 10);
+        ctx.lineTo(0, 18);
+        ctx.lineTo(-8, 10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
     } else if (effect.type === "meteor-strike") {
       ctx.strokeStyle = effect.color;
-      ctx.lineWidth = 5;
-      for (let i = 0; i < 5; i++) {
-        const x = point.x - radius * 0.55 + i * radius * 0.28;
+      ctx.lineWidth = 6;
+      ctx.globalAlpha = alpha * 0.9;
+      for (let i = 0; i < 7; i++) {
+        const offset = (i - 3) * radius * 0.22;
+        const x = point.x + offset;
+        const topY = point.y - radius * (2.2 + age * 0.9) - Math.abs(i - 3) * 7;
         ctx.beginPath();
-        ctx.moveTo(x - 38, point.y - radius * (1.4 + age));
-        ctx.lineTo(x + 8, point.y + radius * 0.35);
+        ctx.moveTo(x - 54, topY);
+        ctx.lineTo(x + 12, point.y + radius * 0.48);
         ctx.stroke();
+        ctx.globalAlpha = alpha * 0.36;
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.moveTo(x - 54, topY);
+        ctx.lineTo(x + 12, point.y + radius * 0.48);
+        ctx.stroke();
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.lineWidth = 6;
       }
-      ctx.globalAlpha = alpha * 0.22;
+      ctx.strokeStyle = "#fff3b0";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.9 + age * 0.35), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = alpha * 0.24;
       ctx.fillStyle = effect.color;
       ctx.beginPath();
-      ctx.arc(point.x, point.y, radius * (0.65 + age * 0.3), 0, Math.PI * 2);
+      ctx.arc(point.x, point.y, radius * (0.92 + age * 0.34), 0, Math.PI * 2);
       ctx.fill();
     } else if (effect.type === "seed-awaken" || effect.type === "zero-break" || effect.type === "energy-core") {
       const spokes = effect.type === "seed-awaken" ? 8 : 6;
