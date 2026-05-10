@@ -319,13 +319,13 @@ const upgradePool = [
     type: "Valkyr 技能",
     name: "GN 防線核心",
     icon: "assets/upgrade-valkyr-gn-core.webp",
-    text: "Valkyr 最大 HP +55、射程 +25，挑釁信標持續更久，GN 力場範圍和推力提升。",
+    text: "Valkyr 最大 HP +55、防禦力 +12%，挑釁信標持續更久，GN 力場範圍和推力提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "Valkyr");
       if (!u) return;
       u.maxHp += 55;
       u.hp = clamp(u.hp + 55, 1, u.maxHp);
-      u.range += 25;
+      u.damageReduction = (u.damageReduction || 0) + 0.12;
       u.valkyrTauntDuration = (u.valkyrTauntDuration || 6) + 2;
       u.gnFieldDuration = (u.gnFieldDuration || 5.5) + 2;
       u.gnFieldRadius = (u.gnFieldRadius || 170) + 32;
@@ -423,14 +423,13 @@ const upgradePool = [
     type: "MEGA 技能",
     name: "EK 光環定律核心",
     icon: "assets/upgrade-miles-ek-aura.webp",
-    text: "MEGA 最大 HP +45；EK 光環更穩定，EK 定律爆炸傷害和波及範圍提升。",
+    text: "MEGA 最大 HP +45、防禦力 +10%；EK 定律爆炸傷害和波及範圍提升。",
     apply() {
       const u = squad.find((unit) => unit.name === "MEGA(EK專用機)");
       if (!u) return;
       u.maxHp += 45;
       u.hp = clamp(u.hp + 45, 1, u.maxHp);
-      u.ekAuraRange = (u.ekAuraRange || 235) + 18;
-      u.ekAuraShield = (u.ekAuraShield || 4.5) + 1.5;
+      u.damageReduction = (u.damageReduction || 0) + 0.1;
       u.ekLawDamage = (u.ekLawDamage || 136) + 26;
       u.ekLawRadius = (u.ekLawRadius || 145) + 16;
       u.ekLawSplashDamage = (u.ekLawSplashDamage || 64) + 12;
@@ -1301,6 +1300,10 @@ function himawariDefenseFactor(unit) {
   return 1;
 }
 
+function unitDefenseFactor(unit) {
+  return 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
+}
+
 function himawariSpeedFactor(unit) {
   const status = unit?.himawariStatus;
   return status?.kind === "speed-down" && status.life > 0 ? 0.2 : 1;
@@ -1801,7 +1804,7 @@ function stepEnemy(enemy, dt) {
     enemy.attackPulse = 0.2;
     enemy.aim = { x: target.x, y: target.y };
     const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1);
-    const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target);
+    const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target) * unitDefenseFactor(target);
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
     shots.push({ x: enemy.x, y: enemy.y, tx: target.x, ty: target.y, color: enemy.color, life: 0.26, maxLife: 0.26 });
     burst(target.x, target.y, enemy.color, 5);
@@ -1981,7 +1984,6 @@ function endMission(won) {
       <strong>${score}</strong>
     </div>
     <div class="result-lines">
-      <span>最高記錄 ${bestScore}</span>
       <span>抵達第 ${wave} 回合</span>
       <span>${won ? "艦隊防線仍然健在。" : "機體已撤退，重新整備後再出擊。"}</span>
     </div>
