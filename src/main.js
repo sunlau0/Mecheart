@@ -48,9 +48,11 @@ const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
 const UNIT_ART_VERSION = 42;
-const REWARD_ICON_VERSION = 29;
+const REWARD_ICON_VERSION = 34;
 const SKILL_ICON_VERSION = 43;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
+const REWARD_TIER_WEIGHTS = { common: 0.68, rare: 0.29, ultra: 0.03 };
+const REWARD_ULTRA_PITY_LIMIT = 8;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
@@ -76,6 +78,9 @@ let messageTime = 0;
 let score = 0;
 let bestScore = Number(localStorage.getItem("cosmic-heart-best") || 0);
 let rewardChoices = [];
+let ultraRewardPity = 0;
+let enemySpawnBonus = 0;
+let genesisWaveActive = false;
 let nextHudRefresh = 0;
 let leaderboardScore = 0;
 let leaderboardSubmitted = false;
@@ -478,6 +483,241 @@ const upgradePool = [
         u.hp = u.hp <= 0 ? reviveHp : clamp(u.hp + heal, 1, u.maxHp);
       });
     }
+  },
+  {
+    id: "spare-thruster-fuel",
+    tier: "common",
+    type: "機動",
+    name: "備用推進燃料",
+    icon: "assets/upgrade-spare-thruster-fuel.webp",
+    text: "全體移動速度 +10%。",
+    apply() {
+      squad.forEach((u) => { u.speed = Math.round(u.speed * 1.1); });
+    }
+  },
+  {
+    id: "beam-cooling-lines",
+    tier: "common",
+    type: "武器",
+    name: "光束冷卻管線",
+    icon: "assets/upgrade-beam-cooling-lines.webp",
+    text: "全體攻擊間隔縮短 5%。",
+    apply() {
+      squad.forEach((u) => { u.rate = Math.max(0.34, u.rate * 0.95); });
+    }
+  },
+  {
+    id: "assist-aim-chip",
+    tier: "common",
+    type: "武器",
+    name: "輔助瞄準晶片",
+    icon: "assets/upgrade-assist-aim-chip.webp",
+    text: "所有攻擊型機體射程 +18。",
+    apply() {
+      squad.forEach((u) => { if (u.damage > 0) u.range += 18; });
+    }
+  },
+  {
+    id: "lightweight-armor-plates",
+    tier: "common",
+    type: "裝甲",
+    name: "輕量化裝甲板",
+    icon: "assets/upgrade-lightweight-armor-plates.webp",
+    text: "全體最大 HP +18，移動速度 +4%。",
+    apply() {
+      squad.forEach((u) => {
+        u.maxHp += 18;
+        u.hp = clamp(u.hp + 18, 1, u.maxHp);
+        u.speed = Math.round(u.speed * 1.04);
+      });
+    }
+  },
+  {
+    id: "field-repair-kit",
+    tier: "common",
+    type: "生存",
+    name: "戰場維修包",
+    icon: "assets/upgrade-field-repair-kit.webp",
+    text: "每回合開始時，全體回復 12% HP。",
+    apply() {
+      squad.forEach((u) => { u.roundHealPercent = (u.roundHealPercent || 0) + 0.12; });
+    }
+  },
+  {
+    id: "squad-sync-link",
+    tier: "common",
+    type: "技能",
+    name: "小隊同步鏈路",
+    icon: "assets/upgrade-squad-sync-link.webp",
+    text: "全體主動技能冷卻時間 -1 秒。",
+    apply() {
+      squad.forEach((u) => { u.skillCooldownFlat = (u.skillCooldownFlat || 0) + 1; });
+    }
+  },
+  {
+    id: "thruster-stabilizer",
+    tier: "common",
+    type: "機動",
+    name: "推進器穩定器",
+    icon: "assets/upgrade-thruster-stabilizer.webp",
+    text: "被敵人推撞或擠壓時，位移影響降低 20%。",
+    apply() {
+      squad.forEach((u) => { u.pushResistance = clamp((u.pushResistance || 0) + 0.2, 0, 0.6); });
+    }
+  },
+  {
+    id: "trajectory-data",
+    tier: "common",
+    type: "武器",
+    name: "彈道校正資料",
+    icon: "assets/upgrade-trajectory-data.webp",
+    text: "攻擊型機體普通武器傷害 +8%。",
+    apply() {
+      squad.forEach((u) => { if (u.damage > 0) u.damage = Math.round(u.damage * 1.08); });
+    }
+  },
+  {
+    id: "tactical-fire-control-core",
+    tier: "rare",
+    type: "火控",
+    name: "戰術火控核心",
+    icon: "assets/upgrade-tactical-fire-control-core.webp",
+    text: "攻擊型機體傷害 +12%，射程 +25。",
+    apply() {
+      squad.forEach((u) => {
+        if (u.damage <= 0) return;
+        u.damage = Math.round(u.damage * 1.12);
+        u.range += 25;
+      });
+    }
+  },
+  {
+    id: "dense-defense-coating",
+    tier: "rare",
+    type: "裝甲",
+    name: "高密度防護塗層",
+    icon: "assets/upgrade-dense-defense-coating.webp",
+    text: "全體防禦力 +8%，最大 HP +20。",
+    apply() {
+      squad.forEach((u) => {
+        u.damageReduction = (u.damageReduction || 0) + 0.08;
+        u.maxHp += 20;
+        u.hp = clamp(u.hp + 20, 1, u.maxHp);
+      });
+    }
+  },
+  {
+    id: "support-sync-protocol",
+    tier: "rare",
+    type: "支援",
+    name: "支援機同步協議",
+    icon: "assets/upgrade-support-sync-protocol.webp",
+    text: "補機治療量 +18%，補血射程 +30。",
+    apply() {
+      squad.forEach((u) => {
+        if (u.damage >= 0) return;
+        u.damage = Math.round(u.damage * 1.18);
+        u.range += 30;
+      });
+    }
+  },
+  {
+    id: "frontline-suppression-order",
+    tier: "rare",
+    type: "戰術",
+    name: "前線壓制指令",
+    icon: "assets/upgrade-frontline-suppression-order.webp",
+    text: "坦機受到攻擊時，附近敵人短時間移速 -15%。",
+    apply() {
+      squad.forEach((u) => {
+        if (u.name === "Asterion" || u.name === "Valkyr" || u.name === "MEGA(EK專用機)") u.frontlineSuppression = true;
+      });
+    }
+  },
+  {
+    id: "skill-circuit-overload",
+    tier: "rare",
+    type: "技能",
+    name: "技能迴路超載",
+    icon: "assets/upgrade-skill-circuit-overload.webp",
+    text: "全體主動技能冷卻 -2 秒，但最大 HP -10。",
+    apply() {
+      squad.forEach((u) => {
+        u.skillCooldownFlat = (u.skillCooldownFlat || 0) + 2;
+        u.maxHp = Math.max(40, u.maxHp - 10);
+        u.hp = clamp(u.hp, 1, u.maxHp);
+      });
+    }
+  },
+  {
+    id: "seed-awakening-protocol",
+    tier: "ultra",
+    type: "Ultra Rare",
+    name: "SEED 覺醒協議",
+    icon: "assets/upgrade-seed-awakening-protocol.webp",
+    text: "全體機體首次低於 35% HP 時覺醒：攻擊力 +35%、移速 +35%，持續 5 秒。",
+    apply() {
+      squad.forEach((u) => {
+        u.seedProtocol = true;
+        addSkillEffect("seed-awaken", u, { radius: bodyRadius(u) + 72, color: "#ff3d54", life: 0.9, follow: true });
+      });
+    }
+  },
+  {
+    id: "meteor-equipment-deploy",
+    tier: "ultra",
+    type: "Ultra Rare",
+    name: "流星裝備展開",
+    icon: "assets/upgrade-meteor-equipment-deploy.webp",
+    text: "攻擊型機體普通攻擊有 35% 機率追加小型範圍光束轟炸。",
+    apply() {
+      squad.forEach((u) => { if (u.damage > 0) u.meteorSupport = true; });
+    }
+  },
+  {
+    id: "genesis-jamming-wave",
+    tier: "ultra",
+    type: "Ultra Rare",
+    name: "創世紀干擾波",
+    icon: "assets/upgrade-genesis-jamming-wave.webp",
+    text: "每回合開始時，全場敵人攻擊力與移速 -25%，持續 8 秒；Boss 效果減半。",
+    apply() {
+      genesisWaveActive = true;
+      enemies.forEach((enemy) => applyGenesisWave(enemy));
+      addSkillEffect("genesis-wave", null, { x: W * 0.5, y: H * 0.5, radius: W * 0.72, color: "#ff3d54", life: 1.25, follow: false });
+    }
+  },
+  {
+    id: "zero-range-breakthrough",
+    tier: "ultra",
+    type: "Ultra Rare",
+    name: "零距離突破命令",
+    icon: "assets/upgrade-zero-range-breakthrough.webp",
+    text: "近戰/中距離攻擊機可穿透碰撞，移速 +45%、攻擊力 +25%，但受到傷害 +15%。",
+    apply() {
+      squad.forEach((u) => {
+        if (u.damage <= 0 || u.range > 265) return;
+        u.zeroBreak = true;
+        u.speed = Math.round(u.speed * 1.45);
+        addSkillEffect("zero-break", u, { radius: bodyRadius(u) + 64, color: "#4be4ff", life: 0.9, follow: true });
+      });
+    }
+  },
+  {
+    id: "infinite-energy-core",
+    tier: "ultra",
+    type: "Ultra Rare",
+    name: "無限能源爐心",
+    icon: "assets/upgrade-infinite-energy-core.webp",
+    text: "全體技能冷卻 -35%，必殺充能 +35%；但敵人每回合生成數量 +15%。",
+    apply() {
+      enemySpawnBonus += 0.15;
+      squad.forEach((u) => {
+        u.skillCooldownMultiplier = (u.skillCooldownMultiplier || 1) * 0.65;
+        u.ultChargeMultiplier = (u.ultChargeMultiplier || 1) * 1.35;
+        addSkillEffect("energy-core", u, { radius: bodyRadius(u) + 70, color: "#62f6b0", life: 0.9, follow: true });
+      });
+    }
   }
 ];
 
@@ -556,6 +796,9 @@ function reset() {
   resultEl.classList.remove("lost", "won");
   rewardEl.hidden = true;
   rewardChoices = [];
+  ultraRewardPity = 0;
+  enemySpawnBonus = 0;
+  genesisWaveActive = false;
   nextHudRefresh = 0;
   hudCardsSignature = "";
   skillBarSignature = "";
@@ -567,7 +810,8 @@ function reset() {
 function spawnWave() {
   const isBossRound = wave % 3 === 0;
   const difficulty = getDifficulty();
-  const count = Math.min(15, 2 + Math.floor(wave * 0.82) + (isBossRound ? 0 : 0));
+  const baseCount = 2 + Math.floor(wave * 0.82) + (isBossRound ? 0 : 0);
+  const count = Math.min(18, Math.ceil(baseCount * (1 + enemySpawnBonus)));
   for (let i = 0; i < count; i++) {
     const typeKey = chooseEnemyType(i, count, isBossRound);
     const type = enemyTypes[typeKey];
@@ -605,7 +849,9 @@ function spawnWave() {
       slowTime: 0,
       fireControlTime: 0
     });
+    if (genesisWaveActive) applyGenesisWave(enemies[enemies.length - 1]);
   }
+  if (genesisWaveActive) addSkillEffect("genesis-wave", null, { x: W * 0.5, y: H * 0.5, radius: W * 0.72, color: "#ff3d54", life: 1.0, follow: false });
   setMessage(isBossRound ? `Boss 回合 ${wave}` : `第 ${wave} 回合`);
 }
 
@@ -895,7 +1141,8 @@ function activateSkill(unit) {
     unit.buttonPulse = 0.25;
     return;
   }
-  unit.skillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : 10;
+  const baseSkillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : 10;
+  unit.skillCooldown = baseSkillCooldown <= 0 ? 0 : Math.max(3.5, baseSkillCooldown * (unit.skillCooldownMultiplier || 1) - (unit.skillCooldownFlat || 0));
   unit.buttonPulse = 0.35;
   unit.attackPulse = 0.26;
   if (unit.name === "Asterion") {
@@ -1260,7 +1507,7 @@ function useUltimate(unit) {
 function hit(target, amount, color, sourceId = null) {
   const wasAlive = target.hp > 0;
   const source = squad.find((u) => u.id === sourceId && u.hp > 0);
-  target.hp -= amount * himawariAttackFactor(source);
+  target.hp -= amount * sourceDamageFactor(source);
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
     chargeUltimate(sourceId, target.boss ? 55 : 28);
@@ -1276,7 +1523,7 @@ function hit(target, amount, color, sourceId = null) {
 function chargeUltimate(sourceId, amount) {
   const unit = squad.find((u) => u.id === sourceId && u.hp > 0);
   if (!unit) return;
-  unit.ultCharge = clamp((unit.ultCharge || 0) + amount, 0, unit.ultMax || 100);
+  unit.ultCharge = clamp((unit.ultCharge || 0) + amount * (unit.ultChargeMultiplier || 1), 0, unit.ultMax || 100);
 }
 
 function chargeUltimateByHealing(unit, amount) {
@@ -1292,6 +1539,13 @@ function himawariAttackFactor(unit) {
   return 1;
 }
 
+function sourceDamageFactor(unit) {
+  let factor = himawariAttackFactor(unit);
+  if (unit?.seedAwakenTime > 0) factor *= 1.35;
+  if (unit?.zeroBreak) factor *= 1.25;
+  return factor;
+}
+
 function himawariDefenseFactor(unit) {
   const status = unit?.himawariStatus;
   if (!status || status.life <= 0) return 1;
@@ -1301,7 +1555,9 @@ function himawariDefenseFactor(unit) {
 }
 
 function unitDefenseFactor(unit) {
-  return 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
+  let factor = 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
+  if (unit?.zeroBreak) factor *= 1.15;
+  return factor;
 }
 
 function himawariSpeedFactor(unit) {
@@ -1401,6 +1657,17 @@ function performNovaQuantumSlash(unit) {
   addSkillEffect("quantum-slash", unit, { radius, color: "#ff9b38", life: 0.46, follow: true });
 }
 
+function triggerMeteorSupport(unit, target) {
+  if (!unit.meteorSupport || unit.damage <= 0 || !target || target.hp <= 0 || Math.random() >= 0.35) return;
+  const radius = 74;
+  const damage = Math.max(12, unit.damage * 0.72);
+  enemies
+    .filter((enemy) => enemy.hp > 0 && dist(enemy, target) <= radius + bodyRadius(enemy) * 0.35)
+    .forEach((enemy) => hit(enemy, damage, "#ffd166", unit.id));
+  burst(target.x, target.y, "#ffd166", 26);
+  addSkillEffect("meteor-strike", null, { x: target.x, y: target.y, radius, color: "#ffd166", life: 0.62, follow: false });
+}
+
 function applyHelixRegen(unit, dt) {
   const radius = unit.regenRadius || 260;
   const healPerSecond = unit.regenRate || 13;
@@ -1494,6 +1761,13 @@ function updateGravityFields(dt) {
   gravityFields = gravityFields.filter((field) => field.life > 0);
 }
 
+function applyGenesisWave(enemy) {
+  enemy.genesisTime = Math.max(enemy.genesisTime || 0, 8);
+  enemy.jamTime = Math.max(enemy.jamTime || 0, enemy.boss ? 2.5 : 4);
+  enemy.slowTime = Math.max(enemy.slowTime || 0, enemy.boss ? 2.5 : 4);
+  if (Math.random() < 0.55) burst(enemy.x, enemy.y, "#ff3d54", 3);
+}
+
 function burst(x, y, color, count) {
   for (let i = 0; i < count; i++) {
     sparks.push({
@@ -1559,6 +1833,14 @@ function stepUnit(unit, dt) {
   unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
   unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
   unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
+  unit.seedAwakenTime = Math.max(0, (unit.seedAwakenTime || 0) - dt);
+  if (unit.seedProtocol && !unit.seedAwakened && unit.hp <= unit.maxHp * 0.35) {
+    unit.seedAwakened = true;
+    unit.seedAwakenTime = 5;
+    unit.buttonPulse = 0.5;
+    burst(unit.x, unit.y, "#ff3d54", 38);
+    addSkillEffect("seed-awaken", unit, { radius: bodyRadius(unit) + 78, color: "#ff3d54", life: 1.2, follow: true });
+  }
   if (unit.himawariStatus) {
     unit.himawariStatus.life = Math.max(0, unit.himawariStatus.life - dt);
     if (unit.himawariStatus.life <= 0) unit.himawariStatus = null;
@@ -1577,7 +1859,8 @@ function stepUnit(unit, dt) {
   if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) applyEkAura(unit, dt);
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
-  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost * himawariSpeedFactor(unit);
+  const seedMoveBoost = unit.seedAwakenTime > 0 ? 1.35 : 1;
+  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost * seedMoveBoost * himawariSpeedFactor(unit);
 
   if (unit.name === "MEGA(EK專用機)") {
     unit.lostTime = Math.max(0, (unit.lostTime || 0) - dt);
@@ -1687,6 +1970,7 @@ function stepUnit(unit, dt) {
         } else {
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
         }
+        triggerMeteorSupport(unit, target);
       }
     }
     return;
@@ -1712,6 +1996,7 @@ function moveToward(actor, target, amount, limitAutoChase = false) {
 }
 
 function moveAwayFrom(actor, target, amount) {
+  if (actor.pushResistance) amount *= 1 - clamp(actor.pushResistance, 0, 0.6);
   const dx = actor.x - target.x;
   const dy = actor.y - target.y;
   const d = Math.hypot(dx, dy) || 1;
@@ -1771,13 +2056,19 @@ function resolveBodyOverlaps() {
           d = 1;
         }
 
+        const aResist = a.pushResistance ? 1 - clamp(a.pushResistance, 0, 0.6) : 1;
+        const bResist = b.pushResistance ? 1 - clamp(b.pushResistance, 0, 0.6) : 1;
         const push = (minD - d) * 0.5;
         const nx = dx / d;
         const ny = dy / d;
-        a.x -= nx * push;
-        a.y -= ny * push;
-        b.x += nx * push;
-        b.y += ny * push;
+        if (!a.zeroBreak) {
+          a.x -= nx * push * aResist;
+          a.y -= ny * push * aResist;
+        }
+        if (!b.zeroBreak) {
+          b.x += nx * push * bResist;
+          b.y += ny * push * bResist;
+        }
         clampUnitAfterSeparation(a);
         clampUnitAfterSeparation(b);
       }
@@ -1794,18 +2085,25 @@ function stepEnemy(enemy, dt) {
   enemy.jamTime = Math.max(0, (enemy.jamTime || 0) - dt);
   enemy.slowTime = Math.max(0, (enemy.slowTime || 0) - dt);
   enemy.fireControlTime = Math.max(0, (enemy.fireControlTime || 0) - dt);
+  enemy.genesisTime = Math.max(0, (enemy.genesisTime || 0) - dt);
   const target = chooseEnemyTarget(enemy, living);
   const d = dist(enemy, target);
-  const speedFactor = enemy.slowTime > 0 ? 0.54 : 1;
+  const genesisFactor = enemy.genesisTime > 0 ? (enemy.boss ? 0.875 : 0.75) : 1;
+  const speedFactor = (enemy.slowTime > 0 ? 0.54 : 1) * genesisFactor;
   if (d > enemy.range) moveToward(enemy, target, enemy.speed * speedFactor * dt);
   if (d <= enemy.range && enemy.cooldown <= 0 && (enemy.fireControlTime || 0) <= 0) {
     const jamFactor = enemy.jamTime > 0 ? 1.38 : 1;
     enemy.cooldown = enemy.rate * jamFactor + Math.random() * 0.22;
     enemy.attackPulse = 0.2;
     enemy.aim = { x: target.x, y: target.y };
-    const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1);
+    const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1) * genesisFactor;
     const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target) * unitDefenseFactor(target);
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
+    if (target.frontlineSuppression) {
+      enemies
+        .filter((other) => other.hp > 0 && dist(other, target) < 170)
+        .forEach((other) => { other.slowTime = Math.max(other.slowTime || 0, 1.2); });
+    }
     shots.push({ x: enemy.x, y: enemy.y, tx: target.x, ty: target.y, color: enemy.color, life: 0.26, maxLife: 0.26 });
     burst(target.x, target.y, enemy.color, 5);
   }
@@ -1898,20 +2196,31 @@ function completeRound() {
 function advanceRound() {
   wave += 1;
   nextWaveAt = now() + 1.35;
+  applyRoundStartRewards();
   spawnWave();
+}
+
+function applyRoundStartRewards() {
+  squad.forEach((unit) => {
+    if (unit.hp <= 0 || !unit.roundHealPercent) return;
+    unit.hp = clamp(unit.hp + Math.ceil(unit.maxHp * unit.roundHealPercent), 1, unit.maxHp);
+    unit.regenGlow = Math.max(unit.regenGlow || 0, 0.35);
+  });
 }
 
 async function showReward() {
   running = false;
   setPauseButtonVisible(false);
   rewardChoices = pickRewards();
+  if (rewardChoices.some((reward) => rewardTier(reward) === "ultra")) ultraRewardPity = 0;
+  else ultraRewardPity += 1;
   showLoading("載入獎勵圖像...");
   await loadRewardArt(rewardChoices);
   rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
-    <button class="reward-card" data-reward-index="${index}">
+    <button class="reward-card tier-${rewardTier(reward)}" data-reward-index="${index}">
       <img src="${assetSrc(reward.icon)}" alt="${reward.name} icon" />
       <div class="reward-copy">
-        <div class="reward-type">${reward.type}</div>
+        <div class="reward-type">${rewardTierLabel(reward)} / ${reward.type}</div>
         <h3>${reward.name}</h3>
         <p>${reward.text}</p>
       </div>
@@ -1942,11 +2251,45 @@ function pickRewards() {
 
   const pool = [...generalRewards, ...unitCandidates];
   const picks = [];
+  const forceUltra = ultraRewardPity >= REWARD_ULTRA_PITY_LIMIT;
+  if (forceUltra) drawRewardByTier(pool, picks, "ultra");
   while (picks.length < 3 && pool.length) {
-    const index = Math.floor(Math.random() * pool.length);
-    picks.push(pool.splice(index, 1)[0]);
+    const tier = drawRewardTier();
+    if (!drawRewardByTier(pool, picks, tier)) {
+      const index = Math.floor(Math.random() * pool.length);
+      picks.push(pool.splice(index, 1)[0]);
+    }
   }
   return picks;
+}
+
+function rewardTier(reward) {
+  return reward.tier || (reward.unit ? "rare" : "common");
+}
+
+function rewardTierLabel(reward) {
+  const tier = rewardTier(reward);
+  if (tier === "ultra") return "Ultra Rare";
+  if (tier === "rare") return "Rare";
+  return "Common";
+}
+
+function drawRewardTier() {
+  const roll = Math.random();
+  if (roll < REWARD_TIER_WEIGHTS.ultra) return "ultra";
+  if (roll < REWARD_TIER_WEIGHTS.ultra + REWARD_TIER_WEIGHTS.rare) return "rare";
+  return "common";
+}
+
+function drawRewardByTier(pool, picks, tier) {
+  const candidates = pool
+    .map((reward, index) => ({ reward, index }))
+    .filter((entry) => rewardTier(entry.reward) === tier);
+  if (!candidates.length) return false;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  picks.push(chosen.reward);
+  pool.splice(chosen.index, 1);
+  return true;
 }
 
 function chooseReward(index) {
@@ -2993,6 +3336,49 @@ function drawSkillEffects() {
       if (effect.type === "artillery") {
         for (let i = 0; i < 4; i++) ctx.strokeRect(point.x - size * (0.25 + i * 0.18), point.y - size * (0.25 + i * 0.18), size * (0.5 + i * 0.36), size * (0.5 + i * 0.36));
       }
+    } else if (effect.type === "meteor-strike") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 5;
+      for (let i = 0; i < 5; i++) {
+        const x = point.x - radius * 0.55 + i * radius * 0.28;
+        ctx.beginPath();
+        ctx.moveTo(x - 38, point.y - radius * (1.4 + age));
+        ctx.lineTo(x + 8, point.y + radius * 0.35);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = alpha * 0.22;
+      ctx.fillStyle = effect.color;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.65 + age * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+    } else if (effect.type === "seed-awaken" || effect.type === "zero-break" || effect.type === "energy-core") {
+      const spokes = effect.type === "seed-awaken" ? 8 : 6;
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = effect.type === "energy-core" ? 4 : 5;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 6, radius * (0.78 + age * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < spokes; i++) {
+        const angle = effect.rotation + i * Math.PI * 2 / spokes + age * 1.2;
+        ctx.beginPath();
+        ctx.moveTo(point.x + Math.cos(angle) * radius * 0.28, point.y - 6 + Math.sin(angle) * radius * 0.28);
+        ctx.lineTo(point.x + Math.cos(angle) * radius * 0.82, point.y - 6 + Math.sin(angle) * radius * 0.82);
+        ctx.stroke();
+      }
+    } else if (effect.type === "genesis-wave") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 8;
+      ctx.globalAlpha = alpha * 0.76;
+      for (let i = 0; i < 5; i++) {
+        const y = H * (i / 4) + Math.sin(now() * 4 + i) * 12;
+        ctx.beginPath();
+        ctx.moveTo(-80, y - age * 80);
+        ctx.lineTo(W + 80, y + age * 40);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = alpha * 0.1;
+      ctx.fillStyle = effect.color;
+      ctx.fillRect(0, 0, W, H);
     } else if (effect.type === "jam" || effect.type === "cloak" || effect.type === "jam-aura" || effect.type === "mirage-domain") {
       const persistent = effect.type === "jam-aura" || effect.type === "mirage-domain";
       const pulse = 0.72 + Math.sin(now() * 5.6 + effect.rotation) * 0.18;
