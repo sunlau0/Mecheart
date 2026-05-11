@@ -1279,8 +1279,8 @@ function activateSkill(unit) {
     if (target) {
       const radius = unit.splashRadius || 138;
       const bossBonus = target.boss ? 1.65 : 1;
-      hit(target, (92 + unit.damage + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
-      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 30 + Math.floor(unit.damage * 0.5), "#f6c34f", unit.id));
+      hit(target, (112 + unit.damage + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
+      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 46 + Math.floor(unit.damage * 0.65) + Math.floor((unit.bastionBonus || 0) * 0.35), "#f6c34f", unit.id));
       burst(target.x, target.y, "#f6c34f", 56);
       addSkillEffect("impact-grid", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 0.95 });
     }
@@ -1472,8 +1472,8 @@ function useUltimate(unit) {
     if (target) {
       const radius = unit.ultimateSplashRadius || 177;
       const bossBonus = target.boss ? 1.85 : 1;
-      hit(target, (185 + unit.damage * 1.8 + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
-      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 72 + unit.damage * 0.75, "#f6c34f", unit.id));
+      hit(target, (200 + unit.damage * 1.9 + (unit.bastionBonus || 0)) * bossBonus, "#f6c34f", unit.id);
+      enemies.filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < radius).forEach((e) => hit(e, 88 + unit.damage * 0.85 + (unit.bastionBonus || 0) * 0.35, "#f6c34f", unit.id));
       burst(target.x, target.y, "#f6c34f", 96);
       addSkillEffect("artillery", unit, { x: target.x, y: target.y, radius, color: "#f6c34f", life: 1.15, follow: false });
     }
