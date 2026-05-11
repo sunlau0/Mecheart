@@ -47,9 +47,9 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
-const UNIT_ART_VERSION = 42;
-const REWARD_ICON_VERSION = 34;
-const SKILL_ICON_VERSION = 43;
+const UNIT_ART_VERSION = 43;
+const REWARD_ICON_VERSION = 35;
+const SKILL_ICON_VERSION = 44;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const REWARD_TIER_WEIGHTS = { common: 0.68, rare: 0.29, ultra: 0.03 };
 const REWARD_ULTRA_PITY_LIMIT = 8;
@@ -107,6 +107,7 @@ const squadSeeds = [
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
   { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 265, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
+  { name: "Eumist (Eunice專用機)", ace: true, faction: "Allied", role: "霧刃循環支援機", weapon: "霞霧光刃 / 霧痕治癒核心", trait: "邊輸出邊補血。每次造成傷害會疊加霧痕，疊滿後消耗霧痕為全隊小補；但會隨時被阿媽捉去溫書補習，原地停止 3 秒。", tactic: "放在中前排持續斬擊同一批敵人，讓霧痕爆開形成穩定續航。八重霞適合敵群壓入時回血，朧可清場並為全隊提供短暫減傷。", color: "#66f2e4", x: 245, y: 315, maxHp: 126, range: 215, damage: 24, rate: 0.82, speed: 172, skill: "八重霞", activeDesc: "向四周發出連續霧刃斬擊，部分總傷害轉化為全隊治療，最低血友方額外回復。", ultimate: "朧", ultimateDesc: "展開大範圍霧域，高速斬擊敵方全體，將部分傷害轉化為治療，並令全隊短時間減傷。", passive: "霧痕循環", passiveDesc: "每次本機造成傷害時疊加 1 層霧痕；每層令本機對該敵人傷害 +4%。疊滿 5 層時消耗霧痕，治療全隊並額外治療最低血友方。", activeIcon: "assets/skill-eumist-yaegasumi.webp", ultimateIcon: "assets/skill-eumist-oboro.webp", art: "assets/player-eumist-profile.webp", sprite: "assets/player-eumist-sd.webp" },
   { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。EK 光環是開關式光環，會持續拉住附近敵機；EK 定律可鎖定全場敵人，1 秒後爆炸並波及附近機體。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "鎖定全場最高威脅敵人植入 EK 定律，1 秒後爆炸並波及附近機體。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
   { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" }
 ];
@@ -420,6 +421,23 @@ const upgradePool = [
       u.range += 25;
       u.jamRadius = (u.jamRadius || 250) + 45;
       u.jamDuration = (u.jamDuration || 4.5) + 1.5;
+    }
+  },
+  {
+    id: "eumist-mist-cycle-core",
+    unit: "Eumist (Eunice專用機)",
+    type: "Eumist 霧痕",
+    name: "補習筆記核心",
+    tier: "rare",
+    icon: "assets/upgrade-eumist-mist-cycle.webp",
+    text: "Eumist 傷害 +7；霧痕爆開治療提升，補習中觸發間隔延長。",
+    apply() {
+      const u = squad.find((unit) => unit.name === "Eumist (Eunice專用機)");
+      if (!u) return;
+      u.damage += 7;
+      u.eumistBurstHealMultiplier = (u.eumistBurstHealMultiplier || 1) * 1.25;
+      u.eumistTutoringMin = (u.eumistTutoringMin || 7) + 6;
+      u.eumistTutoringRange = (u.eumistTutoringRange || 23) + 4;
     }
   },
   {
@@ -779,6 +797,8 @@ function reset() {
     lostPoint: null,
     lostRetarget: 0,
     himawariPassiveCooldown: u.name === "Himawari (Candy專用機)" ? 5 + Math.random() * 6 : 0,
+    eumistTutoringCooldown: u.name === "Eumist (Eunice專用機)" ? 5 + Math.random() * 9 : 0,
+    eumistTutoringTime: 0,
     himawariStatus: null
     });
   });
@@ -1129,6 +1149,11 @@ function addSkillEffect(type, source, options = {}) {
 
 function activateSkill(unit) {
   if (!unit || unit.hp <= 0) return;
+  if (unit.eumistTutoringTime > 0) {
+    setMessage("Eumist: 補習中");
+    unit.buttonPulse = 0.25;
+    return;
+  }
   if (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive) {
     unit.ekAuraActive = false;
     unit.skillCooldown = 10;
@@ -1286,6 +1311,8 @@ function activateSkill(unit) {
     }
     holdPositionAfterCast(unit);
     setMessage("重炮壓制");
+  } else if (unit.name === "Eumist (Eunice專用機)") {
+    activateEumistSkill(unit);
   } else if (unit.name === "Mirage") {
     const radius = unit.jamRadius || 270;
     const duration = unit.jamDuration || 5.2;
@@ -1307,6 +1334,11 @@ function holdPositionAfterCast(unit, duration = 0.85) {
 
 function useUltimate(unit) {
   if (!unit || unit.hp <= 0) return;
+  if (unit.eumistTutoringTime > 0) {
+    setMessage("Eumist: 補習中");
+    unit.buttonPulse = 0.25;
+    return;
+  }
   const charge = Math.floor(((unit.ultCharge || 0) / (unit.ultMax || 100)) * 100);
   if (charge < 100) {
     setMessage(`${unit.ultimate}: 能量 ${charge}%`);
@@ -1482,6 +1514,11 @@ function useUltimate(unit) {
     return;
   }
 
+  if (unit.name === "Eumist (Eunice專用機)") {
+    activateEumistUltimate(unit);
+    return;
+  }
+
   if (unit.name === "Mirage") {
     const duration = unit.mirageDomainDuration || 4;
     const radius = unit.mirageDomainRadius || 294;
@@ -1520,7 +1557,16 @@ function useUltimate(unit) {
 function hit(target, amount, color, sourceId = null) {
   const wasAlive = target.hp > 0;
   const source = squad.find((u) => u.id === sourceId && u.hp > 0);
-  target.hp -= amount * sourceDamageFactor(source);
+  const hpBefore = target.hp;
+  let finalAmount = amount * sourceDamageFactor(source);
+  if (source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
+    finalAmount *= 1 + getEumistMistMarks(target, source) * 0.04;
+  }
+  target.hp = Math.max(0, target.hp - finalAmount);
+  const dealt = hpBefore - target.hp;
+  if (dealt > 0 && source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
+    applyEumistMistMark(source, target);
+  }
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
     chargeUltimate(sourceId, target.boss ? 55 : 28);
@@ -1531,6 +1577,7 @@ function hit(target, amount, color, sourceId = null) {
       localStorage.setItem("cosmic-heart-best", String(bestScore));
     }
   }
+  return dealt;
 }
 
 function chargeUltimate(sourceId, amount) {
@@ -1562,6 +1609,88 @@ function chargeUltimateByDamageTaken(unit, amount) {
   chargeUltimate(unit.id, applied);
 }
 
+function lowestHpAlly() {
+  return squad
+    .filter((ally) => ally.hp > 0 && ally.hp < ally.maxHp)
+    .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0] || null;
+}
+
+function healAlly(source, ally, amount, color = "#66f2e4") {
+  if (!source || !ally || ally.hp <= 0 || amount <= 0) return 0;
+  const hpBefore = ally.hp;
+  ally.hp = clamp(ally.hp + amount, 0, ally.maxHp);
+  const healed = ally.hp - hpBefore;
+  if (healed > 0) {
+    ally.regenGlow = Math.max(ally.regenGlow || 0, 0.45);
+    chargeUltimateByHealing(source, healed);
+    addSkillEffect("mist-heal", ally, { radius: bodyRadius(ally) + 34, color, life: 0.55, follow: true });
+  }
+  return healed;
+}
+
+function healSquad(source, amount, color = "#66f2e4") {
+  if (!source || amount <= 0) return 0;
+  return squad.reduce((total, ally) => total + healAlly(source, ally, amount, color), 0);
+}
+
+function getEumistMistMarks(target, source) {
+  return Math.max(0, target?.eumistMistMarks?.[source?.id] || 0);
+}
+
+function applyEumistMistMark(source, target) {
+  target.eumistMistMarks = target.eumistMistMarks || {};
+  const next = getEumistMistMarks(target, source) + 1;
+  if (next < 5) {
+    target.eumistMistMarks[source.id] = next;
+    return;
+  }
+  target.eumistMistMarks[source.id] = 0;
+  const heal = source.damage * 0.6 * (source.eumistBurstHealMultiplier || 1);
+  healSquad(source, heal, "#66f2e4");
+  healAlly(source, lowestHpAlly(), heal, "#dffcff");
+  burst(target.x, target.y, "#66f2e4", 22);
+  addSkillEffect("mist-bloom", null, { x: target.x, y: target.y, radius: bodyRadius(target) + 72, color: "#66f2e4", life: 0.82, follow: false });
+}
+
+function performEumistBasicHeal(unit) {
+  const ally = lowestHpAlly();
+  if (!ally) return;
+  const lowHpBonus = ally.hp / ally.maxHp < 0.4 ? 1.3 : 1;
+  healAlly(unit, ally, unit.damage * 0.3 * lowHpBonus);
+}
+
+function activateEumistSkill(unit) {
+  const radius = unit.eumistSkillRadius || 218;
+  const targets = enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius + bodyRadius(enemy) * 0.45);
+  let totalDamage = 0;
+  targets.forEach((enemy) => { totalDamage += hit(enemy, unit.damage * 1.65, "#66f2e4", unit.id) || 0; });
+  const teamHeal = Math.min(totalDamage * 0.18, unit.damage * 1.75) * (unit.eumistBurstHealMultiplier || 1);
+  healSquad(unit, teamHeal);
+  healAlly(unit, lowestHpAlly(), unit.damage * 0.8 * (unit.eumistBurstHealMultiplier || 1), "#dffcff");
+  burst(unit.x, unit.y, "#66f2e4", 48);
+  addSkillEffect("eumist-blades", unit, { radius, color: "#66f2e4", life: 1.0, follow: true });
+  holdPositionAfterCast(unit);
+  setMessage("八重霞");
+}
+
+function activateEumistUltimate(unit) {
+  let totalDamage = 0;
+  enemies.filter((enemy) => enemy.hp > 0).forEach((enemy) => {
+    totalDamage += hit(enemy, unit.damage * 3.2, "#66f2e4", unit.id) || 0;
+  });
+  const teamHeal = Math.min(totalDamage * 0.22, unit.damage * 3.0) * (unit.eumistBurstHealMultiplier || 1);
+  healSquad(unit, teamHeal);
+  healAlly(unit, lowestHpAlly(), unit.damage * 1.8 * (unit.eumistBurstHealMultiplier || 1), "#dffcff");
+  squad.forEach((ally) => {
+    if (ally.hp <= 0) return;
+    ally.eumistVeilTime = Math.max(ally.eumistVeilTime || 0, 6);
+    ally.eumistVeilReduction = Math.max(ally.eumistVeilReduction || 0, 0.12);
+  });
+  burst(unit.x, unit.y, "#66f2e4", 92);
+  addSkillEffect("eumist-oboro", unit, { x: W * 0.5, y: H * 0.5, radius: W * 0.55, color: "#66f2e4", life: 1.25, follow: false });
+  setMessage("朧");
+}
+
 function himawariAttackFactor(unit) {
   const status = unit?.himawariStatus;
   if (!status || status.life <= 0) return 1;
@@ -1587,6 +1716,7 @@ function himawariDefenseFactor(unit) {
 
 function unitDefenseFactor(unit) {
   let factor = 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
+  if (unit?.eumistVeilTime > 0) factor *= 1 - clamp(unit.eumistVeilReduction || 0.12, 0, 0.3);
   if (unit?.zeroBreak) factor *= 1.15;
   return factor;
 }
@@ -1874,6 +2004,7 @@ function stepUnit(unit, dt) {
   unit.regenGlow = Math.max(0, (unit.regenGlow || 0) - dt);
   unit.guardianRegenTime = Math.max(0, (unit.guardianRegenTime || 0) - dt);
   unit.gnFieldTime = Math.max(0, (unit.gnFieldTime || 0) - dt);
+  unit.eumistVeilTime = Math.max(0, (unit.eumistVeilTime || 0) - dt);
   unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
   unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
   unit.seedAwakenTime = Math.max(0, (unit.seedAwakenTime || 0) - dt);
@@ -1897,6 +2028,26 @@ function stepUnit(unit, dt) {
     if (unit.himawariPassiveCooldown <= 0) {
       applyHimawariPassive(unit);
       unit.himawariPassiveCooldown = (unit.himawariPassiveMin || 7) + Math.random() * 7;
+    }
+  }
+  if (unit.name === "Eumist (Eunice專用機)") {
+    unit.eumistTutoringTime = Math.max(0, (unit.eumistTutoringTime || 0) - dt);
+    if (unit.eumistTutoringTime > 0) {
+      unit.target = null;
+      unit.move = null;
+      unit.aim = null;
+      return;
+    }
+    unit.eumistTutoringCooldown = Math.max(0, (unit.eumistTutoringCooldown || 0) - dt);
+    if (unit.eumistTutoringCooldown <= 0) {
+      unit.eumistTutoringTime = 3;
+      unit.eumistTutoringCooldown = (unit.eumistTutoringMin || 7) + Math.random() * (unit.eumistTutoringRange || 23);
+      unit.cooldown = Math.max(unit.cooldown || 0, 3);
+      unit.buttonPulse = 0.35;
+      burst(unit.x, unit.y, "#66f2e4", 16);
+      addSkillEffect("tutoring", unit, { radius: bodyRadius(unit) + 42, color: "#66f2e4", life: 3.0, follow: true });
+      setMessage("Eumist: 補習中");
+      return;
     }
   }
   if (unit.name === "Asterion" && unit.guardianRegenTime > 0) applyGuardianRegen(unit, dt);
@@ -2020,6 +2171,10 @@ function stepUnit(unit, dt) {
           const damage = (unit.damage + (unit.bastionBonus || 0) * 0.35) * (target.boss ? 1.7 : 1.1);
           const splashRadius = Math.max(unit.bastionBasicSplashRadius || 93, (unit.splashRadius || 138) * 0.85);
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.34, maxLife: 0.34, damage, target: target.id, source: unit.id, splashRadius, splashDamage: unit.damage * 0.32 });
+        } else if (unit.name === "Eumist (Eunice專用機)") {
+          shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage * 0.9, target: target.id, source: unit.id });
+          performEumistBasicHeal(unit);
+          addSkillEffect("eumist-slash", unit, { tx: target.x, ty: target.y, radius: unit.range, color: "#66f2e4", life: 0.36 });
         } else {
           shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.24, maxLife: 0.24, damage: unit.damage, target: target.id, source: unit.id });
         }
@@ -2072,6 +2227,7 @@ function bodyRadius(actor) {
   if (actor.name === "Helix") return 37;
   if (actor.name === "Bastion") return 52;
   if (actor.name === "Mirage") return 41;
+  if (actor.name === "Eumist (Eunice專用機)") return 42;
   if (actor.name === "Seraphim") return 39;
   return 41;
 }
@@ -3062,6 +3218,128 @@ function drawSkillEffects() {
         ctx.lineTo(point.x + px * radius * (0.72 + age * 0.2), point.y + py * radius * (0.72 + age * 0.2));
         ctx.stroke();
       }
+    } else if (effect.type === "eumist-slash") {
+      const tx = effect.tx ?? point.x + radius;
+      const ty = effect.ty ?? point.y;
+      const base = Math.atan2(ty - point.y, tx - point.x);
+      const reach = Math.min(radius, Math.hypot(tx - point.x, ty - point.y));
+      const px = Math.cos(base);
+      const py = Math.sin(base);
+      const cx = point.x + px * reach * (0.62 + age * 0.26);
+      const cy = point.y - 10 + py * reach * (0.62 + age * 0.26);
+      const arcRadius = 26 + age * 10;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(223,252,255,0.92)";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(cx, cy, arcRadius, base - 0.95, base + 0.95);
+      ctx.stroke();
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      for (let i = -1; i <= 1; i++) {
+        const offset = i * 0.18;
+        ctx.beginPath();
+        ctx.arc(cx - px * i * 5, cy - py * i * 5, arcRadius * (0.72 + i * 0.08), base - 0.8 + offset, base + 0.8 + offset);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(102,242,228,0.22)";
+      for (let i = 0; i < 4; i++) {
+        const t = 0.48 + i * 0.09 + age * 0.12;
+        ctx.beginPath();
+        ctx.arc(point.x + px * reach * t - py * (i - 1.5) * 5, point.y - 10 + py * reach * t + px * (i - 1.5) * 5, 3 + i % 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (effect.type === "eumist-blades") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 5;
+      for (let i = 0; i < 8; i++) {
+        const angle = effect.rotation + i * Math.PI / 4 + age * 2.6;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y - 6, radius * (0.22 + age * 0.48 + (i % 3) * 0.04), angle - 0.55, angle + 0.55);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(102,242,228,0.16)";
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 6, radius * (0.3 + age * 0.34), 0, Math.PI * 2);
+      ctx.fill();
+    } else if (effect.type === "mist-heal" || effect.type === "mist-bloom") {
+      const marks = effect.type === "mist-bloom" ? 10 : 5;
+      for (let i = 0; i < marks; i++) {
+        const angle = effect.rotation + i * 2.399 + age * 0.8;
+        const spread = radius * (0.16 + (i / marks) * 0.72);
+        drawPlusMark(point.x + Math.cos(angle) * spread, point.y - 8 + Math.sin(angle) * spread - age * 18, 5, i % 3 === 0 ? "#dffcff" : effect.color);
+      }
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.55 + age * 0.35), 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (effect.type === "eumist-oboro") {
+      ctx.fillStyle = "rgba(102,242,228,0.12)";
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * (0.55 + age * 0.34), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const angle = effect.rotation + i * 0.72 + age * 3.5;
+        const inner = radius * (0.1 + (i % 4) * 0.08);
+        const outer = radius * (0.62 + (i % 3) * 0.08);
+        ctx.beginPath();
+        ctx.moveTo(point.x + Math.cos(angle) * inner, point.y + Math.sin(angle) * inner);
+        ctx.lineTo(point.x + Math.cos(angle + 0.18) * outer, point.y + Math.sin(angle + 0.18) * outer);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 8; i++) drawPlusMark(point.x - 70 + i * 20, point.y - 90 + Math.sin(now() * 4 + i) * 7, 5, "#dffcff");
+    } else if (effect.type === "tutoring") {
+      const bob = Math.sin(now() * 9) * 3;
+      const bookW = 74;
+      const bookH = 54;
+      const x = point.x - bookW * 0.5;
+      const y = point.y - 36 + bob;
+      ctx.shadowBlur = 28;
+      ctx.fillStyle = "rgba(6, 18, 28, 0.88)";
+      ctx.strokeStyle = "#dffcff";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(x, y, bookW, bookH, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(point.x, y + 7);
+      ctx.lineTo(point.x, y + bookH - 7);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(223,252,255,0.72)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const lineY = y + 15 + i * 9;
+        ctx.beginPath();
+        ctx.moveTo(x + 10, lineY);
+        ctx.lineTo(point.x - 8, lineY + Math.sin(now() * 4 + i) * 1.5);
+        ctx.moveTo(point.x + 8, lineY);
+        ctx.lineTo(x + bookW - 10, lineY + Math.cos(now() * 4 + i) * 1.5);
+        ctx.stroke();
+      }
+      const signR = 18 + Math.sin(now() * 10) * 1.8;
+      ctx.strokeStyle = "#ff5b66";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(point.x, y + bookH * 0.52, signR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(point.x - signR * 0.72, y + bookH * 0.52 + signR * 0.72);
+      ctx.lineTo(point.x + signR * 0.72, y + bookH * 0.52 - signR * 0.72);
+      ctx.stroke();
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 7]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.92 + age * 0.18), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
     } else if (effect.type === "repair-shield" || effect.type === "revive") {
       const marks = effect.type === "revive" ? 14 : 9;
       for (let i = 0; i < marks; i++) {
