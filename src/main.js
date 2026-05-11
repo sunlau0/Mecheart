@@ -1297,7 +1297,18 @@ function applyStaticLanguage() {
     element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
   });
   if (languageToggleEl) languageToggleEl.textContent = "English / 繁中";
+  updateTutorialImage();
   updatePauseControls();
+}
+
+function updateTutorialImage() {
+  const image = document.getElementById("tutorial-controls-image");
+  if (!image) return;
+  const src = currentLanguage === "en"
+    ? "assets/tutorial-controls-en.webp?v=6"
+    : "assets/tutorial-controls-zh.webp?v=6";
+  image.dataset.src = src;
+  if (image.getAttribute("src")) image.src = src;
 }
 
 function refreshLanguageSensitiveViews() {
