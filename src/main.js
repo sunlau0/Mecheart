@@ -1544,6 +1544,24 @@ function chargeUltimateByHealing(unit, amount) {
   chargeUltimate(unit.id, Math.max(1, amount * 0.42));
 }
 
+function chargeUltimateByDamageTaken(unit, amount) {
+  if (!unit || unit.faction !== "Allied" || unit.hp <= 0 || amount <= 0) return;
+  const windowNow = now();
+  if (!unit.damageUltWindowStart || windowNow - unit.damageUltWindowStart >= 1) {
+    unit.damageUltWindowStart = windowNow;
+    unit.damageUltWindowCharge = 0;
+  }
+  const tankRole = /(前衛|重盾|坦機)/.test(unit.role || "");
+  const maxPerSecond = tankRole ? 5.6 : 3.8;
+  const room = maxPerSecond - (unit.damageUltWindowCharge || 0);
+  if (room <= 0) return;
+  const pressureBonus = tankRole ? 1.22 : 1;
+  const charge = clamp((amount / unit.maxHp) * 36 * pressureBonus, 0.35, 3.4);
+  const applied = Math.min(room, charge);
+  unit.damageUltWindowCharge = (unit.damageUltWindowCharge || 0) + applied;
+  chargeUltimate(unit.id, applied);
+}
+
 function himawariAttackFactor(unit) {
   const status = unit?.himawariStatus;
   if (!status || status.life <= 0) return 1;
@@ -2131,7 +2149,9 @@ function stepEnemy(enemy, dt) {
     const frontlineFactor = enemy.frontlineSuppressionTime > 0 ? 0.85 : 1;
     const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1) * genesisFactor * frontlineFactor;
     const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target) * unitDefenseFactor(target);
+    const hpBefore = target.hp;
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
+    chargeUltimateByDamageTaken(target, hpBefore - target.hp);
     if (target.frontlineSuppression) {
       enemies
         .filter((other) => other.hp > 0 && dist(other, target) < 170)
