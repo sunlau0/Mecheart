@@ -269,7 +269,7 @@ const enemyTypes = {
     tactic: "裝甲薄。用 Asterion 聚怪，再由 Caliburn 或 Orion 清場。",
     color: "#b767ff",
     maxHpBase: 34,
-    range: 92,
+    range: 125,
     damage: 6,
     speedBase: 46,
     rateBase: 1.65,
@@ -287,7 +287,7 @@ const enemyTypes = {
     tactic: "讓 Asterion 攔截，避免它貼近 Orion 或 Seraphim。",
     color: "#ff9b38",
     maxHpBase: 30,
-    range: 76,
+    range: 105,
     damage: 8,
     speedBase: 78,
     rateBase: 1.25,
@@ -305,7 +305,7 @@ const enemyTypes = {
     tactic: "派 Caliburn 近身斬落，或用 Orion 對射壓制。",
     color: "#4aa8ff",
     maxHpBase: 42,
-    range: 230,
+    range: 285,
     damage: 9,
     speedBase: 34,
     rateBase: 2.05,
@@ -323,7 +323,7 @@ const enemyTypes = {
     tactic: "除非卡住近戰機，否則可先清其他威脅。",
     color: "#9aa0aa",
     maxHpBase: 88,
-    range: 105,
+    range: 140,
     damage: 7,
     speedBase: 30,
     rateBase: 1.9,
@@ -341,7 +341,7 @@ const enemyTypes = {
     tactic: "用 Caliburn 與 Orion 集火，別讓 Seraphim 漂到前面。",
     color: "#ff3f55",
     maxHpBase: 62,
-    range: 150,
+    range: 205,
     damage: 10,
     speedBase: 42,
     rateBase: 1.55,
@@ -359,9 +359,9 @@ const enemyTypes = {
     tactic: "保持 Asterion 有護盾，全隊集火，技能一好就用。",
     color: "#f6c34f",
     maxHpBase: 230,
-    range: 190,
-    damage: 15,
-    speedBase: 25,
+    range: 320,
+    damage: 22,
+    speedBase: 42,
     rateBase: 1.28,
     radius: 48,
     points: 700,
@@ -2857,16 +2857,27 @@ function chooseEnemyTarget(enemy, living) {
     if (taunted) return taunted;
   }
 
-  const byDistance = [...living].sort((a, b) => dist(enemy, a) - dist(enemy, b));
-  const vulnerable = living.filter((u) => u.name !== "Asterion" && u.name !== "Valkyr").sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp));
-  const support = living.find((u) => u.name === "Seraphim" || u.name === "Helix");
-  const artillery = living.find((u) => u.name === "Orion" || u.name === "Lancer" || u.name === "Bastion");
+  const priority = enemy.boss || enemy.type !== "sniper"
+    ? ["attacker", "repair", "tank"]
+    : ["repair", "attacker", "tank"];
 
-  if (enemy.type === "raider") return vulnerable[0] || byDistance[0];
-  if (enemy.type === "sniper") return support || artillery || vulnerable[0] || byDistance[0];
-  if (enemy.type === "commander" && wave >= 5) return support || byDistance[0];
-  if (enemy.boss) return vulnerable[0] || support || byDistance[0];
-  return byDistance[0];
+  for (const role of priority) {
+    const target = nearestUnitByRole(enemy, living, role);
+    if (target) return target;
+  }
+  return [...living].sort((a, b) => dist(enemy, a) - dist(enemy, b))[0];
+}
+
+function nearestUnitByRole(enemy, units, role) {
+  return units
+    .filter((unit) => unitCombatRole(unit) === role)
+    .sort((a, b) => dist(enemy, a) - dist(enemy, b) || (a.hp / a.maxHp) - (b.hp / b.maxHp))[0] || null;
+}
+
+function unitCombatRole(unit) {
+  if (unit.name === "Asterion" || unit.name === "Valkyr" || unit.name === "MEGA(EK專用機)") return "tank";
+  if (unit.damage < 0 || unit.name === "Seraphim" || unit.name === "Helix") return "repair";
+  return "attacker";
 }
 
 function update(dt) {
