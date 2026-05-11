@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
     <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=54" />
+    <link rel="stylesheet" href="src/styles.css?v=55" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
       <section id="stage-wrap">
-        <canvas id="game" width="1280" height="720" aria-label="宇宙心戰隊戰場"></canvas>
+        <canvas id="game" width="1280" height="720" aria-label="宇宙心戰隊戰場" data-i18n-aria-label="canvasLabel"></canvas>
         <div id="skill-bar">
           <div id="skill-buttons"></div>
         </div>
@@ -27,30 +27,33 @@
         </button>
         <div id="pause-overlay" class="pause-overlay" hidden>
           <section class="pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
-            <p class="kicker">Tactical Pause</p>
-            <h2 id="pause-title">遊戲已暫停</h2>
-            <p>戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。</p>
+            <p class="kicker" data-i18n="pauseKicker">Tactical Pause</p>
+            <h2 id="pause-title" data-i18n="pauseTitle">遊戲已暫停</h2>
+            <p data-i18n="pauseCopy">戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。</p>
             <div class="pause-actions">
-              <button id="pause-resume" type="button">繼續作戰</button>
-              <button id="pause-formation" type="button">回編隊</button>
+              <button id="pause-resume" type="button" data-i18n="pauseResume">繼續作戰</button>
+              <button id="pause-formation" type="button" data-i18n="pauseFormation">回編隊</button>
             </div>
           </section>
         </div>
         <div id="briefing">
           <div class="title-content">
-            <p class="kicker">機動兵器戰線指揮</p>
+            <p class="kicker" data-i18n="titleKicker">機動兵器戰線指揮</p>
             <h1 class="title-logo" data-text="Mecha Heart">
               <span>Mecha</span>
               <span>Heart</span>
             </h1>
-            <p>軌道戰場 Roguelike 小隊指揮</p>
-            <span class="title-version">(ver.92)</span>
+            <p data-i18n="titleSubtitle">軌道戰場 Roguelike 小隊指揮</p>
+            <span class="title-version">(ver.94)</span>
           </div>
-          <button id="start-btn" class="title-start">開始作戰</button>
+          <div class="title-actions">
+            <button id="start-btn" class="title-start" data-i18n="startBattle">開始作戰</button>
+            <button id="language-toggle" class="language-toggle" type="button">English / 繁中</button>
+          </div>
           <section id="title-leaderboard" class="leaderboard-panel title-leaderboard" aria-live="polite">
             <div class="leaderboard-head">
               <p class="kicker">Top 10 Ranking</p>
-              <h3>王牌排行榜</h3>
+              <h3 data-i18n="aceRanking">王牌排行榜</h3>
             </div>
             <p id="title-leaderboard-message">讀取排行榜中...</p>
             <ol id="title-leaderboard-list" class="leaderboard-list"></ol>
@@ -60,22 +63,22 @@
           <div class="formation-shell">
             <header class="formation-head">
               <div>
-                <p class="kicker">出擊前整備</p>
-                <h2>隊伍編成</h2>
-                <p>選擇 4 架機體出戰。點擊機體可查看武裝、定位、主動技和必殺技。</p>
+                <p class="kicker" data-i18n="formationKicker">出擊前整備</p>
+                <h2 data-i18n="formationTitle">隊伍編成</h2>
+                <p data-i18n="formationCopy">選擇 4 架機體出戰。點擊機體可查看武裝、定位、主動技和必殺技。</p>
               </div>
               <div class="formation-actions">
                 <strong id="formation-count">已選 4/4</strong>
-                <button id="formation-start">開始地圖</button>
+                <button id="formation-start" data-i18n="launchMission">開始地圖</button>
               </div>
             </header>
             <div id="formation-slots" class="formation-slots" aria-label="出戰隊伍"></div>
             <section class="tutorial-panel" aria-label="新手操作教學">
-              <img data-src="assets/tutorial-controls.webp?v=4" loading="lazy" decoding="async" alt="新手操作教學：揀機、拖線移動、指向目標、放技能" />
+              <img data-src="assets/tutorial-controls.webp?v=5" loading="lazy" decoding="async" alt="新手操作教學：揀機、拖線移動、指向目標、放技能" data-i18n-alt="tutorialAlt" />
               <div class="tutorial-notes">
-                <h3>新手教學</h3>
-                <p>先編成 4 架機體。入場後拖拉機體落地圖下令，拖到敵人會攻擊，拖到友軍會補血或協助集火。</p>
-                <p>下方每架機都有主動技和必殺；必殺能量滿後按右邊技能制發動。</p>
+                <h3 data-i18n="tutorialTitle">新手教學</h3>
+                <p data-i18n="tutorialCopy1">先編成 4 架機體。入場後拖拉機體落地圖下令，拖到敵人會攻擊，拖到友軍會補血或協助集火。</p>
+                <p data-i18n="tutorialCopy2">下方每架機都有主動技和必殺；必殺能量滿後按右邊技能制發動。</p>
               </div>
             </section>
             <div class="formation-scroll">
@@ -83,21 +86,21 @@
               <section class="ace-unit-panel" aria-label="皇牌機師專機">
                 <div>
                   <p class="kicker">Ace Pilot Custom</p>
-                  <h3>皇牌機師專機</h3>
-                  <p>預留俾日後加入嘅個人化專用機。呢類機體會有獨立定位、專屬技能同更鮮明嘅機師風格。</p>
+                  <h3 data-i18n="aceCustomTitle">皇牌機師專機</h3>
+                  <p data-i18n="aceCustomCopy">預留俾日後加入嘅個人化專用機。呢類機體會有獨立定位、專屬技能同更鮮明嘅機師風格。</p>
                 </div>
                 <div id="ace-unit-list" class="ace-unit-list" aria-label="可選皇牌機師專機"></div>
               </section>
               <section id="intel" class="intel-panel"></section>
               <details class="database" open>
-                <summary>機體設計資料庫</summary>
+                <summary data-i18n="databaseTitle">機體設計資料庫</summary>
                 <div class="database-art">
                   <figure>
-                    <figcaption>玩家機體設計</figcaption>
+                    <figcaption data-i18n="playerDesigns">玩家機體設計</figcaption>
                     <img data-src="assets/player-new-lineup.webp?v=6" loading="lazy" decoding="async" alt="Six redesigned player mobile suits" />
                   </figure>
                   <figure>
-                    <figcaption>敵方機體設計</figcaption>
+                    <figcaption data-i18n="enemyDesigns">敵方機體設計</figcaption>
                     <img data-src="assets/enemy-variants.webp?v=20" loading="lazy" decoding="async" alt="Enemy original mobile suit sprite art" />
                   </figure>
                 </div>
@@ -108,8 +111,8 @@
         </div>
         <div id="reward" hidden>
           <div>
-            <p class="kicker">Boss 擊破</p>
-            <h2>選擇一項強化</h2>
+            <p class="kicker" data-i18n="bossDefeated">Boss 擊破</p>
+            <h2 data-i18n="chooseUpgrade">選擇一項強化</h2>
           </div>
           <div id="reward-options"></div>
         </div>
@@ -119,36 +122,36 @@
           <section id="leaderboard" class="leaderboard-panel" aria-live="polite">
             <div class="leaderboard-head">
               <p class="kicker">Top 10 Ranking</p>
-              <h3>排行榜</h3>
+              <h3 data-i18n="ranking">排行榜</h3>
             </div>
             <form id="leaderboard-form" class="leaderboard-form">
-              <label for="player-name">輸入姓名</label>
+              <label for="player-name" data-i18n="enterName">輸入姓名</label>
               <div class="leaderboard-entry">
                 <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" placeholder="Pilot" />
-                <button type="submit">提交分數</button>
+                <button type="submit" data-i18n="submitScore">提交分數</button>
               </div>
               <p id="leaderboard-message">讀取排行榜中...</p>
             </form>
             <ol id="leaderboard-list" class="leaderboard-list"></ol>
           </section>
-          <button id="restart-btn">再次出擊</button>
+          <button id="restart-btn" data-i18n="redeploy">再次出擊</button>
         </div>
       </section>
       <aside id="hud">
         <div class="hud-head">
-          <p class="kicker">戰術艦橋介面</p>
-          <h2>小隊狀態</h2>
+          <p class="kicker" data-i18n="hudKicker">戰術艦橋介面</p>
+          <h2 data-i18n="hudTitle">小隊狀態</h2>
         </div>
         <div id="cards"></div>
         <div class="panel score-panel">
-          <div class="stat-row round-row"><span>回合</span><strong id="wave">1</strong></div>
-          <div class="stat-row score-row"><span>分數</span><strong id="score">0</strong></div>
-          <div class="stat-row"><span>最高記錄</span><strong id="best-score">0</strong></div>
-          <div class="stat-row"><span>敵機</span><strong id="enemy-count">0</strong></div>
-          <div class="stat-row"><span>指令</span><strong id="command">待命</strong></div>
+          <div class="stat-row round-row"><span data-i18n="wave">回合</span><strong id="wave">1</strong></div>
+          <div class="stat-row score-row"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
+          <div class="stat-row"><span data-i18n="bestScore">最高記錄</span><strong id="best-score">0</strong></div>
+          <div class="stat-row"><span data-i18n="hostiles">敵機</span><strong id="enemy-count">0</strong></div>
+          <div class="stat-row"><span data-i18n="command">指令</span><strong id="command">待命</strong></div>
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=104"></script>
+    <script src="src/main.js?v=105"></script>
   </body>
 </html>

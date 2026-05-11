@@ -1269,15 +1269,39 @@ h1 {
   text-shadow: 0 0 12px rgba(75, 228, 255, 0.36), 0 3px 12px rgba(0, 0, 0, 0.85);
 }
 
+.title-actions {
+  display: grid;
+  gap: 12px;
+  grid-area: start;
+  justify-items: center;
+}
+
 .title-start {
   border-color: rgba(255, 230, 154, 0.95);
   box-shadow: 0 0 32px rgba(75, 228, 255, 0.26), inset 0 0 20px rgba(255, 209, 102, 0.12);
   font-size: clamp(20px, 2.6vw, 34px);
-  grid-area: start;
   letter-spacing: 0;
   min-height: 64px;
   min-width: 220px;
   text-transform: uppercase;
+}
+
+.language-toggle {
+  min-height: 42px;
+  min-width: 170px;
+  border-color: rgba(75, 228, 255, 0.62);
+  background: rgba(4, 14, 34, 0.72);
+  color: #eaf7ff;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: 0 0 18px rgba(75, 228, 255, 0.16), inset 0 0 14px rgba(75, 228, 255, 0.08);
+}
+
+.language-toggle:hover {
+  border-color: rgba(255, 230, 154, 0.9);
+  color: #ffffff;
 }
 
 #briefing p:not(.kicker),
@@ -2415,15 +2439,25 @@ h1 {
     font-size: 13px;
   }
 
-  body.setup-mode .title-start {
+  body.setup-mode .title-actions {
     align-self: start;
-    font-size: 20px;
     grid-area: start;
+    gap: 6px;
+    position: relative;
+    z-index: 3;
+  }
+
+  body.setup-mode .title-start {
+    font-size: 20px;
     min-height: 44px;
     min-width: 196px;
     padding: 0 24px;
-    position: relative;
-    z-index: 3;
+  }
+
+  body.setup-mode .language-toggle {
+    font-size: 12px;
+    min-height: 32px;
+    min-width: 150px;
   }
 
   body.setup-mode .title-leaderboard {

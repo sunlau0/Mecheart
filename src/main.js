@@ -34,6 +34,7 @@ const pauseResumeEl = document.getElementById("pause-resume");
 const pauseFormationEl = document.getElementById("pause-formation");
 const loadingEl = document.getElementById("loading-overlay");
 const loadingCopyEl = document.getElementById("loading-copy");
+const languageToggleEl = document.getElementById("language-toggle");
 
 const W = 1280;
 const H = 720;
@@ -60,7 +61,153 @@ const assetVersion = (path) => {
   return UNIT_ART_VERSION;
 };
 const assetSrc = (path, version = assetVersion(path)) => `${path}?v=${version}`;
-const labelFaction = (faction) => faction === "Allied" ? "友軍" : "敵軍";
+const LOCALE_KEY = "mecha-heart-language";
+const uiText = {
+  zh: {
+    canvasLabel: "宇宙心戰隊戰場",
+    pauseKicker: "Tactical Pause",
+    pauseTitle: "遊戲已暫停",
+    pauseCopy: "戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。",
+    pauseResume: "繼續作戰",
+    pauseFormation: "回編隊",
+    titleKicker: "機動兵器戰線指揮",
+    titleSubtitle: "軌道戰場 Roguelike 小隊指揮",
+    startBattle: "開始作戰",
+    aceRanking: "王牌排行榜",
+    formationKicker: "出擊前整備",
+    formationTitle: "隊伍編成",
+    formationCopy: "選擇 4 架機體出戰。點擊機體可查看武裝、定位、主動技和必殺技。",
+    launchMission: "開始地圖",
+    tutorialAlt: "新手操作教學：揀機、拖線移動、指向目標、放技能",
+    tutorialTitle: "新手教學",
+    tutorialCopy1: "先編成 4 架機體。入場後拖拉機體落地圖下令，拖到敵人會攻擊，拖到友軍會補血或協助集火。",
+    tutorialCopy2: "下方每架機都有主動技和必殺；必殺能量滿後按右邊技能制發動。",
+    aceCustomTitle: "皇牌機師專機",
+    aceCustomCopy: "預留俾日後加入嘅個人化專用機。呢類機體會有獨立定位、專屬技能同更鮮明嘅機師風格。",
+    databaseTitle: "機體設計資料庫",
+    playerDesigns: "玩家機體設計",
+    enemyDesigns: "敵方機體設計",
+    bossDefeated: "Boss 擊破",
+    chooseUpgrade: "選擇一項強化",
+    ranking: "排行榜",
+    enterName: "輸入姓名",
+    submitScore: "提交分數",
+    redeploy: "再次出擊",
+    hudKicker: "戰術艦橋介面",
+    hudTitle: "小隊狀態",
+    wave: "回合",
+    score: "分數",
+    bestScore: "最高記錄",
+    hostiles: "敵機",
+    command: "指令",
+    idle: "待命",
+    allied: "友軍",
+    enemy: "敵軍",
+    selected: "已選",
+    emptySlot: "待選機體",
+    range: "射程",
+    durability: "耐久",
+    active: "主動",
+    ultimate: "必殺",
+    weapon: "武器",
+    activeSkill: "主動技",
+    ultimateSkill: "必殺技",
+    trait: "特性",
+    tactic: "用法",
+    noSkill: "沒有",
+    useSkillBar: "由下方技能列使用。",
+    tacticalIntel: "戰術情報",
+    playerUnits: "玩家機體",
+    enemyUnits: "敵方機體",
+    unknown: "不明",
+    remove: "移除",
+    add: "加入",
+    seconds: "秒",
+    activeOn: "啟動中",
+    finalScore: "最終分數",
+    reachedWave: "抵達第 {wave} 回合",
+    missionClear: "作戰完成",
+    missionEnd: "作戰結束",
+    fleetSafe: "艦隊防線仍然健在。",
+    retreat: "機體已撤退，重新整備後再出擊。",
+    boundary: "自動追擊邊界"
+  },
+  en: {
+    canvasLabel: "Mecha Heart battlefield",
+    pauseKicker: "Tactical Pause",
+    pauseTitle: "Game Paused",
+    pauseCopy: "Battle time is frozen. Resume the mission or return to loadout for a quick rebuild.",
+    pauseResume: "Resume Mission",
+    pauseFormation: "Back to Loadout",
+    titleKicker: "Mobile Weapon Frontline Command",
+    titleSubtitle: "Orbital roguelike squad command",
+    startBattle: "Deploy",
+    aceRanking: "Ace Leaderboard",
+    formationKicker: "Pre-Launch Prep",
+    formationTitle: "Squad Loadout",
+    formationCopy: "Choose 4 mecha for deployment. Tap a unit to inspect weapons, role, active skill and ultimate.",
+    launchMission: "Launch Mission",
+    tutorialAlt: "Controls tutorial: pick mecha, drag to move, target enemies, trigger skills",
+    tutorialTitle: "Quick Training",
+    tutorialCopy1: "Build a 4-mecha squad first. In battle, drag a unit onto the map to command it. Drag onto hostiles to attack, or onto allies to heal or focus fire.",
+    tutorialCopy2: "Each unit has an active skill and an ultimate below. When ultimate charge is full, hit the right-hand skill button.",
+    aceCustomTitle: "Ace Pilot Customs",
+    aceCustomCopy: "Reserved for future personalised ace machines. These units get their own role, exclusive skills and much louder pilot energy.",
+    databaseTitle: "Mecha Design Archive",
+    playerDesigns: "Player Mecha Designs",
+    enemyDesigns: "Hostile Mecha Designs",
+    bossDefeated: "Boss Down",
+    chooseUpgrade: "Choose an Upgrade",
+    ranking: "Leaderboard",
+    enterName: "Enter Name",
+    submitScore: "Submit Score",
+    redeploy: "Redeploy",
+    hudKicker: "Tactical Bridge Interface",
+    hudTitle: "Squad Status",
+    wave: "Wave",
+    score: "Score",
+    bestScore: "Best Score",
+    hostiles: "Hostiles",
+    command: "Command",
+    idle: "Standby",
+    allied: "Allied",
+    enemy: "Hostile",
+    selected: "Selected",
+    emptySlot: "Empty Slot",
+    range: "Range",
+    durability: "Armour",
+    active: "Active",
+    ultimate: "Ultimate",
+    weapon: "Weapon",
+    activeSkill: "Active",
+    ultimateSkill: "Ultimate",
+    trait: "Trait",
+    tactic: "Tactic",
+    noSkill: "None",
+    useSkillBar: "Use it from the skill bar below.",
+    tacticalIntel: "Tactical Intel",
+    playerUnits: "Player Mecha",
+    enemyUnits: "Hostile Mecha",
+    unknown: "Unknown",
+    remove: "Remove",
+    add: "Add",
+    seconds: "s",
+    activeOn: "Online",
+    finalScore: "Final Score",
+    reachedWave: "Reached Wave {wave}",
+    missionClear: "Mission Clear",
+    missionEnd: "Mission Over",
+    fleetSafe: "The fleet line is still standing.",
+    retreat: "Units have withdrawn. Rebuild, reload, redeploy.",
+    boundary: "Auto-Chase Boundary"
+  }
+};
+let currentLanguage = localStorage.getItem(LOCALE_KEY) === "en" ? "en" : "zh";
+const t = (key, replacements = {}) => {
+  const value = uiText[currentLanguage]?.[key] ?? uiText.zh[key] ?? key;
+  return Object.entries(replacements).reduce((text, [name, replacement]) => text.replace(`{${name}}`, replacement), value);
+};
+const labelFaction = (faction) => faction === "Allied" ? t("allied") : t("enemy");
 const leaderboardDefaults = [
   { name: "Sun", score: 99230 },
   { name: "Candy", score: 86000 },
@@ -741,6 +888,245 @@ const upgradePool = [
   }
 ];
 
+const unitEnglish = {
+  Asterion: {
+    role: "Phase-Armour Vanguard",
+    weapon: "Anti-Ship Beam Sabre / Gravity Control Core",
+    trait: "Highest durability. Guardian Burst shields nearby allies and restores Asterion over time.",
+    tactic: "Drag it into the pack to draw fire. Drop Gravity Core behind priority targets to bunch hostiles up for focused fire.",
+    skill: "Guardian Burst",
+    activeDesc: "Throws shields over nearby allies and restores Asterion over time.",
+    ultimate: "Gravity Core",
+    ultimateDesc: "Drops a gravity core behind the target, dragging hostiles into the kill zone."
+  },
+  Caliburn: {
+    role: "Beam-Sabre Duelist",
+    weapon: "Twin Sabre Rush / Close-Range Beam Pistol",
+    trait: "Fastest attack speed with fierce burst damage, but its armour is thin.",
+    tactic: "Once Asterion has enemy attention, send Caliburn to cut down isolated targets or commanders.",
+    skill: "SEED Rush",
+    activeDesc: "Slashes all hostiles near Caliburn.",
+    ultimate: "Meteor Slash",
+    ultimateDesc: "Strikes several nearby targets with heavy blade damage."
+  },
+  Seraphim: {
+    role: "Repair and Shield Support",
+    weapon: "Nanite Repair Beam / Guardian Shield",
+    trait: "Wide-area emergency repair. Its active skill also shields allies.",
+    tactic: "Lock onto a frontline ally and Seraphim will keep healing from maximum safe range.",
+    skill: "Phantom Repair",
+    activeDesc: "Repairs nearby allies in a wide area and adds shields.",
+    ultimate: "Angel Halo",
+    ultimateDesc: "Revives fallen allies and restores the whole squad."
+  },
+  Orion: {
+    role: "Dragoon Sweeper Artillery",
+    weapon: "Long-Range Beam Cannon / Remote Gun Pods",
+    trait: "Longest range. Lower single-shot power, high fire rate, excellent at clearing weak swarms.",
+    tactic: "Keep it on a safe flank to clear mobs. Its active harvests low-HP targets; the ultimate clears crowds but is weaker into bosses.",
+    skill: "Omni Volley",
+    activeDesc: "Remote pods prioritise several low-HP hostiles.",
+    ultimate: "Satellite Barrage",
+    ultimateDesc: "Sweeps the whole field, best against light enemy units."
+  },
+  Valkyr: {
+    role: "Heavy-Shield Taunt Defender",
+    weapon: "Anti-Beam Tower Shield / GN Field Generator",
+    trait: "High defence and reliable aggro control. Its ultimate keeps pushing nearby hostiles back.",
+    tactic: "Hold the frontline edge, taunt incoming threats, then use GN Field to protect the backline.",
+    skill: "Taunt Beacon",
+    activeDesc: "Taunts hostiles in range, forcing them to attack Valkyr.",
+    ultimate: "GN Field",
+    ultimateDesc: "Creates a short-lived field that pushes nearby hostiles away."
+  },
+  Lancer: {
+    role: "Orbital Sniper",
+    weapon: "Ultra-Long-Range Armour-Piercing Beam Lance",
+    trait: "Huge single-shot damage, built for heavy units and bosses.",
+    tactic: "Keep it in the rear and lock high-HP targets before fast attackers close in.",
+    skill: "Piercing Snipe",
+    activeDesc: "Immediately snipes the highest-HP hostile with armour-piercing damage.",
+    ultimate: "Orbital Pierce",
+    ultimateDesc: "Fires an extreme-range piercing beam at the strongest target."
+  },
+  Nova: {
+    role: "High-Mobility Assault",
+    weapon: "Quantum Blade / Short-Range Phase Thruster",
+    trait: "Fastest movement. It can cut through the backline, but its durability is only moderate.",
+    tactic: "Use Quantum Backstab to dive enemy supports. During Phase Shift, Nova can pass through units and burst hard.",
+    skill: "Quantum Backstab",
+    activeDesc: "Dashes behind the target and slashes nearby hostiles.",
+    ultimate: "Phase Shift",
+    ultimateDesc: "Briefly phases through all units, gains +200% movement speed, and turns basic attacks into stronger area slashes."
+  },
+  Helix: {
+    role: "Area Repair and Stealth Support",
+    weapon: "Regeneration Field / Mirage Particle Disperser",
+    trait: "Steady area healing rather than panic burst. Its ultimate cloaks Helix and breaks enemy lock-on.",
+    tactic: "Place it behind the tank or centre squad. Trigger the field for steady healing, then cloak out of danger when focused.",
+    skill: "Regeneration Field",
+    activeDesc: "Restores allies inside the area over time.",
+    ultimate: "Mirage Particles",
+    ultimateDesc: "Cloaks Helix; enemies targeting it lose lock and switch targets."
+  },
+  Bastion: {
+    role: "Heavy Armour-Break Artillery",
+    weapon: "Shoulder Heavy Particle Cannon / Armour-Break Grenades",
+    trait: "Slow, massive shots. Especially strong against bosses and bulky hostiles.",
+    tactic: "Park behind a tank and delete high-HP targets. Both skills bombard a small area around the target.",
+    skill: "Cannon Suppression",
+    activeDesc: "Shells the highest-HP target, dealing bonus boss damage and splash.",
+    ultimate: "Fortress Salvo",
+    ultimateDesc: "Concentrates fire on the highest-threat target, dealing huge armour-break damage and splash."
+  },
+  Mirage: {
+    role: "Electronic Warfare Mid-Ranger",
+    weapon: "Phantom Funnels / Jamming Pulse",
+    trait: "Moderate damage, but it cuts hostile speed and firepower to protect the backline.",
+    tactic: "Keep it central. Its active slows incoming packs before they reach your supports.",
+    skill: "Sustained Jammer",
+    activeDesc: "Jams nearby hostiles, briefly reducing speed and damage.",
+    ultimate: "Mirage Domain",
+    ultimateDesc: "Disables enemy fire control over a wide area and deals damage over time."
+  },
+  "Eumist (Eunice專用機)": {
+    name: "Eumist (Eunice Custom)",
+    role: "Mist-Blade Loop Support",
+    weapon: "Haze Beam Blade / Mistmark Heal Core",
+    trait: "Deals damage while healing. Hits stack Mistmarks, then cash them in for squad healing. May be dragged off by Mum for revision at any moment, freezing in place for 3 seconds.",
+    tactic: "Keep it mid-front and slicing the same pack. Yaegasumi heals when enemies flood in; Oboro clears the screen and gives the squad brief damage reduction.",
+    skill: "Yaegasumi",
+    activeDesc: "Fires repeated mist-blade slashes around itself. Part of the damage becomes squad healing, with extra help for the lowest-HP ally.",
+    ultimate: "Oboro",
+    ultimateDesc: "Unleashes a wide mist domain, rapidly slashing all hostiles, converting part of the damage into healing and brief squad damage reduction.",
+    passive: "Mistmark Loop",
+    passiveDesc: "Each hit adds 1 Mistmark. Each mark makes Eumist deal +4% damage to that enemy. At 5 marks, Eumist consumes them to heal the squad and extra-heal the lowest-HP ally."
+  },
+  "MEGA(EK專用機)": {
+    name: "MEGA (EK Custom)",
+    role: "Ace Custom Tank",
+    weapon: "EK Ring Blade / Close-Range All-Angle Slash",
+    trait: "Heavy melee tank. Basic attacks slash nearby hostiles, but it sometimes gets completely lost for 3 seconds and charges about in the wrong direction.",
+    tactic: "Drop it on the frontline to grab attention. EK Aura is a toggle that drags nearby hostiles in; EK Law marks the field, then detonates after 1 second.",
+    skill: "EK Aura",
+    activeDesc: "Toggles EK Aura. While active, it keeps pulling nearby hostiles. When switched off, it enters a 10-second cooldown.",
+    ultimate: "EK Law",
+    ultimateDesc: "Marks the highest-threat hostile with EK Law, then detonates after 1 second with splash damage."
+  },
+  "Himawari (Candy專用機)": {
+    name: "Himawari (Candy Custom)",
+    role: "Ace Custom Heavy Support",
+    weapon: "Fan-Shaped Death-Glare Cannon / Combo Detonation",
+    trait: "Chunky stylish heavy unit, extremely slow. Basic attacks hit a frontal cone; three hits on the same enemy cause a small explosion. Performance is wildly unpredictable and often forgets which side is which, blessing or ruining allies depending on the pilot's mood.",
+    tactic: "Use it mid-rear for cone AOE wave clear. Lock the same enemy to trigger combo explosions; Beauty Kitchen Disaster poisons bulky targets, while Full Tantrum Mode blasts everything away with rude lasers.",
+    skill: "Beauty Kitchen Disaster",
+    activeDesc: "Force-feeds the target pilot suspicious food, ignoring defence and dealing max-HP poison damage for 6 seconds. Very nasty against bulky enemies.",
+    ultimate: "Full Tantrum Mode",
+    ultimateDesc: "Knocks away every nearby unit, including allies, then sweeps the whole screen with rough laser fire.",
+    passive: "I'm Helping, Honest",
+    passiveDesc: "Randomly applies a 3-second state to an allied unit. It might help or sabotage: attack +80%, defence +80%, speed -80%, attack -80%, or defence -80%. Affected units are clearly marked."
+  },
+  "Vesper Drone": {
+    role: "Mass-Production Assault Unit",
+    weapon: "Beam Carbine / Boost Wings",
+    trait: "Fast and attacks the nearest ally in packs.",
+    tactic: "Thin armour. Let Asterion bunch them up, then clear with Caliburn or Orion."
+  },
+  "Helios Raider": {
+    role: "High-Speed Sabre Ambusher",
+    weapon: "Thermal Sabre / Burst Thruster",
+    trait: "Fast but fragile. It dives isolated units.",
+    tactic: "Let Asterion intercept it before it reaches Orion or Seraphim."
+  },
+  "Azure Lancer": {
+    role: "Long-Range Beam Sniper",
+    weapon: "Orbital Beam Lance",
+    trait: "Slow movement, long range, dangerous if ignored.",
+    tactic: "Send Caliburn in close or let Orion suppress it at range."
+  },
+  "Obsidian Guard": {
+    role: "Heavy Shield Unit",
+    weapon: "Shield Ram / Heavy Carbine",
+    trait: "High durability, slow movement, absorbs damage for enemies.",
+    tactic: "Unless it blocks melee units, clear other threats first."
+  },
+  "Crimson Marshal": {
+    role: "Command Fire Support",
+    weapon: "Heavy Beam Rifle / Shoulder Thrusters",
+    trait: "Higher durability and range; pressures your repair units.",
+    tactic: "Focus it with Caliburn and Orion. Do not let Seraphim drift forward."
+  },
+  "Dread Sovereign": {
+    role: "Ace Mobile Armour Boss",
+    weapon: "All-Range Beam Array / Wing Cannons",
+    trait: "Boss unit. High durability, high range, appears every 3 waves.",
+    tactic: "Keep Asterion shielded, focus fire, and spend skills as soon as they are ready."
+  }
+};
+
+const rewardEnglish = {
+  "beam-capacitors": ["Weapons", "High-Output Beam Capacitors", "Weapon damage for all attack units +15%."],
+  "phase-armor": ["Armour", "Phase-Armour Retrofit", "All allied units gain +25 max HP and instantly repair 25 HP."],
+  "guardian-reactor": ["Asterion Skill", "Guardian Reactor", "Asterion gains +45 max HP and +5 damage. Guardian Burst self-repairs longer; Gravity Core gets a wider pull."],
+  "seed-rush": ["Caliburn Weapon", "SEED Rush OS", "Caliburn gains +12 damage, attacks faster, and hits harder with its rush skill."],
+  "repair-drones": ["Seraphim Skill", "Repair Drone Swarm", "Seraphim heals more, reaches further, and Phantom Repair adds thicker shields."],
+  "dragoon-pods": ["Orion Weapon", "Dragoon Pod Expansion", "Orion fires faster, gains +35 range, and launches more clearing pods with its active."],
+  "valkyr-zero-core": ["Valkyr Skill", "GN Defence Core", "Valkyr gains +55 max HP and +12% defence. Taunt Beacon lasts longer; GN Field gets wider and stronger."],
+  "lancer-rail-scope": ["Lancer Weapon", "Orbital Targeting Scope", "Lancer gains +14 damage and +35 range. Piercing Snipe and Orbital Pierce hit harder."],
+  "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +8 damage, +30 range and +24 speed. Quantum Backstab gets a wider strike area."],
+  "helix-beacon-grid": ["Helix Repair", "Regeneration Mirage Matrix", "Helix gains stronger healing, better range and survival. Regeneration Field lasts longer; Mirage Particles cloak wider."],
+  "bastion-stabilizer": ["Bastion Artillery", "Heavy Cannon Stabiliser", "Bastion gains +16 damage and +30 range. Cannon Suppression gets a wider blast."],
+  "mirage-phantom-core": ["Mirage Jammer", "Phantom Jammer Core", "Mirage gains +8 damage and +25 range. Jamming duration and area increase."],
+  "eumist-mist-cycle-core": ["Eumist Mistmarks", "Revision Notes Core", "Eumist gains +7 damage. Mistmark burst healing improves, and Mum takes longer to drag it off for revision."],
+  "miles-ek-aura-core": ["MEGA Skill", "EK Aura-Law Core", "MEGA gains +45 max HP and +10% defence. EK Law explosion damage and splash radius improve."],
+  "himawari-helping-core": ["Himawari Support", "I'm Helping, Honest Core", "Himawari gains +35 max HP. Beauty Kitchen poison gets worse, the passive triggers more often, and tantrum lasers hit harder."],
+  "overclocked-servos": ["Mobility", "Overclocked AMBAC Servos", "All units move faster and attack intervals shorten by 8%."],
+  "emergency-nanites": ["Survival", "Emergency Nanite Bay", "All units recover 40% HP. Downed units return with 35% HP."],
+  "spare-thruster-fuel": ["Mobility", "Spare Thruster Fuel", "All unit movement speed +10%."],
+  "beam-cooling-lines": ["Weapons", "Beam Cooling Lines", "All attack intervals shorten by 5%."],
+  "assist-aim-chip": ["Weapons", "Assist-Aim Chip", "All attack units gain +18 range."],
+  "lightweight-armor-plates": ["Armour", "Lightweight Armour Plates", "All units gain +18 max HP and +4% movement speed."],
+  "field-repair-kit": ["Survival", "Field Repair Kit", "At the start of each wave, all units recover 12% HP."],
+  "squad-sync-link": ["Skills", "Squad Sync Link", "All active skill cooldowns -1 second."],
+  "thruster-stabilizer": ["Mobility", "Thruster Stabiliser", "Enemy shoves and crush movement affect units 20% less."],
+  "trajectory-data": ["Weapons", "Trajectory Correction Data", "Attack unit basic weapon damage +8%."],
+  "tactical-fire-control-core": ["Fire Control", "Tactical Fire-Control Core", "Attack units gain +12% damage and +25 range."],
+  "dense-defense-coating": ["Armour", "Dense Defence Coating", "All units gain +8% defence and +20 max HP."],
+  "support-sync-protocol": ["Support", "Support Unit Sync Protocol", "Repair unit healing +18%, healing range +30."],
+  "frontline-suppression-order": ["Command", "Frontline Suppression Order", "When tanks are attacked, nearby hostiles deal 15% less damage."],
+  "skill-circuit-overload": ["Skills", "Skill Circuit Overload", "All active skill cooldowns -2 seconds, but max HP -10."],
+  "seed-awakening-protocol": ["Ultra Rare", "SEED Awakening Protocol", "The first time each unit drops below 35% HP, it awakens: +35% attack and +35% speed for 5 seconds."],
+  "meteor-equipment-deploy": ["Ultra Rare", "Meteor Equipment Deploy", "Attack units have a 35% chance for basic attacks to call a small area beam bombardment."],
+  "genesis-jamming-wave": ["Ultra Rare", "Positron Cannon", "Each unit fires a field-wide positron sweep once whenever its HP drops below 35%."],
+  "zero-range-breakthrough": ["Ultra Rare", "Zero-Range Breakthrough Order", "Melee and mid-range units resist shoves 50% more, gain +45% speed and +25 damage, but take +15% damage."],
+  "infinite-energy-core": ["Ultra Rare", "Infinite Energy Core", "All skill cooldowns -35% and ultimate charge +35%, but enemy spawns increase by 15% each wave."]
+};
+
+function localizeUnit(unit) {
+  if (currentLanguage !== "en" || !unit) return unit;
+  return { ...unit, ...(unitEnglish[unit.name] || {}) };
+}
+
+function localizeReward(reward) {
+  if (currentLanguage !== "en" || !reward) return reward;
+  const values = rewardEnglish[reward.id];
+  if (!values) return reward;
+  return { ...reward, type: values[0], name: values[1], text: values[2] };
+}
+
+function localizeStatus(status) {
+  if (currentLanguage !== "en") return status;
+  const labels = {
+    "atk-up": ["Attack +80%", "ATK+"],
+    "def-up": ["Defence +80%", "DEF+"],
+    "speed-down": ["Speed -80%", "SPD-"],
+    "atk-down": ["Attack -80%", "ATK-"],
+    "def-down": ["Defence -80%", "DEF-"]
+  };
+  const value = labels[status.kind];
+  return value ? { ...status, label: value[0], shortLabel: value[1] } : status;
+}
+
 let squad = [];
 let enemies = [];
 let shots = [];
@@ -813,7 +1199,7 @@ function reset() {
   selected = null;
   focusedUnit = squad[0];
   pointer = null;
-  commandEl.textContent = "待命";
+  commandEl.textContent = t("idle");
   resultEl.hidden = true;
   resultEl.classList.remove("lost", "won");
   rewardEl.hidden = true;
@@ -899,8 +1285,143 @@ function chooseEnemyType(index, count, isBossRound) {
   return pool[(index + wave + Math.floor(Math.random() * pool.length)) % pool.length];
 }
 
+function applyStaticLanguage() {
+  document.documentElement.lang = currentLanguage === "en" ? "en-GB" : "zh-Hant";
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach((element) => {
+    element.setAttribute("alt", t(element.dataset.i18nAlt));
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+  if (languageToggleEl) languageToggleEl.textContent = "English / 繁中";
+  updatePauseControls();
+}
+
+function refreshLanguageSensitiveViews() {
+  hudCardsSignature = "";
+  skillBarSignature = "";
+  applyStaticLanguage();
+  if (!formationEl.hidden) {
+    renderDatabase();
+    renderFormation();
+  }
+  if (squad.length) {
+    renderIntel(focusedUnit || squad[0]);
+    updateHud();
+  } else {
+    commandEl.textContent = t("idle");
+  }
+  if (!rewardEl.hidden && rewardChoices.length) renderRewardChoices();
+  if (!resultEl.hidden) renderResultCopy(resultEl.classList.contains("won"));
+  loadLeaderboard();
+}
+
+function toggleLanguage() {
+  currentLanguage = currentLanguage === "en" ? "zh" : "en";
+  localStorage.setItem(LOCALE_KEY, currentLanguage);
+  refreshLanguageSensitiveViews();
+}
+
+function translateMessage(text) {
+  if (currentLanguage !== "en") return text;
+  const exact = {
+    "待命": "Standby",
+    "暫停中": "Paused",
+    "繼續作戰": "Mission Resumed",
+    "讀取排行榜中...": "Loading leaderboard...",
+    "輸入姓名後可提交今局分數。": "Enter your name to submit this run.",
+    "挑戰最高分數，打入王牌榜。": "Push the score and break into the ace board.",
+    "已載入預設排名；Cloudflare KV 尚未綁定。": "Default ranks loaded; Cloudflare KV is not linked yet.",
+    "預設排行榜": "Default Leaderboard",
+    "即時排行榜": "Live Leaderboard",
+    "暫時未能連線排行榜，先顯示預設排名。": "Leaderboard is offline for now, showing default ranks.",
+    "暫時顯示預設排行榜": "Showing default leaderboard for now",
+    "今局分數已提交。": "This run has already been submitted.",
+    "提交分數中...": "Submitting score...",
+    "分數已提交。": "Score submitted.",
+    "即時排行榜已更新": "Live leaderboard updated",
+    "本機預覽排行榜": "Local leaderboard preview",
+    "最多只能派出 4 架機體，請先移除一架。": "You can only deploy 4 mecha. Remove one first.",
+    "請選擇 4 架機體出擊。": "Choose 4 mecha before deployment.",
+    "載入機體圖像...": "Loading mecha images...",
+    "載入獎勵圖像...": "Loading upgrade icons...",
+    "載入編隊機體...": "Loading loadout mecha...",
+    "載入戰鬥機體...": "Loading battle mecha...",
+    "選擇一項強化": "Choose an Upgrade",
+    "Eumist: 補習中": "Eumist: Stuck in Revision",
+    "MEGA: EK光環停止": "MEGA: EK Aura Offline",
+    "守護爆發已展開": "Guardian Burst Online",
+    "SEED 突擊發動": "SEED Rush Engaged",
+    "幻象修復與護盾已部署": "Phantom Repair and Shields Deployed",
+    "全方位齊射": "Omni Volley",
+    "挑釁信標展開": "Taunt Beacon Online",
+    "MEGA: EK光環啟動": "MEGA: EK Aura Online",
+    "穿甲狙擊": "Piercing Snipe",
+    "量子背刺": "Quantum Backstab",
+    "熱刃旋風": "Thermal Blade Cyclone",
+    "美女廚房: 沒有目標": "Beauty Kitchen Disaster: No Target",
+    "美女廚房: 有毒食物投餵": "Beauty Kitchen Disaster: Suspicious Food Delivered",
+    "再生力場展開": "Regeneration Field Online",
+    "重炮壓制": "Cannon Suppression",
+    "持續干擾": "Sustained Jammer",
+    "重力球: 沒有目標": "Gravity Core: No Target",
+    "重力球生成": "Gravity Core Deployed",
+    "流星斬": "Meteor Slash",
+    "天使光環": "Angel Halo",
+    "衛星全炮門": "Satellite Barrage",
+    "GN 力場展開": "GN Field Online",
+    "EK定律: 沒有目標": "EK Law: No Target",
+    "MEGA: EK定律成立": "MEGA: EK Law Confirmed",
+    "軌道貫穿": "Orbital Pierce",
+    "量子化": "Phase Shift",
+    "發脾氣: 全場粗雷射掃射": "Full Tantrum Mode: Rude Laser Sweep",
+    "幻象粒子散布": "Mirage Particles Deployed",
+    "要塞齊射": "Fortress Salvo",
+    "海市蜃樓域": "Mirage Domain",
+    "八重霞": "Yaegasumi",
+    "朧": "Oboro",
+    "MEGA: 迷路中": "MEGA: Completely Lost"
+  };
+  if (exact[text]) return exact[text];
+  let match = text.match(/^Boss 回合 (\d+)$/);
+  if (match) return `Boss Wave ${match[1]}`;
+  match = text.match(/^第 (\d+) 回合$/);
+  if (match) return `Wave ${match[1]}`;
+  match = text.match(/^(.+): 攻擊 (.+)$/);
+  if (match) return `${localizeName(match[1])}: Attack ${localizeName(match[2])}`;
+  match = text.match(/^(.+): 修復 (.+)$/);
+  if (match) return `${localizeName(match[1])}: Repair ${localizeName(match[2])}`;
+  match = text.match(/^(.+): 協助 (.+)$/);
+  if (match) return `${localizeName(match[1])}: Assist ${localizeName(match[2])}`;
+  match = text.match(/^(.+): 移動$/);
+  if (match) return `${localizeName(match[1])}: Move`;
+  match = text.match(/^(.+): 冷卻 (\d+) 秒$/);
+  if (match) return `${localizeSkillName(match[1])}: Recharging ${match[2]}s`;
+  match = text.match(/^(.+): 能量 (\d+)%$/);
+  if (match) return `${localizeSkillName(match[1])}: Charge ${match[2]}%`;
+  match = text.match(/^我幫緊你: (.+) (.+)$/);
+  if (match) return `I'm Helping, Honest: ${localizeName(match[1])} ${match[2]}`;
+  return text;
+}
+
+function localizeName(name) {
+  return unitEnglish[name]?.name || name;
+}
+
+function localizeSkillName(name) {
+  const unit = squadSeeds.find((seed) => seed.skill === name || seed.ultimate === name || seed.passive === name);
+  if (!unit) return name;
+  const localized = localizeUnit(unit);
+  if (unit.skill === name) return localized.skill;
+  if (unit.ultimate === name) return localized.ultimate;
+  return localized.passive || name;
+}
+
 function setMessage(text) {
-  commandEl.textContent = text;
+  commandEl.textContent = translateMessage(text);
   messageTime = now() + 1.8;
 }
 
@@ -952,12 +1473,12 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
 
 function renderResultLeaderboard(rankings, message = "") {
   renderLeaderboardList(leaderboardListEl, rankings, leaderboardScore);
-  leaderboardMessageEl.textContent = message || "輸入姓名後可提交今局分數。";
+  leaderboardMessageEl.textContent = translateMessage(message || "輸入姓名後可提交今局分數。");
 }
 
 function renderTitleLeaderboard(rankings, message = "") {
   renderLeaderboardList(titleLeaderboardListEl, rankings);
-  titleLeaderboardMessageEl.textContent = message || "挑戰最高分數，打入王牌榜。";
+  titleLeaderboardMessageEl.textContent = translateMessage(message || "挑戰最高分數，打入王牌榜。");
 }
 
 function renderLeaderboards(rankings, resultMessage = "", titleMessage = "") {
@@ -968,8 +1489,8 @@ function renderLeaderboards(rankings, resultMessage = "", titleMessage = "") {
 function updatePauseControls() {
   pauseOverlayEl.hidden = !paused;
   pauseToggleEl.setAttribute("aria-pressed", paused ? "true" : "false");
-  pauseToggleEl.setAttribute("aria-label", paused ? "繼續遊戲" : "暫停遊戲");
-  pauseToggleEl.querySelector(".pause-label").textContent = paused ? "繼續" : "暫停";
+  pauseToggleEl.setAttribute("aria-label", paused ? (currentLanguage === "en" ? "Resume game" : "繼續遊戲") : (currentLanguage === "en" ? "Pause game" : "暫停遊戲"));
+  pauseToggleEl.querySelector(".pause-label").textContent = paused ? (currentLanguage === "en" ? "Resume" : "繼續") : (currentLanguage === "en" ? "Pause" : "暫停");
   document.body.classList.toggle("paused-mode", paused);
 }
 
@@ -992,7 +1513,7 @@ function setPaused(value) {
     pausedAt = now();
     selected = null;
     pointer = null;
-    commandEl.textContent = "暫停中";
+    commandEl.textContent = translateMessage("暫停中");
     return;
   }
   if (pausedAt) {
@@ -1026,14 +1547,14 @@ async function loadLeaderboard() {
 async function submitLeaderboard(event) {
   event.preventDefault();
   if (leaderboardSubmitted) {
-    leaderboardMessageEl.textContent = "今局分數已提交。";
+    leaderboardMessageEl.textContent = translateMessage("今局分數已提交。");
     return;
   }
 
   const name = sanitizePlayerName(playerNameEl.value);
   playerNameEl.value = name;
   localStorage.setItem("mecha-heart-player-name", name);
-  leaderboardMessageEl.textContent = "提交分數中...";
+  leaderboardMessageEl.textContent = translateMessage("提交分數中...");
   const submitButton = leaderboardFormEl.querySelector("button");
   submitButton.disabled = true;
 
@@ -1739,10 +2260,11 @@ function applyHimawariPassive(unit) {
   ];
   const status = options[Math.floor(Math.random() * options.length)];
   target.himawariStatus = { ...status, life: 5, maxLife: 5 };
+  const displayStatus = localizeStatus(status);
   target.buttonPulse = 0.25;
   burst(target.x, target.y, status.color, 18);
-  addSkillEffect("himawari-status", target, { radius: 76, color: status.color, life: 5, follow: true, buff: status.buff, label: status.shortLabel });
-  setMessage(`我幫緊你: ${target.name} ${status.label}`);
+  addSkillEffect("himawari-status", target, { radius: 76, color: status.color, life: 5, follow: true, buff: status.buff, label: displayStatus.shortLabel });
+  setMessage(`我幫緊你: ${target.name} ${displayStatus.label}`);
 }
 
 function performHimawariFanAttack(unit, target) {
@@ -2380,7 +2902,7 @@ function update(dt) {
 
   if (!squad.some((u) => u.hp > 0)) endMission(false);
   if (messageTime && now() > messageTime) {
-    commandEl.textContent = "待命";
+    commandEl.textContent = t("idle");
     messageTime = 0;
   }
   if (now() >= nextHudRefresh) {
@@ -2425,7 +2947,16 @@ async function showReward() {
   else ultraRewardPity += 1;
   showLoading("載入獎勵圖像...");
   await loadRewardArt(rewardChoices);
-  rewardOptionsEl.innerHTML = rewardChoices.map((reward, index) => `
+  renderRewardChoices();
+  hideLoading();
+  rewardEl.hidden = false;
+  setMessage("選擇一項強化");
+}
+
+function renderRewardChoices() {
+  rewardOptionsEl.innerHTML = rewardChoices.map((sourceReward, index) => {
+    const reward = localizeReward(sourceReward);
+    return `
     <button class="reward-card tier-${rewardTier(reward)}" data-reward-index="${index}">
       <img src="${assetSrc(reward.icon)}" alt="${reward.name} icon" />
       <div class="reward-copy">
@@ -2434,10 +2965,8 @@ async function showReward() {
         <p>${reward.text}</p>
       </div>
     </button>
-  `).join("");
-  hideLoading();
-  rewardEl.hidden = false;
-  setMessage("選擇一項強化");
+  `;
+  }).join("");
 }
 
 function pickRewards() {
@@ -2529,26 +3058,35 @@ function endMission(won) {
   leaderboardFormEl.querySelector("button").disabled = false;
   resultEl.classList.toggle("lost", !won);
   resultEl.classList.toggle("won", won);
-  resultTitleEl.textContent = won ? "作戰完成" : "作戰結束";
-  resultCopyEl.innerHTML = `
-    <div class="result-score">
-      <span>最終分數</span>
-      <strong>${score}</strong>
-    </div>
-    <div class="result-lines">
-      <span>抵達第 ${wave} 回合</span>
-      <span>${won ? "艦隊防線仍然健在。" : "機體已撤退，重新整備後再出擊。"}</span>
-    </div>
-  `;
+  renderResultCopy(won);
   resultEl.hidden = false;
   loadLeaderboard();
 }
 
+function renderResultCopy(won) {
+  resultTitleEl.textContent = won ? t("missionClear") : t("missionEnd");
+  resultCopyEl.innerHTML = `
+    <div class="result-score">
+      <span>${t("finalScore")}</span>
+      <strong>${score}</strong>
+    </div>
+    <div class="result-lines">
+      <span>${t("reachedWave", { wave })}</span>
+      <span>${won ? t("fleetSafe") : t("retreat")}</span>
+    </div>
+  `;
+}
+
 function renderHudCardsShell() {
-  const signature = squad.map((u) => `${u.id}:${u.name}:${u.role}:${u.sprite || u.art}`).join("|");
+  const signature = squad.map((u) => {
+    const unit = localizeUnit(u);
+    return `${currentLanguage}:${u.id}:${unit.name}:${unit.role}:${u.sprite || u.art}`;
+  }).join("|");
   if (signature === hudCardsSignature) return;
   hudCardsSignature = signature;
-  cardsEl.innerHTML = squad.map((u) => `
+  cardsEl.innerHTML = squad.map((sourceUnit) => {
+    const u = localizeUnit(sourceUnit);
+    return `
     <article class="unit-card" data-unit-id="${u.id}">
       <img src="${assetSrc(u.sprite || u.art)}" alt="${u.name} artwork" draggable="false" decoding="async" loading="eager" />
       <div class="unit-info">
@@ -2558,7 +3096,8 @@ function renderHudCardsShell() {
         <div class="bar cool"><span data-card-cool></span></div>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function updateHud() {
@@ -2581,18 +3120,20 @@ function updateHud() {
 
 function renderSkillBarShell() {
   const signature = squad.map((unit) => [
+    currentLanguage,
     unit.id,
-    unit.name,
-    unit.skill,
-    unit.ultimate,
+    localizeUnit(unit).name,
+    localizeUnit(unit).skill,
+    localizeUnit(unit).ultimate,
     unit.activeIcon,
     unit.ultimateIcon,
-    unit.activeDesc,
-    unit.ultimateDesc
+    localizeUnit(unit).activeDesc,
+    localizeUnit(unit).ultimateDesc
   ].join(":")).join("|");
   if (signature === skillBarSignature) return;
   skillBarSignature = signature;
-  skillButtonsEl.innerHTML = squad.map((unit) => {
+  skillButtonsEl.innerHTML = squad.map((sourceUnit) => {
+    const unit = localizeUnit(sourceUnit);
     return `
       <div class="skill-pair" data-unit-id="${unit.id}">
         <button class="skill-button active" data-unit-id="${unit.id}" data-skill-kind="active" title="${unit.name}: ${unit.skill} - ${unit.activeDesc}">
@@ -2628,7 +3169,7 @@ function updateSkillBar() {
     activeButton.classList.toggle("not-ready", activeCooling);
     activeButton.classList.toggle("pulse", pulse || (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive));
     activeButton.disabled = dead;
-    activeButton.querySelector("[data-skill-status]").textContent = activeCooling ? `${Math.ceil(unit.skillCooldown)}秒` : (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive ? "啟動中" : unit.name);
+    activeButton.querySelector("[data-skill-status]").textContent = activeCooling ? `${Math.ceil(unit.skillCooldown)}${t("seconds")}` : (unit.name === "MEGA(EK專用機)" && unit.ekAuraActive ? t("activeOn") : localizeUnit(unit).name);
 
     const ultimateButton = pair.querySelector('.skill-button[data-skill-kind="ultimate"]');
     ultimateButton.classList.toggle("not-ready", ultCharging);
@@ -2648,9 +3189,11 @@ function getEnemyScale(enemy) {
 
 function renderIntel(unit) {
   if (!unit || !intelEl) return;
-  const hp = unit.maxHp ? `${Math.ceil(Math.max(0, unit.hp ?? unit.maxHp))} / ${unit.maxHp}` : "不明";
+  const sourceUnit = unit;
+  unit = localizeUnit(unit);
+  const hp = sourceUnit.maxHp ? `${Math.ceil(Math.max(0, sourceUnit.hp ?? sourceUnit.maxHp))} / ${sourceUnit.maxHp}` : t("unknown");
   intelEl.innerHTML = `
-    <p class="kicker">戰術情報</p>
+    <p class="kicker">${t("tacticalIntel")}</p>
     <div class="intel-layout">
       <img src="${assetSrc(unit.art || unit.sprite)}" alt="${unit.name} profile" />
       <div>
@@ -2658,11 +3201,11 @@ function renderIntel(unit) {
         <div class="role">${labelFaction(unit.faction)} / ${unit.role}</div>
         <div class="spec-grid">
           <div><span>HP</span><strong>${hp}</strong></div>
-          <div><span>武器</span><strong>${unit.weapon}</strong></div>
-          <div><span>主動技</span><strong>${unit.skill ? `${unit.skill}: ${unit.activeDesc || "由下方技能列使用。"}` : "沒有"}</strong></div>
-          ${unit.ultimate ? `<div><span>必殺技</span><strong>${unit.ultimate}: ${unit.ultimateDesc}</strong></div>` : ""}
-          <div><span>特性</span><strong>${unit.trait}</strong></div>
-          <div><span>用法</span><strong>${unit.tactic}</strong></div>
+          <div><span>${t("weapon")}</span><strong>${unit.weapon}</strong></div>
+          <div><span>${t("activeSkill")}</span><strong>${unit.skill ? `${unit.skill}: ${unit.activeDesc || t("useSkillBar")}` : t("noSkill")}</strong></div>
+          ${unit.ultimate ? `<div><span>${t("ultimateSkill")}</span><strong>${unit.ultimate}: ${unit.ultimateDesc}</strong></div>` : ""}
+          <div><span>${t("trait")}</span><strong>${unit.trait}</strong></div>
+          <div><span>${t("tactic")}</span><strong>${unit.tactic}</strong></div>
         </div>
       </div>
     </div>
@@ -2673,16 +3216,17 @@ function renderFormation() {
   if (!formationEl || !formationListEl || !formationSlotsEl) return;
   const focused = squadSeeds.find((unit) => unit.name === formationFocusName) || squadSeeds[0];
   formationFocusName = focused.name;
-  formationCountEl.textContent = `已選 ${selectedSquadNames.length}/4`;
+  formationCountEl.textContent = `${t("selected")} ${selectedSquadNames.length}/4`;
   formationStartEl.disabled = selectedSquadNames.length !== 4;
 
   formationSlotsEl.innerHTML = Array.from({ length: 4 }, (_, index) => {
-    const unit = squadSeeds.find((seed) => seed.name === selectedSquadNames[index]);
-    if (!unit) {
-      return `<article class="formation-slot empty"><span>${index + 1}</span><strong>待選機體</strong></article>`;
+    const sourceUnit = squadSeeds.find((seed) => seed.name === selectedSquadNames[index]);
+    if (!sourceUnit) {
+      return `<article class="formation-slot empty"><span>${index + 1}</span><strong>${t("emptySlot")}</strong></article>`;
     }
+    const unit = localizeUnit(sourceUnit);
     return `
-      <article class="formation-slot" data-unit-name="${unit.name}">
+      <article class="formation-slot" data-unit-name="${sourceUnit.name}">
         <span>${index + 1}</span>
         <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name} SD sprite" />
         <div>
@@ -2693,11 +3237,12 @@ function renderFormation() {
     `;
   }).join("");
 
-  const renderFormationCard = (unit) => {
-    const selectedForBattle = selectedSquadNames.includes(unit.name);
-    const focusedClass = unit.name === focused.name ? "focused" : "";
+  const renderFormationCard = (sourceUnit) => {
+    const unit = localizeUnit(sourceUnit);
+    const selectedForBattle = selectedSquadNames.includes(sourceUnit.name);
+    const focusedClass = sourceUnit.name === focused.name ? "focused" : "";
     return `
-      <article class="formation-card ${selectedForBattle ? "selected" : ""} ${focusedClass}" data-unit-name="${unit.name}">
+      <article class="formation-card ${selectedForBattle ? "selected" : ""} ${focusedClass}" data-unit-name="${sourceUnit.name}">
         <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name} SD sprite" />
         <div class="formation-card-copy">
           <div class="formation-card-title">
@@ -2706,13 +3251,13 @@ function renderFormation() {
           </div>
           <p>${unit.trait}</p>
           <dl>
-            <div><dt>射程</dt><dd>${unit.range}</dd></div>
-            <div><dt>耐久</dt><dd>${unit.maxHp}</dd></div>
-            <div><dt>主動</dt><dd>${unit.skill}</dd></div>
-            <div><dt>必殺</dt><dd>${unit.ultimate}</dd></div>
+            <div><dt>${t("range")}</dt><dd>${sourceUnit.range}</dd></div>
+            <div><dt>${t("durability")}</dt><dd>${sourceUnit.maxHp}</dd></div>
+            <div><dt>${t("active")}</dt><dd>${unit.skill}</dd></div>
+            <div><dt>${t("ultimate")}</dt><dd>${unit.ultimate}</dd></div>
           </dl>
         </div>
-        <button class="formation-toggle" data-unit-name="${unit.name}" type="button">${selectedForBattle ? "移除" : "加入"}</button>
+        <button class="formation-toggle" data-unit-name="${sourceUnit.name}" type="button">${selectedForBattle ? t("remove") : t("add")}</button>
       </article>
     `;
   };
@@ -2774,7 +3319,9 @@ async function startBattleFromFormation() {
 }
 
 function renderDatabase() {
-  const renderRows = (entries, className) => entries.map((unit) => `
+  const renderRows = (entries, className) => entries.map((sourceUnit) => {
+    const unit = localizeUnit(sourceUnit);
+    return `
     <article class="db-row ${className}">
       <img src="${assetSrc(unit.art || unit.sprite)}" alt="${unit.name} design" />
       <div>
@@ -2783,11 +3330,12 @@ function renderDatabase() {
         <p>${unit.trait}</p>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
   databaseListEl.innerHTML = `
-    <h3 class="db-heading player">玩家機體</h3>
+    <h3 class="db-heading player">${t("playerUnits")}</h3>
     ${renderRows(squadSeeds, "player")}
-    <h3 class="db-heading enemy">敵方機體</h3>
+    <h3 class="db-heading enemy">${t("enemyUnits")}</h3>
     ${renderRows(Object.values(enemyTypes), "enemy")}
   `;
 }
@@ -2823,7 +3371,7 @@ function drawBackground() {
 
 function drawEnergyBoundary() {
   const x = W * 0.75;
-  const t = now();
+  const time = now();
   const gradient = ctx.createLinearGradient(x - 46, 0, x + 36, 0);
   gradient.addColorStop(0, "rgba(75,228,255,0)");
   gradient.addColorStop(0.42, "rgba(75,228,255,0.18)");
@@ -2837,12 +3385,12 @@ function drawEnergyBoundary() {
   ctx.shadowColor = "#4be4ff";
   ctx.shadowBlur = 18;
   for (let i = 0; i < 5; i++) {
-    const wave = Math.sin(t * 2.6 + i * 1.7) * 10;
+    const wave = Math.sin(time * 2.6 + i * 1.7) * 10;
     ctx.strokeStyle = i % 2 ? "rgba(255,255,255,0.48)" : "rgba(75,228,255,0.72)";
     ctx.lineWidth = i === 2 ? 3 : 1.5;
     ctx.beginPath();
     for (let y = -20; y <= H + 20; y += 24) {
-      const px = x + Math.sin(y * 0.035 + t * 3.2 + i) * (10 + i * 2) + wave;
+      const px = x + Math.sin(y * 0.035 + time * 3.2 + i) * (10 + i * 2) + wave;
       if (y === -20) ctx.moveTo(px, y);
       else ctx.lineTo(px, y);
     }
@@ -2855,7 +3403,7 @@ function drawEnergyBoundary() {
   ctx.fillStyle = "rgba(75,228,255,0.85)";
   ctx.font = "800 16px 'Microsoft JhengHei', sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("自動追擊邊界", x, 34);
+  ctx.fillText(t("boundary"), x, 34);
   ctx.restore();
 }
 
@@ -3862,7 +4410,7 @@ function drawSupportAuras() {
   squad.forEach((unit) => {
     if (unit.hp <= 0) return;
     if (unit.himawariStatus) {
-      const status = unit.himawariStatus;
+      const status = localizeStatus(unit.himawariStatus);
       const alpha = clamp(status.life / status.maxLife, 0.22, 0.82);
       ctx.save();
       ctx.globalAlpha = alpha;
@@ -4047,7 +4595,7 @@ function initStars() {
 }
 
 function showLoading(message) {
-  if (loadingCopyEl && message) loadingCopyEl.textContent = message;
+  if (loadingCopyEl && message) loadingCopyEl.textContent = translateMessage(message);
   if (loadingEl) loadingEl.hidden = false;
 }
 
@@ -4265,6 +4813,8 @@ pauseFormationEl.addEventListener("click", () => {
   showFormation();
 });
 
+languageToggleEl?.addEventListener("click", toggleLanguage);
+
 document.getElementById("start-btn").addEventListener("click", () => {
   showFormation();
 });
@@ -4292,6 +4842,8 @@ window.addEventListener("load", () => {
     warmGameArt();
   }, 500);
 }, { once: true });
+applyStaticLanguage();
+commandEl.textContent = t("idle");
 initStars();
 resizeCanvas();
 loadLeaderboard();
