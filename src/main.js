@@ -839,10 +839,11 @@ const upgradePool = [
     type: "Ultra Rare",
     name: "SEED 覺醒協議",
     icon: "assets/upgrade-seed-awakening-protocol.webp",
-    text: "全體機體首次低於 35% HP 時覺醒：攻擊力 +35%、移速 +35%，持續 5 秒。",
+    text: "全體機體每次低於 40% HP 時覺醒：攻擊力、防禦力、補血量、移速 +35%，抗敵機推撞能力 +300%，持續 10 秒。",
     apply() {
       squad.forEach((u) => {
         u.seedProtocol = true;
+        u.seedAwakenArmed = true;
         addSkillEffect("seed-awaken", u, { radius: bodyRadius(u) + 72, color: "#ff3d54", life: 0.9, follow: true });
       });
     }
@@ -1127,7 +1128,7 @@ const rewardEnglish = {
   "support-sync-protocol": ["Support", "Support Unit Sync Protocol", "Repair unit healing +18%, healing range +30."],
   "frontline-suppression-order": ["Command", "Frontline Suppression Order", "When tanks are attacked, nearby hostiles deal 15% less damage."],
   "skill-circuit-overload": ["Skills", "Skill Circuit Overload", "All active skill cooldowns -2 seconds, but max HP -10."],
-  "seed-awakening-protocol": ["Ultra Rare", "SEED Awakening Protocol", "The first time each unit drops below 35% HP, it awakens: +35% attack and +35% speed for 5 seconds."],
+  "seed-awakening-protocol": ["Ultra Rare", "SEED Awakening Protocol", "Each time a unit drops below 40% HP, it awakens for 10 seconds: +35% attack, defence, healing and speed, plus +300% resistance to hostile collision push."],
   "meteor-equipment-deploy": ["Ultra Rare", "Meteor Equipment Deploy", "Attack units have a 35% chance for basic attacks to call a small area beam bombardment."],
   "genesis-jamming-wave": ["Ultra Rare", "Positron Cannon", "Each unit fires a field-wide positron sweep once whenever its HP drops below 35%."],
   "zero-range-breakthrough": ["Ultra Rare", "Zero-Range Breakthrough Order", "Melee and mid-range units resist shoves 50% more, gain +45% speed and +25 damage, but take +15% damage."],
@@ -1764,7 +1765,7 @@ function activateSkill(unit) {
     squad.forEach((ally) => {
       if (ally.hp > 0 && dist(unit, ally) < radius) {
         const hpBefore = ally.hp;
-        ally.hp = clamp(ally.hp + (unit.burstHeal || 56), 0, ally.maxHp);
+        ally.hp = clamp(ally.hp + (unit.burstHeal || 56) * healingOutputFactor(unit), 0, ally.maxHp);
         ally.shield = Math.max(ally.shield || 0, shieldValue);
         chargeUltimateByHealing(unit, ally.hp - hpBefore);
       }
@@ -2370,8 +2371,9 @@ function lowestHpAlly() {
 
 function healAlly(source, ally, amount, color = "#66f2e4") {
   if (!source || !ally || ally.hp <= 0 || amount <= 0) return 0;
+  const finalAmount = amount * healingOutputFactor(source);
   const hpBefore = ally.hp;
-  ally.hp = clamp(ally.hp + amount, 0, ally.maxHp);
+  ally.hp = clamp(ally.hp + finalAmount, 0, ally.maxHp);
   const healed = ally.hp - hpBefore;
   if (healed > 0) {
     ally.regenGlow = Math.max(ally.regenGlow || 0, 0.45);
@@ -2460,6 +2462,10 @@ function sourceDamageFactor(unit) {
   return factor;
 }
 
+function healingOutputFactor(unit) {
+  return unit?.seedAwakenTime > 0 ? 1.35 : 1;
+}
+
 function himawariDefenseFactor(unit) {
   const status = unit?.himawariStatus;
   if (!status || status.life <= 0) return 1;
@@ -2473,6 +2479,7 @@ function unitDefenseFactor(unit) {
   let factor = 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
   if (unit?.ekDefenseTime > 0) factor *= 0.5;
   if (unit?.eumistVeilTime > 0) factor *= 1 - clamp(unit.eumistVeilReduction || 0.12, 0, 0.3);
+  if (unit?.seedAwakenTime > 0) factor *= 0.65;
   if (unit?.accipioCommandTime > 0) factor *= 0.82;
   if (unit?.accipioProtectionTime > 0) factor *= 0.65;
   if (unit?.zeroBreak) factor *= 1.15;
@@ -2595,7 +2602,7 @@ function applyHelixRegen(unit, dt) {
   squad.forEach((ally) => {
     if (ally.hp <= 0 || dist(unit, ally) > radius) return;
     const hpBefore = ally.hp;
-    ally.hp = clamp(ally.hp + healPerSecond * dt, 1, ally.maxHp);
+    ally.hp = clamp(ally.hp + healPerSecond * healingOutputFactor(unit) * dt, 1, ally.maxHp);
     ally.regenGlow = Math.max(ally.regenGlow || 0, 0.25);
     chargeUltimateByHealing(unit, ally.hp - hpBefore);
   });
@@ -2649,7 +2656,7 @@ function updateMirageDomains(dt) {
 function applyGuardianRegen(unit, dt) {
   if (unit.hp <= 0 || unit.hp >= unit.maxHp) return;
   const hpBefore = unit.hp;
-  unit.hp = clamp(unit.hp + (unit.guardianRegenRate || 5) * dt, 1, unit.maxHp);
+  unit.hp = clamp(unit.hp + (unit.guardianRegenRate || 5) * healingOutputFactor(unit) * dt, 1, unit.maxHp);
   if (unit.hp > hpBefore) unit.regenGlow = Math.max(unit.regenGlow || 0, 0.3);
 }
 
@@ -2770,12 +2777,15 @@ function stepUnit(unit, dt) {
   unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
   unit.accipioCommandTime = Math.max(0, (unit.accipioCommandTime || 0) - dt);
   unit.seedAwakenTime = Math.max(0, (unit.seedAwakenTime || 0) - dt);
-  if (unit.seedProtocol && !unit.seedAwakened && unit.hp <= unit.maxHp * 0.35) {
-    unit.seedAwakened = true;
-    unit.seedAwakenTime = 5;
-    unit.buttonPulse = 0.5;
-    burst(unit.x, unit.y, "#ff3d54", 38);
-    addSkillEffect("seed-awaken", unit, { radius: bodyRadius(unit) + 78, color: "#ff3d54", life: 1.2, follow: true });
+  if (unit.seedProtocol) {
+    if (unit.hp > unit.maxHp * 0.4) unit.seedAwakenArmed = true;
+    if (unit.seedAwakenArmed !== false && unit.hp <= unit.maxHp * 0.4) {
+      unit.seedAwakenArmed = false;
+      unit.seedAwakenTime = 10;
+      unit.buttonPulse = 0.5;
+      burst(unit.x, unit.y, "#ff3d54", 38);
+      addSkillEffect("seed-awaken", unit, { radius: bodyRadius(unit) + 78, color: "#ff3d54", life: 1.2, follow: true });
+    }
   }
   if (unit.positronProtocol && !unit.positronFired && unit.hp <= unit.maxHp * 0.35) {
     unit.positronFired = true;
@@ -2905,7 +2915,7 @@ function stepUnit(unit, dt) {
         unit.attackPulse = 0.22;
         unit.aim = { x: target.x, y: target.y };
         const hpBefore = target.hp;
-        target.hp = clamp(target.hp - unit.damage, 0, target.maxHp);
+        target.hp = clamp(target.hp + (-unit.damage * healingOutputFactor(unit)), 0, target.maxHp);
         chargeUltimateByHealing(unit, target.hp - hpBefore);
         shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.42, maxLife: 0.42, heal: true, source: unit.id });
       }
@@ -2984,13 +2994,20 @@ function moveToward(actor, target, amount, limitAutoChase = false) {
 }
 
 function moveAwayFrom(actor, target, amount) {
-  if (actor.pushResistance) amount *= 1 - clamp(actor.pushResistance, 0, 0.6);
+  amount *= pushDisplacementFactor(actor);
   const dx = actor.x - target.x;
   const dy = actor.y - target.y;
   const d = Math.hypot(dx, dy) || 1;
   actor.x += (dx / d) * amount;
   actor.y += (dy / d) * amount;
   if (actor.faction === "Allied") clampToBattlefield(actor, false);
+}
+
+function pushDisplacementFactor(actor) {
+  let factor = actor?.pushResistance ? 1 - clamp(actor.pushResistance, 0, 0.6) : 1;
+  if (actor?.seedAwakenTime > 0 && actor.faction === "Allied") factor *= 0.25;
+  if (actor?.zeroBreak) factor *= 1 - (actor.zeroBreakPushReduction || 0.5);
+  return factor;
 }
 
 function clampToBattlefield(actor, limitAutoChase = false) {
@@ -3046,8 +3063,8 @@ function resolveBodyOverlaps() {
           d = 1;
         }
 
-        const aResist = (a.pushResistance ? 1 - clamp(a.pushResistance, 0, 0.6) : 1) * (a.zeroBreak ? 1 - (a.zeroBreakPushReduction || 0.5) : 1);
-        const bResist = (b.pushResistance ? 1 - clamp(b.pushResistance, 0, 0.6) : 1) * (b.zeroBreak ? 1 - (b.zeroBreakPushReduction || 0.5) : 1);
+        const aResist = pushDisplacementFactor(a);
+        const bResist = pushDisplacementFactor(b);
         const push = (minD - d) * 0.5;
         const nx = dx / d;
         const ny = dy / d;
