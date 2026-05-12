@@ -255,7 +255,7 @@ const squadSeeds = [
   { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 265, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
   { name: "Eumist (Eunice專用機)", ace: true, faction: "Allied", role: "霧刃循環支援機", weapon: "霞霧光刃 / 霧痕治癒核心", trait: "邊輸出邊補血。每次造成傷害會疊加霧痕，疊滿後消耗霧痕為全隊小補；但會隨時被阿媽捉去溫書補習，原地停止 3 秒。", tactic: "放在中前排持續斬擊同一批敵人，讓霧痕爆開形成穩定續航。八重霞適合敵群壓入時回血，朧可清場並為全隊提供短暫減傷。", color: "#66f2e4", x: 245, y: 315, maxHp: 126, range: 215, damage: 24, rate: 0.82, speed: 172, skill: "八重霞", activeDesc: "向四周發出連續霧刃斬擊，部分總傷害轉化為全隊治療，最低血友方額外回復。", ultimate: "朧", ultimateDesc: "展開大範圍霧域，高速斬擊敵方全體，將部分傷害轉化為治療，並令全隊短時間減傷。", passive: "霧痕循環", passiveDesc: "每次本機造成傷害時疊加 1 層霧痕；每層令本機對該敵人傷害 +4%。疊滿 5 層時消耗霧痕，治療全隊並額外治療最低血友方。", activeIcon: "assets/skill-eumist-yaegasumi.webp", ultimateIcon: "assets/skill-eumist-oboro.webp", art: "assets/player-eumist-profile.webp", sprite: "assets/player-eumist-sd.webp" },
-  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。每次啟動 EK 光環會獲得 15 秒防禦力 +100%；EK 定律會植入全場敵人，1 秒後同時爆炸並波及附近機體，MEGA 自身獲得 3 秒無敵。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；每次啟動獲得防禦力 +100% 15 秒，啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "為全場敵人植入 EK 定律，1 秒後爆炸並波及附近機體；MEGA 自身獲得無敵 3 秒。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
+  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。每次啟動 EK 光環會獲得 15 秒防禦力 +100%；EK 定律會植入場上最大威脅敵人，1 秒後以擴大範圍爆炸並波及附近機體，MEGA 自身獲得 3 秒無敵。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；每次啟動獲得防禦力 +100% 15 秒，啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "為場上最大威脅敵人植入 EK 定律，1 秒後以擴大 50% 範圍爆炸並波及附近機體；MEGA 自身獲得無敵 3 秒。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
   { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" },
   { name: "Accipio", ace: true, faction: "Allied", role: "後方支援 / 多重鎖定補助機", weapon: "Solace 光束步槍 / IT 支援無人機 / XDR 防護核心", trait: "以多重鎖定標記敵人，令敵人成為全隊回血節點；危急時可復活隊友，無人陣亡時則展開平鏡止牛凍結戰場。", tactic: "Accipio 為開發者 Sun 的專用機。放在隊伍後方，以 400 射程鎖定最多 5 名敵機並打上治療標記。先用普攻鋪 recovery point，再用 IT Remote Support 將標記轉成全隊護盾。", color: "#62f6b0", x: 185, y: 470, maxHp: 158, range: 400, damage: 20, rate: 1.05, speed: 138, spriteScale: 1.18, skill: "IT Remote Support", activeDesc: "全隊即時回血並獲得 HOT；若場上有治療標記，會消耗全部標記並按層數轉化成全隊護盾。", ultimate: "XDR Cyber Protection", ultimateDesc: "有隊友陣亡時復活 1 名友方；否則施放平鏡止牛，為全隊加大型護盾、減傷並停止範圍敵機。", passive: "Sun 支援協定・傷膝版", passiveDesc: "身處全隊後方時，治療標記回血提升。隨機觸發後方戰術指揮強化全隊，或膝患復發令 Accipio 暫時不能移動、普攻及新增標記。", activeIcon: "assets/skill-accipio-remote-support.webp", ultimateIcon: "assets/skill-accipio-xdr-protection.webp", art: "assets/player-accipio-profile.webp", sprite: "assets/player-accipio-sd.webp" }
 ];
@@ -1026,11 +1026,11 @@ const unitEnglish = {
     role: "Ace Custom Tank",
     weapon: "EK Ring Blade / Close-Range All-Angle Slash",
     trait: "Heavy melee tank. Basic attacks slash nearby hostiles, but it sometimes gets completely lost for 3 seconds and charges about in the wrong direction.",
-    tactic: "Drop it on the frontline to grab attention. Each EK Aura activation grants +100% defence for 15 seconds; EK Law marks every hostile, detonates after 1 second, and makes MEGA invulnerable for 3 seconds.",
+    tactic: "Drop it on the frontline to grab attention. Each EK Aura activation grants +100% defence for 15 seconds; EK Law marks the highest-threat hostile, detonates after 1 second with a 50% larger blast, and makes MEGA invulnerable for 3 seconds.",
     skill: "EK Aura",
     activeDesc: "Toggles EK Aura. Each activation grants +100% defence for 15 seconds. While active, it keeps pulling nearby hostiles. When switched off, it enters a 10-second cooldown.",
     ultimate: "EK Law",
-    ultimateDesc: "Implants EK Law into all hostiles, detonating after 1 second with splash damage. MEGA becomes invulnerable for 3 seconds."
+    ultimateDesc: "Implants EK Law into the highest-threat hostile, detonating after 1 second with 50% larger splash damage. MEGA becomes invulnerable for 3 seconds."
   },
   "Himawari (Candy專用機)": {
     name: "Himawari (Candy Custom)",
@@ -2050,21 +2050,20 @@ function useUltimate(unit) {
   }
 
   if (unit.name === "MEGA(EK專用機)") {
-    const targets = enemies.filter((enemy) => enemy.hp > 0);
-    if (!targets.length) {
+    const target = enemies
+      .filter((enemy) => enemy.hp > 0)
+      .sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || b.hp - a.hp || dist(unit, a) - dist(unit, b))[0];
+    if (!target) {
       setMessage("EK定律: 沒有目標");
       unit.ultCharge = unit.ultMax || 100;
       return;
     }
-    const radius = unit.ekLawRadius || 145;
+    const radius = (unit.ekLawRadius || 145) * 1.5;
     unit.invulnerableTime = Math.max(unit.invulnerableTime || 0, 3);
-    targets.forEach((target) => {
-      shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#48a8ff", life: 1, maxLife: 1, damage: unit.ekLawDamage || (112 + unit.damage), target: target.id, source: unit.id, splashRadius: radius, splashDamage: unit.ekLawSplashDamage || (46 + unit.damage * 0.75) });
-      addSkillEffect("ek-law", unit, { x: target.x, y: target.y, radius, color: "#48a8ff", life: 1, follow: false });
-    });
-    unit.target = targets[0].id;
-    burst(unit.x, unit.y, "#48a8ff", 72);
-    addSkillEffect("ek-law-field", unit, { radius: 250, color: "#48a8ff", life: 1, follow: true });
+    unit.target = target.id;
+    shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: "#48a8ff", life: 1, maxLife: 1, damage: unit.ekLawDamage || (112 + unit.damage), target: target.id, source: unit.id, splashRadius: radius, splashDamage: unit.ekLawSplashDamage || (46 + unit.damage * 0.75) });
+    burst(target.x, target.y, "#48a8ff", 58);
+    addSkillEffect("ek-law", unit, { x: target.x, y: target.y, radius, color: "#48a8ff", life: 1, follow: false });
     addSkillEffect("ek-invulnerable", unit, { radius: bodyRadius(unit) + 92, color: "#d9fbff", life: 3, follow: true });
     setMessage("MEGA: EK定律成立");
     return;
