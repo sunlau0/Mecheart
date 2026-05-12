@@ -48,9 +48,9 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
-const UNIT_ART_VERSION = 44;
-const REWARD_ICON_VERSION = 36;
-const SKILL_ICON_VERSION = 45;
+const UNIT_ART_VERSION = 47;
+const REWARD_ICON_VERSION = 39;
+const SKILL_ICON_VERSION = 48;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const REWARD_TIER_WEIGHTS = { common: 0.68, rare: 0.29, ultra: 0.03 };
 const REWARD_ULTRA_PITY_LIMIT = 8;
@@ -256,7 +256,8 @@ const squadSeeds = [
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
   { name: "Eumist (Eunice專用機)", ace: true, faction: "Allied", role: "霧刃循環支援機", weapon: "霞霧光刃 / 霧痕治癒核心", trait: "邊輸出邊補血。每次造成傷害會疊加霧痕，疊滿後消耗霧痕為全隊小補；但會隨時被阿媽捉去溫書補習，原地停止 3 秒。", tactic: "放在中前排持續斬擊同一批敵人，讓霧痕爆開形成穩定續航。八重霞適合敵群壓入時回血，朧可清場並為全隊提供短暫減傷。", color: "#66f2e4", x: 245, y: 315, maxHp: 126, range: 215, damage: 24, rate: 0.82, speed: 172, skill: "八重霞", activeDesc: "向四周發出連續霧刃斬擊，部分總傷害轉化為全隊治療，最低血友方額外回復。", ultimate: "朧", ultimateDesc: "展開大範圍霧域，高速斬擊敵方全體，將部分傷害轉化為治療，並令全隊短時間減傷。", passive: "霧痕循環", passiveDesc: "每次本機造成傷害時疊加 1 層霧痕；每層令本機對該敵人傷害 +4%。疊滿 5 層時消耗霧痕，治療全隊並額外治療最低血友方。", activeIcon: "assets/skill-eumist-yaegasumi.webp", ultimateIcon: "assets/skill-eumist-oboro.webp", art: "assets/player-eumist-profile.webp", sprite: "assets/player-eumist-sd.webp" },
   { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。EK 光環是開關式光環，會持續拉住附近敵機；EK 定律可鎖定全場敵人，1 秒後爆炸並波及附近機體。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "鎖定全場最高威脅敵人植入 EK 定律，1 秒後爆炸並波及附近機體。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
-  { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" }
+  { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" },
+  { name: "Accipio", ace: true, faction: "Allied", role: "後方支援 / 多重鎖定補助機", weapon: "Solace 光束步槍 / IT 支援無人機 / XDR 防護核心", trait: "以多重鎖定標記敵人，令敵人成為全隊回血節點；危急時可復活隊友，無人陣亡時則展開平鏡止牛凍結戰場。", tactic: "Accipio 為開發者 Sun 的專用機。放在隊伍後方，以 400 射程鎖定最多 5 名敵機並打上治療標記。先用普攻鋪 recovery point，再用 IT Remote Support 將標記轉成全隊護盾。", color: "#62f6b0", x: 185, y: 470, maxHp: 158, range: 400, damage: 20, rate: 1.05, speed: 138, spriteScale: 1.18, skill: "IT Remote Support", activeDesc: "全隊即時回血並獲得 HOT；若場上有治療標記，會消耗全部標記並按層數轉化成全隊護盾。", ultimate: "XDR Cyber Protection", ultimateDesc: "有隊友陣亡時復活 1 名友方；否則施放平鏡止牛，為全隊加大型護盾、減傷並停止範圍敵機。", passive: "Sun 支援協定・傷膝版", passiveDesc: "身處全隊後方時，治療標記回血提升。隨機觸發後方戰術指揮強化全隊，或膝患復發令 Accipio 暫時不能移動、普攻及新增標記。", activeIcon: "assets/skill-accipio-remote-support.webp", ultimateIcon: "assets/skill-accipio-xdr-protection.webp", art: "assets/player-accipio-profile.webp", sprite: "assets/player-accipio-sd.webp" }
 ];
 
 const enemyTypes = {
@@ -620,6 +621,24 @@ const upgradePool = [
       u.himawariPoisonRate = (u.himawariPoisonRate || 0.04) + 0.008;
       u.himawariPassiveMin = Math.max(4.5, (u.himawariPassiveMin || 7) - 1.2);
       u.himawariLaserDamage = (u.himawariLaserDamage || 72) + 24;
+    }
+  },
+  {
+    id: "accipio-remote-protection-budget",
+    unit: "Accipio",
+    type: "Accipio XDR",
+    name: "Remote Protection Budget",
+    icon: "assets/upgrade-accipio-remote-budget.webp",
+    text: "Accipio HOT 時間 +2 秒、治療量 +18%、標記轉盾效率 +20%、XDR 充能 +12%，平鏡止牛範圍和停止時間提升。",
+    apply() {
+      const u = squad.find((unit) => unit.name === "Accipio");
+      if (!u) return;
+      u.accipioHealBoost = (u.accipioHealBoost || 1) * 1.18;
+      u.accipioHotDuration = (u.accipioHotDuration || 6) + 2;
+      u.accipioShieldScale = (u.accipioShieldScale || 1) * 1.2;
+      u.accipioXdrGain = (u.accipioXdrGain || 1) * 1.12;
+      u.accipioMirrorRadius = (u.accipioMirrorRadius || 364) + 66;
+      u.accipioMirrorStopDuration = (u.accipioMirrorStopDuration || 3.2) + 0.8;
     }
   },
   {
@@ -1026,6 +1045,18 @@ const unitEnglish = {
     passive: "I'm Helping, Honest",
     passiveDesc: "Randomly applies a 3-second state to an allied unit. It might help or sabotage: attack +80%, defence +80%, speed -80%, attack -80%, or defence -80%. Affected units are clearly marked."
   },
+  Accipio: {
+    role: "Rear Support / Multi-Lock Recovery Unit",
+    weapon: "Solace Beam Rifle / IT Support Drones / XDR Protection Core",
+    trait: "Marks hostiles as recovery points. Allies attacking marked hostiles restore the lowest-HP ally; the ultimate either restores a fallen unit or freezes the field with Mirror Stillness.",
+    tactic: "Accipio is developer Sun's custom unit. Keep it behind the squad. Its 400 range marks up to 5 hostiles inside the lock zone, then IT Remote Support converts those marks into squad shields.",
+    skill: "IT Remote Support",
+    activeDesc: "Instantly heals the squad and applies HOT. Existing Healing Marks are consumed and converted into squad shields.",
+    ultimate: "XDR Cyber Protection",
+    ultimateDesc: "Revives one fallen ally if possible; otherwise shields the squad, grants damage reduction, and stops nearby hostiles.",
+    passive: "Sun Support Protocol: Knee Edition",
+    passiveDesc: "Healing Marks recover more while Accipio is behind the team. Randomly triggers rear command buffs, or a knee flare-up that roots Accipio and clears marks."
+  },
   "Vesper Drone": {
     role: "Mass-Production Assault Unit",
     weapon: "Beam Carbine / Boost Wings",
@@ -1080,6 +1111,7 @@ const rewardEnglish = {
   "eumist-mist-cycle-core": ["Eumist Mistmarks", "Revision Notes Core", "Eumist gains +7 damage. Mistmark burst healing improves, and Mum takes longer to drag it off for revision."],
   "miles-ek-aura-core": ["MEGA Skill", "EK Aura-Law Core", "MEGA gains +45 max HP and +10% defence. EK Law explosion damage and splash radius improve."],
   "himawari-helping-core": ["Himawari Support", "I'm Helping, Honest Core", "Himawari gains +35 max HP. Beauty Kitchen poison gets worse, the passive triggers more often, and tantrum lasers hit harder."],
+  "accipio-remote-protection-budget": ["Accipio XDR", "Remote Protection Budget", "Accipio HOT lasts longer, healing improves, Mark-to-shield conversion gets stronger, XDR charges faster, and Mirror Stillness grows wider and longer."],
   "overclocked-servos": ["Mobility", "Overclocked AMBAC Servos", "All units move faster and attack intervals shorten by 8%."],
   "emergency-nanites": ["Survival", "Emergency Nanite Bay", "All units recover 40% HP. Downed units return with 35% HP."],
   "spare-thruster-fuel": ["Mobility", "Spare Thruster Fuel", "All unit movement speed +10%."],
@@ -1185,6 +1217,13 @@ function reset() {
     himawariPassiveCooldown: u.name === "Himawari (Candy專用機)" ? 5 + Math.random() * 6 : 0,
     eumistTutoringCooldown: u.name === "Eumist (Eunice專用機)" ? 5 + Math.random() * 9 : 0,
     eumistTutoringTime: 0,
+    accipioPassiveCooldown: u.name === "Accipio" ? 5 + Math.random() * 7 : 0,
+    accipioKneeTime: 0,
+    accipioCommandTime: 0,
+    accipioHotTime: 0,
+    accipioHotSource: null,
+    accipioShieldTime: 0,
+    accipioProtectionTime: 0,
     himawariStatus: null
     });
   });
@@ -1700,7 +1739,7 @@ function activateSkill(unit) {
     unit.buttonPulse = 0.25;
     return;
   }
-  const baseSkillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : 10;
+  const baseSkillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : (unit.name === "Accipio" ? 12 : 10);
   unit.skillCooldown = baseSkillCooldown <= 0 ? 0 : Math.max(3.5, baseSkillCooldown * (unit.skillCooldownMultiplier || 1) - (unit.skillCooldownFlat || 0));
   unit.buttonPulse = 0.35;
   unit.attackPulse = 0.26;
@@ -1731,6 +1770,26 @@ function activateSkill(unit) {
     burst(unit.x, unit.y, "#62e6a7", 34);
     addSkillEffect("repair-shield", unit, { radius, color: "#62e6a7", life: 1.2 });
     setMessage("幻象修復與護盾已部署");
+  } else if (unit.name === "Accipio") {
+    const marks = clearAccipioMarks();
+    const healBoost = unit.accipioHealBoost || 1;
+    const hotDuration = unit.accipioHotDuration || 6;
+    const shieldDuration = unit.accipioShieldDuration || 7;
+    squad.forEach((ally) => {
+      if (ally.hp <= 0) return;
+      const burstHeal = (ally.maxHp * 0.18 + unit.damage * 1.6) * healBoost;
+      healAlly(unit, ally, burstHeal, "#62f6b0");
+      chargeAccipioXdr(unit, 0.9);
+      setAccipioHot(ally, unit, hotDuration);
+      if (marks > 0) {
+        const shieldBonus = Math.min(8.5, marks * 0.32 * (unit.accipioShieldScale || 1));
+        grantAccipioShield(ally, shieldDuration + shieldBonus * 0.12, 0, 0.7);
+      }
+    });
+    if (marks > 0) chargeAccipioXdr(unit, marks * 2.2);
+    burst(unit.x, unit.y, "#62f6b0", 58);
+    addSkillEffect("accipio-remote", unit, { radius: 168, color: "#62f6b0", life: 0.75 });
+    setMessage(marks > 0 ? `IT Remote Support: ${marks} 層標記轉盾` : "IT Remote Support: 全隊修復");
   } else if (unit.name === "Orion") {
     enemies
       .filter((e) => e.hp > 0)
@@ -1930,6 +1989,42 @@ function useUltimate(unit) {
     return;
   }
 
+  if (unit.name === "Accipio") {
+    const fallen = squad.filter((ally) => ally.id !== unit.id && ally.hp <= 0).sort((a, b) => a.maxHp - b.maxHp)[0];
+    if (fallen) {
+      fallen.hp = Math.ceil(fallen.maxHp * 0.45);
+      grantAccipioShield(fallen, 8, 0);
+      setAccipioHot(fallen, unit, 6);
+      fallen.regenGlow = Math.max(fallen.regenGlow || 0, 0.85);
+      burst(fallen.x, fallen.y, "#62f6b0", 96);
+      addSkillEffect("accipio-restore", fallen, { radius: 210, color: "#62f6b0", life: 1.55, follow: true });
+      setMessage(`XDR Restore: ${fallen.name} 已還原`);
+      return;
+    }
+
+    const radius = unit.accipioMirrorRadius || 364;
+    const stopDuration = unit.accipioMirrorStopDuration || 3.2;
+    squad.forEach((ally) => {
+      if (ally.hp <= 0) return;
+      grantAccipioShield(ally, 8, 8);
+      ally.regenGlow = Math.max(ally.regenGlow || 0, 0.5);
+    });
+    enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius).forEach((enemy) => {
+      if (enemy.boss) {
+        enemy.slowTime = Math.max(enemy.slowTime || 0, stopDuration);
+        enemy.jamTime = Math.max(enemy.jamTime || 0, stopDuration);
+        enemy.fireControlTime = Math.max(enemy.fireControlTime || 0, stopDuration * 0.6);
+      } else {
+        enemy.accipioStopTime = Math.max(enemy.accipioStopTime || 0, stopDuration);
+        enemy.fireControlTime = Math.max(enemy.fireControlTime || 0, stopDuration);
+      }
+    });
+    burst(unit.x, unit.y, "#62f6b0", 104);
+    addSkillEffect("accipio-mirror-field", unit, { radius, color: "#62f6b0", life: stopDuration, follow: true });
+    setMessage("平鏡止牛: 戰場停止");
+    return;
+  }
+
   if (unit.name === "Orion") {
     enemies.forEach((e) => {
       const damage = e.boss ? 38 + unit.damage : 86 + unit.damage;
@@ -2099,9 +2194,12 @@ function hit(target, amount, color, sourceId = null) {
   if (dealt > 0 && source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
     applyEumistMistMark(source, target);
   }
+  if (dealt > 0 && target.faction === "Enemy" && (target.accipioMarks || 0) > 0) {
+    triggerAccipioMarkHeal(target);
+  }
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
-    chargeUltimate(sourceId, target.boss ? 55 : 28);
+    if (source?.name !== "Accipio") chargeUltimate(sourceId, target.boss ? 55 : 28);
     score += target.points || 50;
     if (target.boss) score += wave * 100;
     if (score > bestScore) {
@@ -2124,7 +2222,7 @@ function chargeUltimateByHealing(unit, amount) {
 }
 
 function chargeUltimateByDamageTaken(unit, amount) {
-  if (!unit || unit.faction !== "Allied" || unit.hp <= 0 || amount <= 0) return;
+  if (!unit || unit.faction !== "Allied" || unit.hp <= 0 || amount <= 0 || unit.name === "Accipio") return;
   const windowNow = now();
   if (!unit.damageUltWindowStart || windowNow - unit.damageUltWindowStart >= 1) {
     unit.damageUltWindowStart = windowNow;
@@ -2141,6 +2239,122 @@ function chargeUltimateByDamageTaken(unit, amount) {
   chargeUltimate(unit.id, applied);
 }
 
+function chargeAccipioXdr(unit, amount) {
+  if (!unit || unit.name !== "Accipio" || unit.hp <= 0 || amount <= 0) return;
+  chargeUltimate(unit.id, amount * (unit.accipioXdrGain || 1));
+}
+
+function activeAccipio() {
+  return squad.find((unit) => unit.name === "Accipio" && unit.hp > 0) || null;
+}
+
+function isAccipioRearSupportActive(unit) {
+  if (!unit || unit.name !== "Accipio" || unit.hp <= 0) return false;
+  return squad
+    .filter((ally) => ally.hp > 0 && ally.id !== unit.id)
+    .every((ally) => unit.x <= ally.x + 8);
+}
+
+function addAccipioMark(unit, enemy) {
+  if (!unit || !enemy || enemy.hp <= 0 || unit.accipioKneeTime > 0) return;
+  enemy.accipioMarks = clamp((enemy.accipioMarks || 0) + 1, 0, 5);
+  enemy.accipioMarkTime = 8;
+  chargeAccipioXdr(unit, 1.2);
+  addSkillEffect("accipio-lock", unit, { tx: enemy.x, ty: enemy.y, radius: bodyRadius(enemy) + 44, color: "#62f6b0", life: 0.48 });
+}
+
+function clearAccipioMarks() {
+  let total = 0;
+  enemies.forEach((enemy) => {
+    total += enemy.accipioMarks || 0;
+    enemy.accipioMarks = 0;
+    enemy.accipioMarkTime = 0;
+    enemy.accipioMarkHealCooldown = 0;
+  });
+  return total;
+}
+
+function triggerAccipioMarkHeal(enemy) {
+  const unit = activeAccipio();
+  if (!unit || !enemy || enemy.faction !== "Enemy" || (enemy.accipioMarks || 0) <= 0) return;
+  const stamp = now();
+  if ((enemy.accipioMarkHealCooldown || 0) > stamp) return;
+  const ally = lowestHpAlly();
+  if (!ally) return;
+  enemy.accipioMarkHealCooldown = stamp + 0.35;
+  const rearBonus = isAccipioRearSupportActive(unit) ? 1.3 : 1;
+  const amount = ((unit.damage * 0.32) + ally.maxHp * 0.014 * enemy.accipioMarks) * rearBonus * (unit.accipioHealBoost || 1);
+  healAlly(unit, ally, amount, "#62f6b0");
+  chargeAccipioXdr(unit, 1.8);
+  addSkillEffect("accipio-mark-heal", ally, { radius: bodyRadius(ally) + 38, color: "#62f6b0", life: 0.52, follow: true });
+}
+
+function setAccipioHot(ally, unit, duration = unit?.accipioHotDuration || 6) {
+  if (!ally || ally.hp <= 0 || !unit) return;
+  ally.accipioHotTime = Math.max(ally.accipioHotTime || 0, duration);
+  ally.accipioHotMax = duration;
+  ally.accipioHotSource = unit.id;
+  ally.regenGlow = Math.max(ally.regenGlow || 0, 0.45);
+}
+
+function grantAccipioShield(ally, duration, protection = 0, radiusScale = 0.82) {
+  if (!ally || ally.hp <= 0) return;
+  ally.shield = Math.max(ally.shield || 0, duration);
+  ally.accipioShieldTime = Math.max(ally.accipioShieldTime || 0, duration);
+  ally.accipioProtectionTime = Math.max(ally.accipioProtectionTime || 0, protection);
+  ally.accipioShieldRadiusScale = radiusScale;
+}
+
+function updateAccipioMarks(dt) {
+  enemies.forEach((enemy) => {
+    enemy.accipioMarkTime = Math.max(0, (enemy.accipioMarkTime || 0) - dt);
+    if (enemy.accipioMarkTime <= 0) enemy.accipioMarks = 0;
+  });
+}
+
+function updateAccipioHot(dt) {
+  squad.forEach((ally) => {
+    ally.accipioHotTime = Math.max(0, (ally.accipioHotTime || 0) - dt);
+    ally.accipioShieldTime = Math.max(0, (ally.accipioShieldTime || 0) - dt);
+    ally.accipioProtectionTime = Math.max(0, (ally.accipioProtectionTime || 0) - dt);
+    if (ally.accipioShieldTime <= 0 && ally.accipioProtectionTime <= 0) ally.accipioShieldRadiusScale = 1;
+    if (ally.hp <= 0 || ally.accipioHotTime <= 0) return;
+    const unit = squad.find((source) => source.id === ally.accipioHotSource && source.hp > 0);
+    if (!unit) return;
+    const lowHpBoost = ally.hp / ally.maxHp < 0.45 ? 1.6 : 1;
+    const amount = (ally.maxHp * 0.032 + unit.damage * 0.35) * lowHpBoost * (unit.accipioHealBoost || 1) * dt;
+    const healed = healAlly(unit, ally, amount, "#62f6b0");
+    if (healed > 0) chargeAccipioXdr(unit, 0.45 * dt);
+  });
+}
+
+function updateAccipioPassive(unit, dt) {
+  if (!unit || unit.name !== "Accipio" || unit.hp <= 0) return;
+  unit.accipioKneeTime = Math.max(0, (unit.accipioKneeTime || 0) - dt);
+  if (unit.accipioKneeTime > 0) return;
+  unit.accipioPassiveCooldown = Math.max(0, (unit.accipioPassiveCooldown || 0) - dt);
+  if (unit.accipioPassiveCooldown > 0) return;
+  unit.accipioPassiveCooldown = 12 + Math.random() * 6;
+  if (Math.random() < 0.45) {
+    squad.forEach((ally) => {
+      if (ally.hp <= 0) return;
+      ally.accipioCommandTime = 5;
+      ally.shield = Math.max(ally.shield || 0, 3);
+      ally.regenGlow = Math.max(ally.regenGlow || 0, 0.3);
+    });
+    burst(unit.x, unit.y, "#62f6b0", 34);
+    addSkillEffect("accipio-command", unit, { radius: 260, color: "#62f6b0", life: 1.1 });
+    setMessage("Accipio: 後方戰術指揮");
+    return;
+  }
+  unit.accipioKneeTime = 5;
+  unit.cooldown = Math.max(unit.cooldown || 0, 5);
+  clearAccipioMarks();
+  burst(unit.x, unit.y, "#ff5b66", 18);
+  addSkillEffect("accipio-knee", unit, { radius: bodyRadius(unit) + 52, color: "#ff5b66", life: 5, follow: true });
+  setMessage("Accipio: 膝患復發");
+}
+
 function lowestHpAlly() {
   return squad
     .filter((ally) => ally.hp > 0 && ally.hp < ally.maxHp)
@@ -2154,8 +2368,8 @@ function healAlly(source, ally, amount, color = "#66f2e4") {
   const healed = ally.hp - hpBefore;
   if (healed > 0) {
     ally.regenGlow = Math.max(ally.regenGlow || 0, 0.45);
-    chargeUltimateByHealing(source, healed);
-    addSkillEffect("mist-heal", ally, { radius: bodyRadius(ally) + 34, color, life: 0.55, follow: true });
+    if (source.name !== "Accipio") chargeUltimateByHealing(source, healed);
+    addSkillEffect(source.name === "Accipio" ? "accipio-heal" : "mist-heal", ally, { radius: bodyRadius(ally) + (source.name === "Accipio" ? 14 : 34), color, life: source.name === "Accipio" ? 0.36 : 0.55, follow: true });
   }
   return healed;
 }
@@ -2235,6 +2449,7 @@ function sourceDamageFactor(unit) {
   let factor = himawariAttackFactor(unit);
   if (unit?.seedAwakenTime > 0) factor *= 1.35;
   if (unit?.zeroBreak) factor *= 1.25;
+  if (unit?.accipioCommandTime > 0) factor *= 1.18;
   return factor;
 }
 
@@ -2249,6 +2464,8 @@ function himawariDefenseFactor(unit) {
 function unitDefenseFactor(unit) {
   let factor = 1 - clamp(unit?.damageReduction || 0, 0, 0.45);
   if (unit?.eumistVeilTime > 0) factor *= 1 - clamp(unit.eumistVeilReduction || 0.12, 0, 0.3);
+  if (unit?.accipioCommandTime > 0) factor *= 0.82;
+  if (unit?.accipioProtectionTime > 0) factor *= 0.65;
   if (unit?.zeroBreak) factor *= 1.15;
   return factor;
 }
@@ -2540,6 +2757,7 @@ function stepUnit(unit, dt) {
   unit.eumistVeilTime = Math.max(0, (unit.eumistVeilTime || 0) - dt);
   unit.mirageAuraTime = Math.max(0, (unit.mirageAuraTime || 0) - dt);
   unit.quantumTime = Math.max(0, (unit.quantumTime || 0) - dt);
+  unit.accipioCommandTime = Math.max(0, (unit.accipioCommandTime || 0) - dt);
   unit.seedAwakenTime = Math.max(0, (unit.seedAwakenTime || 0) - dt);
   if (unit.seedProtocol && !unit.seedAwakened && unit.hp <= unit.maxHp * 0.35) {
     unit.seedAwakened = true;
@@ -2580,6 +2798,15 @@ function stepUnit(unit, dt) {
       burst(unit.x, unit.y, "#66f2e4", 16);
       addSkillEffect("tutoring", unit, { radius: bodyRadius(unit) + 42, color: "#66f2e4", life: 3.0, follow: true });
       setMessage("Eumist: 補習中");
+      return;
+    }
+  }
+  if (unit.name === "Accipio") {
+    updateAccipioPassive(unit, dt);
+    if (unit.accipioKneeTime > 0) {
+      unit.target = null;
+      unit.move = null;
+      unit.aim = null;
       return;
     }
   }
@@ -2685,6 +2912,15 @@ function stepUnit(unit, dt) {
       } else {
         if (unit.name === "Himawari (Candy專用機)") {
           performHimawariFanAttack(unit, target);
+        } else if (unit.name === "Accipio") {
+          const targets = enemies
+            .filter((enemy) => enemy.hp > 0 && weaponDistance(unit, enemy) <= unit.range)
+            .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : weaponDistance(unit, a) - weaponDistance(unit, b)))
+            .slice(0, 5);
+          targets.forEach((enemy) => {
+            shots.push({ x: unit.x, y: unit.y, tx: enemy.x, ty: enemy.y, color: unit.color, life: 0.22, maxLife: 0.22, damage: unit.damage * 0.75, target: enemy.id, source: unit.id, accipioMark: true });
+            addAccipioMark(unit, enemy);
+          });
         } else if (unit.name === "MEGA(EK專用機)") {
           const radius = unit.omniSlashRadius || 132;
           const targets = enemies.filter((enemy) => enemy.hp > 0 && dist(unit, enemy) < radius + bodyRadius(enemy) * 0.45);
@@ -2761,6 +2997,7 @@ function bodyRadius(actor) {
   if (actor.name === "Bastion") return 52;
   if (actor.name === "Mirage") return 41;
   if (actor.name === "Eumist (Eunice專用機)") return 42;
+  if (actor.name === "Accipio") return 46;
   if (actor.name === "Seraphim") return 39;
   return 41;
 }
@@ -2823,12 +3060,13 @@ function stepEnemy(enemy, dt) {
   enemy.jamTime = Math.max(0, (enemy.jamTime || 0) - dt);
   enemy.slowTime = Math.max(0, (enemy.slowTime || 0) - dt);
   enemy.fireControlTime = Math.max(0, (enemy.fireControlTime || 0) - dt);
+  enemy.accipioStopTime = Math.max(0, (enemy.accipioStopTime || 0) - dt);
   enemy.genesisTime = Math.max(0, (enemy.genesisTime || 0) - dt);
   enemy.frontlineSuppressionTime = Math.max(0, (enemy.frontlineSuppressionTime || 0) - dt);
   const target = chooseEnemyTarget(enemy, living);
   const d = dist(enemy, target);
   const genesisFactor = enemy.genesisTime > 0 ? (enemy.boss ? 0.875 : 0.75) : 1;
-  const speedFactor = (enemy.slowTime > 0 ? 0.54 : 1) * genesisFactor;
+  const speedFactor = (enemy.accipioStopTime > 0 ? 0 : (enemy.slowTime > 0 ? 0.54 : 1)) * genesisFactor;
   if (d > enemy.range) moveToward(enemy, target, enemy.speed * speedFactor * dt);
   if (d <= enemy.range && enemy.cooldown <= 0 && (enemy.fireControlTime || 0) <= 0) {
     const jamFactor = enemy.jamTime > 0 ? 1.38 : 1;
@@ -2837,6 +3075,11 @@ function stepEnemy(enemy, dt) {
     enemy.aim = { x: target.x, y: target.y };
     const frontlineFactor = enemy.frontlineSuppressionTime > 0 ? 0.85 : 1;
     const baseDamage = enemy.damage * (enemy.jamTime > 0 ? 0.68 : 1) * genesisFactor * frontlineFactor;
+    if (target.shield > 0 && target.accipioShieldTime > 0) {
+      const absorbed = baseDamage * 0.55;
+      const source = activeAccipio();
+      if (source) chargeAccipioXdr(source, 1.5 * (absorbed / Math.max(1, target.maxHp * 0.05)));
+    }
     const damage = (target.shield > 0 ? baseDamage * 0.45 : baseDamage) * himawariDefenseFactor(target) * unitDefenseFactor(target);
     const hpBefore = target.hp;
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
@@ -2876,7 +3119,7 @@ function nearestUnitByRole(enemy, units, role) {
 
 function unitCombatRole(unit) {
   if (unit.name === "Asterion" || unit.name === "Valkyr" || unit.name === "MEGA(EK專用機)") return "tank";
-  if (unit.damage < 0 || unit.name === "Seraphim" || unit.name === "Helix") return "repair";
+  if (unit.damage < 0 || unit.name === "Seraphim" || unit.name === "Helix" || unit.name === "Accipio") return "repair";
   return "attacker";
 }
 
@@ -2884,6 +3127,8 @@ function update(dt) {
   if (!running || paused) return;
   squad.forEach((u) => stepUnit(u, dt));
   enemies.forEach((e) => stepEnemy(e, dt));
+  updateAccipioMarks(dt);
+  updateAccipioHot(dt);
   updateGravityFields(dt);
   updateMirageDomains(dt);
   updateHimawariPoison(dt);
@@ -3482,19 +3727,19 @@ function tracePolygon(cx, cy, radius, sides, rotation = -Math.PI / 2) {
   ctx.closePath();
 }
 
-function drawShieldBubble(cx, cy, radius) {
+function drawShieldBubble(cx, cy, radius, subtle = false) {
   const pulse = Math.sin(now() * 8) * 2.5;
   ctx.save();
   ctx.shadowColor = "#4be4ff";
-  ctx.shadowBlur = 14;
-  ctx.strokeStyle = "rgba(220,255,255,0.78)";
-  ctx.lineWidth = 3.5;
+  ctx.shadowBlur = subtle ? 8 : 14;
+  ctx.strokeStyle = subtle ? "rgba(220,255,255,0.46)" : "rgba(220,255,255,0.78)";
+  ctx.lineWidth = subtle ? 2 : 3.5;
   ctx.beginPath();
   ctx.arc(cx, cy, radius + pulse, 0, Math.PI * 2);
   ctx.stroke();
 
   ctx.shadowBlur = 0;
-  ctx.globalAlpha = 0.16;
+  ctx.globalAlpha = subtle ? 0.055 : 0.16;
   const gradient = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.32, radius * 0.2, cx, cy, radius);
   gradient.addColorStop(0, "rgba(255,255,255,0.5)");
   gradient.addColorStop(0.42, "rgba(75,228,255,0.2)");
@@ -3504,9 +3749,9 @@ function drawShieldBubble(cx, cy, radius) {
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.globalAlpha = 0.62;
-  ctx.strokeStyle = "rgba(75,228,255,0.78)";
-  ctx.lineWidth = 2;
+  ctx.globalAlpha = subtle ? 0.32 : 0.62;
+  ctx.strokeStyle = subtle ? "rgba(98,246,176,0.48)" : "rgba(75,228,255,0.78)";
+  ctx.lineWidth = subtle ? 1.25 : 2;
   ctx.beginPath();
   ctx.arc(cx, cy, radius * 0.78 + pulse * 0.4, -0.28 * Math.PI, 0.18 * Math.PI);
   ctx.stroke();
@@ -3514,8 +3759,8 @@ function drawShieldBubble(cx, cy, radius) {
   ctx.arc(cx, cy, radius * 0.78 + pulse * 0.4, 0.72 * Math.PI, 1.18 * Math.PI);
   ctx.stroke();
 
-  ctx.globalAlpha = 0.48;
-  ctx.lineWidth = 1.4;
+  ctx.globalAlpha = subtle ? 0.22 : 0.48;
+  ctx.lineWidth = subtle ? 1 : 1.4;
   for (let i = 0; i < 4; i++) {
     const angle = -Math.PI / 2 + (i / 4) * Math.PI * 2 + pulse * 0.01;
     ctx.beginPath();
@@ -3545,7 +3790,7 @@ function drawMech(unit) {
       ctx.stroke();
     }
     if (unit.shield > 0) {
-      drawShieldBubble(unit.x, unit.y - 8, 50);
+      drawShieldBubble(unit.x, unit.y - 8, 50, false);
     }
     drawBar(unit.x - 34, unit.y + 44, 68, unit.hp / unit.maxHp, "#62e6a7");
     return;
@@ -3572,7 +3817,7 @@ function drawMech(unit) {
   ctx.lineTo(46, 18);
   ctx.stroke();
   if (unit.shield > 0) {
-    drawShieldBubble(0, 0, 44);
+    drawShieldBubble(0, 0, 44, false);
   }
   ctx.restore();
   if (!alive) return;
@@ -3594,6 +3839,7 @@ function drawEnemy(enemy) {
   const size = (enemy.type === "commander" ? 94 : 82) * getEnemyScale(enemy);
   if (drawSheetSprite(enemy, size, size, -2)) {
     ctx.restore();
+    drawAccipioEnemyMarks(enemy);
     drawBar(enemy.x - 28, enemy.y + enemy.radius + 14, 56, enemy.hp / enemy.maxHp, "#ff5b66");
     return;
   }
@@ -3624,7 +3870,34 @@ function drawEnemy(enemy) {
   ctx.fillStyle = enemy.color;
   ctx.fillRect(-5, -5, 10, 10);
   ctx.restore();
+  drawAccipioEnemyMarks(enemy);
   drawBar(enemy.x - 28, enemy.y + enemy.radius + 10, 56, enemy.hp / enemy.maxHp, "#ff5b66");
+}
+
+function drawAccipioEnemyMarks(enemy) {
+  const marks = enemy.accipioMarks || 0;
+  if (marks <= 0 || enemy.hp <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = clamp((enemy.accipioMarkTime || 0) / 8, 0.28, 0.92);
+  ctx.shadowColor = "#62f6b0";
+  ctx.shadowBlur = 16;
+  ctx.strokeStyle = "#62f6b0";
+  ctx.fillStyle = "rgba(98,246,176,0.22)";
+  ctx.lineWidth = 2;
+  const startX = enemy.x - (marks - 1) * 8;
+  for (let i = 0; i < marks; i++) {
+    const x = startX + i * 16;
+    const y = enemy.y - bodyRadius(enemy) - 18 - Math.sin(now() * 5 + i) * 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x + 7, y);
+    ctx.lineTo(x, y + 8);
+    ctx.lineTo(x - 7, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function drawBar(x, y, width, percent, color) {
@@ -3832,6 +4105,19 @@ function drawSkillEffects() {
       ctx.beginPath();
       ctx.arc(point.x, point.y - 6, radius * (0.3 + age * 0.34), 0, Math.PI * 2);
       ctx.fill();
+    } else if (effect.type === "accipio-heal") {
+      const marks = 4;
+      ctx.globalAlpha = alpha * 0.58;
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 18, radius * (0.36 + age * 0.34), 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < marks; i++) {
+        const angle = effect.rotation + i * 1.7 + age * 0.7;
+        const spread = radius * (0.28 + i * 0.1);
+        drawPlusMark(point.x + Math.cos(angle) * spread, point.y - 42 + Math.sin(angle) * spread - age * 12, 4, i % 2 ? "#dffcff" : effect.color);
+      }
     } else if (effect.type === "mist-heal" || effect.type === "mist-bloom") {
       const marks = effect.type === "mist-bloom" ? 10 : 5;
       for (let i = 0; i < marks; i++) {
@@ -3910,6 +4196,147 @@ function drawSkillEffects() {
       ctx.arc(point.x, point.y - 8, radius * (0.92 + age * 0.18), 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
+    } else if (effect.type === "accipio-lock" || effect.type === "accipio-lock-sweep") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = effect.type === "accipio-lock-sweep" ? 2 : 3;
+      ctx.setLineDash([8, 7]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.7 + age * 0.3), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (effect.tx !== undefined && effect.ty !== undefined) {
+        ctx.beginPath();
+        ctx.moveTo(point.x, point.y - 12);
+        ctx.lineTo(effect.tx, effect.ty);
+        ctx.stroke();
+        tracePolygon(effect.tx, effect.ty, 24 + age * 18, 4, Math.PI / 4 + effect.rotation);
+        ctx.stroke();
+      } else {
+        for (let i = 0; i < 7; i++) {
+          const angle = effect.rotation + i * 0.9 + age * 1.2;
+          ctx.beginPath();
+          ctx.moveTo(point.x, point.y - 8);
+          ctx.lineTo(point.x + Math.cos(angle) * radius, point.y - 8 + Math.sin(angle) * radius);
+          ctx.stroke();
+        }
+      }
+    } else if (effect.type === "accipio-remote") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(98,246,176,0.015)";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 18, radius * (0.26 + age * 0.28), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.globalAlpha = alpha * 0.38;
+      squad.filter((ally) => ally.hp > 0).forEach((ally, i) => {
+        ctx.beginPath();
+        ctx.moveTo(point.x, point.y - 8);
+        ctx.lineTo(ally.x, ally.y - 18);
+        ctx.stroke();
+        drawPlusMark(ally.x + Math.sin(now() * 5 + i) * 10, ally.y - 66, 6, "#dffcff");
+      });
+    } else if (effect.type === "accipio-restore") {
+      ctx.strokeStyle = "#dffcff";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y - radius * 0.74);
+      ctx.lineTo(point.x, point.y + radius * 0.42);
+      ctx.stroke();
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 4;
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y - 8, radius * (0.18 + i * 0.12 + age * 0.12), 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 12; i++) drawPlusMark(point.x + Math.cos(i * 2.1 + effect.rotation) * radius * 0.46, point.y - 8 + Math.sin(i * 2.1 + effect.rotation) * radius * 0.46 - age * 28, 5, effect.color);
+    } else if (effect.type === "accipio-mirror-field") {
+      ctx.strokeStyle = effect.color;
+      ctx.fillStyle = "rgba(98,246,176,0.1)";
+      ctx.lineWidth = 5;
+      tracePolygon(point.x, point.y - 8, radius * (0.96 + Math.sin(now() * 5) * 0.015), 8, effect.rotation);
+      ctx.fill();
+      ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(223,252,255,0.72)";
+      for (let i = -3; i <= 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(point.x - radius * 0.78, point.y + i * 34 - age * 16);
+        ctx.lineTo(point.x + radius * 0.78, point.y + i * 34 + age * 16);
+        ctx.stroke();
+      }
+      enemies.filter((enemy) => enemy.hp > 0 && dist(enemy, point) < radius).forEach((enemy) => {
+        tracePolygon(enemy.x, enemy.y, bodyRadius(enemy) + 12, 4, Math.PI / 4);
+        ctx.stroke();
+      });
+    } else if (effect.type === "accipio-knee") {
+      const cx = point.x;
+      const cy = point.y - 54 + Math.sin(now() * 9) * 2;
+      const iconR = 34;
+      ctx.shadowColor = "#ff5b66";
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = "#ff5b66";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - iconR * 0.68, cy + iconR * 0.68);
+      ctx.lineTo(cx + iconR * 0.68, cy - iconR * 0.68);
+      ctx.stroke();
+
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = "rgba(245,252,255,0.94)";
+      ctx.fillStyle = "rgba(24,34,44,0.92)";
+      ctx.lineWidth = 3;
+
+      ctx.save();
+      ctx.translate(cx - 2, cy + 1);
+      ctx.rotate(-0.14);
+      ctx.beginPath();
+      ctx.roundRect(-8, -32, 16, 27, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#ff5b66";
+      ctx.beginPath();
+      ctx.arc(0, -2, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(24,34,44,0.92)";
+      ctx.beginPath();
+      ctx.roundRect(-7, 3, 15, 31, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect(-9, 27, 30, 12, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(98,246,176,0.7)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -28);
+      ctx.lineTo(0, -10);
+      ctx.moveTo(1, 8);
+      ctx.lineTo(1, 28);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.globalAlpha = alpha * 0.42;
+      ctx.strokeStyle = "#ff5b66";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 8]);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.62 + age * 0.22), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else if (effect.type === "accipio-command" || effect.type === "accipio-mark-heal") {
+      ctx.strokeStyle = effect.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y - 8, radius * (0.72 + age * 0.28), 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) drawPlusMark(point.x - 45 + i * 18, point.y - 70 + Math.sin(now() * 5 + i) * 5, 5, effect.color);
     } else if (effect.type === "repair-shield" || effect.type === "revive") {
       const marks = effect.type === "revive" ? 14 : 9;
       for (let i = 0; i < marks; i++) {
@@ -4564,6 +4991,22 @@ function drawSupportAuras() {
       for (let i = 0; i < 5; i++) {
         const y = unit.y - radius * 0.45 + i * radius * 0.22 + Math.sin(now() * 2 + i) * 7;
         ctx.fillRect(unit.x - radius * 0.58, y, radius * 1.16, 8);
+      }
+      ctx.restore();
+    }
+
+    if (unit.accipioHotTime > 0 || unit.accipioProtectionTime > 0 || unit.accipioCommandTime > 0) {
+      const alpha = unit.accipioProtectionTime > 0 ? 0.38 : 0.34;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = "#62f6b0";
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle = unit.accipioProtectionTime > 0 ? "rgba(223,252,255,0.58)" : "rgba(98,246,176,0.62)";
+      ctx.lineWidth = unit.accipioProtectionTime > 0 ? 2.2 : 2;
+      tracePolygon(unit.x, unit.y - 14, 44 + Math.sin(now() * 7) * 2.5, unit.accipioProtectionTime > 0 ? 6 : 4, Math.PI / 4 + now() * 0.35);
+      ctx.stroke();
+      if (unit.accipioHotTime > 0) {
+        for (let i = 0; i < 4; i++) drawPlusMark(unit.x - 28 + i * 18, unit.y - 70 + Math.sin(now() * 4 + i) * 4, 5, "#62f6b0");
       }
       ctx.restore();
     }
