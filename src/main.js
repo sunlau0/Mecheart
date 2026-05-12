@@ -1048,7 +1048,7 @@ const unitEnglish = {
   Accipio: {
     role: "Rear Support / Multi-Lock Recovery Unit",
     weapon: "Solace Beam Rifle / IT Support Drones / XDR Protection Core",
-    trait: "Marks hostiles as recovery points. Allies attacking marked hostiles restore the lowest-HP ally; the ultimate either restores a fallen unit or freezes the field with Mirror Stillness.",
+    trait: "Marks hostiles as recovery points. Allies attacking marked hostiles restore themselves; the ultimate either restores a fallen unit or freezes the field with Mirror Stillness.",
     tactic: "Accipio is developer Sun's custom unit. Keep it behind the squad. Its 400 range marks up to 5 hostiles inside the lock zone, then IT Remote Support converts those marks into squad shields.",
     skill: "IT Remote Support",
     activeDesc: "Instantly heals the squad and applies HOT. Existing Healing Marks are consumed and converted into squad shields.",
@@ -2201,7 +2201,7 @@ function hit(target, amount, color, sourceId = null) {
     applyEumistMistMark(source, target);
   }
   if (dealt > 0 && target.faction === "Enemy" && (target.accipioMarks || 0) > 0) {
-    triggerAccipioMarkHeal(target);
+    triggerAccipioMarkHeal(target, source);
   }
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
@@ -2276,23 +2276,24 @@ function clearAccipioMarks() {
     enemy.accipioMarks = 0;
     enemy.accipioMarkTime = 0;
     enemy.accipioMarkHealCooldown = 0;
+    enemy.accipioMarkHealCooldowns = {};
   });
   return total;
 }
 
-function triggerAccipioMarkHeal(enemy) {
+function triggerAccipioMarkHeal(enemy, attacker) {
   const unit = activeAccipio();
   if (!unit || !enemy || enemy.faction !== "Enemy" || (enemy.accipioMarks || 0) <= 0) return;
+  if (!attacker || attacker.faction !== "Allied" || attacker.hp <= 0) return;
   const stamp = now();
-  if ((enemy.accipioMarkHealCooldown || 0) > stamp) return;
-  const ally = lowestHpAlly();
-  if (!ally) return;
-  enemy.accipioMarkHealCooldown = stamp + 0.35;
+  enemy.accipioMarkHealCooldowns = enemy.accipioMarkHealCooldowns || {};
+  if ((enemy.accipioMarkHealCooldowns[attacker.id] || 0) > stamp) return;
+  enemy.accipioMarkHealCooldowns[attacker.id] = stamp + 0.35;
   const rearBonus = isAccipioRearSupportActive(unit) ? 1.3 : 1;
-  const amount = ((unit.damage * 0.32) + ally.maxHp * 0.014 * enemy.accipioMarks) * rearBonus * (unit.accipioHealBoost || 1);
-  healAlly(unit, ally, amount, "#62f6b0");
+  const amount = ((unit.damage * 0.32) + attacker.maxHp * 0.014 * enemy.accipioMarks) * rearBonus * (unit.accipioHealBoost || 1);
+  healAlly(unit, attacker, amount, "#62f6b0");
   chargeAccipioXdr(unit, 1.8);
-  addSkillEffect("accipio-mark-heal", ally, { radius: bodyRadius(ally) + 38, color: "#62f6b0", life: 0.52, follow: true });
+  addSkillEffect("accipio-mark-heal", attacker, { radius: bodyRadius(attacker) + 38, color: "#62f6b0", life: 0.52, follow: true });
 }
 
 function setAccipioHot(ally, unit, duration = unit?.accipioHotDuration || 6) {
@@ -2341,7 +2342,7 @@ function updateAccipioPassive(unit, dt) {
   unit.accipioPassiveCooldown = Math.max(0, (unit.accipioPassiveCooldown || 0) - dt);
   if (unit.accipioPassiveCooldown > 0) return;
   unit.accipioPassiveCooldown = 12 + Math.random() * 6;
-  if (Math.random() < 0.45) {
+  if (Math.random() < 0.5) {
     squad.forEach((ally) => {
       if (ally.hp <= 0) return;
       ally.accipioCommandTime = 5;
