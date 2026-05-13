@@ -2248,7 +2248,7 @@ function chargeUltimateByDamageTaken(unit, amount) {
 
 function chargeAccipioXdr(unit, amount) {
   if (!unit || unit.name !== "Accipio" || unit.hp <= 0 || amount <= 0) return;
-  chargeUltimate(unit.id, amount * (unit.accipioXdrGain || 1));
+  chargeUltimate(unit.id, amount * 0.85 * (unit.accipioXdrGain || 1));
 }
 
 function activeAccipio() {
