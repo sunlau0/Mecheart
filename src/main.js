@@ -48,7 +48,7 @@ const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) 
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
 const BACKDROP_VERSION = 21;
-const UNIT_ART_VERSION = 47;
+const UNIT_ART_VERSION = 48;
 const REWARD_ICON_VERSION = 39;
 const SKILL_ICON_VERSION = 48;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
