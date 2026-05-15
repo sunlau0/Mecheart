@@ -21,6 +21,8 @@ const rewardOptionsEl = document.getElementById("reward-options");
 const intelEl = document.getElementById("intel");
 const databaseListEl = document.getElementById("database-list");
 const skillButtonsEl = document.getElementById("skill-buttons");
+const autoBattleToggleEl = document.getElementById("auto-battle-toggle");
+const battleControlsEl = document.getElementById("battle-controls");
 const leaderboardEl = document.getElementById("leaderboard");
 const leaderboardFormEl = document.getElementById("leaderboard-form");
 const leaderboardListEl = document.getElementById("leaderboard-list");
@@ -42,6 +44,7 @@ const ALLIED_MIN_X = 72;
 const ALLIED_MAX_X = W - 72;
 const ALLIED_MIN_Y = 72;
 const ALLIED_MAX_Y = H - 132;
+const AUTO_CHASE_MAX_X = W * 0.75;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
@@ -62,6 +65,7 @@ const assetVersion = (path) => {
 };
 const assetSrc = (path, version = assetVersion(path)) => `${path}?v=${version}`;
 const LOCALE_KEY = "mecha-heart-language";
+const AUTO_BATTLE_KEY = "mecha-heart-auto-battle";
 const uiText = {
   zh: {
     canvasLabel: "宇宙心戰隊戰場",
@@ -233,6 +237,8 @@ let leaderboardScore = 0;
 let leaderboardSubmitted = false;
 let paused = false;
 let pausedAt = 0;
+let autoBattleEnabled = false;
+let autoRewardTimer = 0;
 const defaultSquadNames = ["Asterion", "Caliburn", "Seraphim", "Orion"];
 let selectedSquadNames = [...defaultSquadNames];
 let formationFocusName = "Asterion";
@@ -1184,7 +1190,11 @@ function selectedSquadSeeds() {
 function reset() {
   paused = false;
   pausedAt = 0;
+  autoBattleEnabled = false;
+  localStorage.setItem(AUTO_BATTLE_KEY, "0");
+  clearAutoRewardTimer();
   updatePauseControls();
+  updateAutoBattleControl();
   setPauseButtonVisible(false);
   squad = selectedSquadSeeds().map((u, i) => {
     const slot = squadSlots[i] || { x: 220 + i * 42, y: 220 + i * 88 };
@@ -1548,12 +1558,31 @@ function updatePauseControls() {
 }
 
 function setPauseButtonVisible(visible) {
+  if (battleControlsEl) battleControlsEl.hidden = !visible;
   pauseToggleEl.hidden = !visible;
   if (!visible && paused) {
     paused = false;
     pausedAt = 0;
     updatePauseControls();
   }
+}
+
+function updateAutoBattleControl() {
+  if (!autoBattleToggleEl) return;
+  autoBattleToggleEl.setAttribute("aria-pressed", autoBattleEnabled ? "true" : "false");
+  autoBattleToggleEl.querySelector("strong").textContent = autoBattleEnabled ? "ON" : "OFF";
+}
+
+function setAutoBattleEnabled(value) {
+  autoBattleEnabled = Boolean(value);
+  localStorage.setItem(AUTO_BATTLE_KEY, autoBattleEnabled ? "1" : "0");
+  updateAutoBattleControl();
+  setMessage(autoBattleEnabled ? "Auto Battle ON" : "Auto Battle OFF");
+  if (autoBattleEnabled && rewardEl.hidden === false) scheduleAutoRewardPick();
+}
+
+function toggleAutoBattle() {
+  setAutoBattleEnabled(!autoBattleEnabled);
 }
 
 function setPaused(value) {
@@ -1840,7 +1869,8 @@ function activateSkill(unit) {
       .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : dist(unit, a) - dist(unit, b)))[0];
     if (target) {
       const radius = unit.rushRadius || 210;
-      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, ALLIED_MAX_X);
+      const behindLimit = autoBattleEnabled ? AUTO_CHASE_MAX_X : ALLIED_MAX_X;
+      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, behindLimit);
       const offsetY = target.y > H * 0.5 ? -28 : 28;
       const from = { x: unit.x, y: unit.y };
       unit.x = behindX;
@@ -2734,6 +2764,142 @@ function acquireTarget(unit, allowOutOfRange = false) {
     .sort((a, b) => weaponDistance(unit, a) - weaponDistance(unit, b))[0] || null;
 }
 
+function chooseAutoTarget(unit) {
+  if (unit.damage < 0) return acquireTarget(unit, true);
+  return enemies
+    .filter((enemy) => enemy.hp > 0 && (enemy.boss || enemy.x <= W + bodyRadius(enemy)))
+    .sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || weaponDistance(unit, a) - weaponDistance(unit, b) || a.hp - b.hp)[0] || null;
+}
+
+function supportSkillRadius(unit) {
+  if (!unit || unit.hp <= 0) return 0;
+  if (unit.name === "Asterion") return 230;
+  if (unit.name === "Seraphim") return Math.max(300, unit.range + 80);
+  if (unit.name === "Helix") return unit.regenRadius || 260;
+  if (unit.name === "Valkyr") return unit.gnFieldRadius || 170;
+  return 0;
+}
+
+function enemyPressureOn(unit) {
+  return enemies
+    .filter((enemy) => enemy.hp > 0)
+    .sort((a, b) => dist(unit, a) - dist(unit, b))
+    .find((enemy) => dist(unit, enemy) <= enemy.range + bodyRadius(unit) * 0.35) || null;
+}
+
+function autoSupportAnchor(unit) {
+  const radius = supportSkillRadius(unit);
+  if (!radius || unit.skillCooldown > 0) return null;
+  const needsHelp = squad.filter((ally) => ally.hp > 0 && (
+    ally.hp / ally.maxHp < 0.82 ||
+    enemyPressureOn(ally) ||
+    ally.id === unit.id
+  ));
+  if (needsHelp.length < 2) return null;
+  const center = needsHelp.reduce((point, ally) => {
+    point.x += ally.x;
+    point.y += ally.y;
+    return point;
+  }, { x: 0, y: 0 });
+  center.x /= needsHelp.length;
+  center.y /= needsHelp.length;
+  const anchor = {
+    x: clamp(center.x, ALLIED_MIN_X, AUTO_CHASE_MAX_X),
+    y: clamp(center.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+  };
+  const covered = needsHelp.filter((ally) => dist(anchor, ally) <= radius * 0.92).length;
+  if (covered < Math.min(2, needsHelp.length)) return null;
+  return dist(unit, anchor) > Math.max(20, radius * 0.18) ? anchor : null;
+}
+
+function autoAllySkillAnchor(unit) {
+  if (unit.hp / unit.maxHp > 0.62 && !enemyPressureOn(unit)) return null;
+  const providers = squad
+    .filter((ally) => ally.hp > 0 && ally.id !== unit.id && supportSkillRadius(ally) > 0 && (ally.skillCooldown <= 1.2 || ally.regenAuraTime > 0 || ally.guardianRegenTime > 0 || ally.gnFieldTime > 0))
+    .sort((a, b) => {
+      const aReady = a.skillCooldown <= 0 ? -80 : 0;
+      const bReady = b.skillCooldown <= 0 ? -80 : 0;
+      return dist(unit, a) + aReady - (dist(unit, b) + bReady);
+    });
+  const provider = providers[0];
+  if (!provider) return null;
+  const radius = supportSkillRadius(provider) * 0.78;
+  if (dist(unit, provider) <= radius) return null;
+  return {
+    x: clamp(provider.x - 28, ALLIED_MIN_X, AUTO_CHASE_MAX_X),
+    y: clamp(provider.y + (unit.y >= provider.y ? 34 : -34), ALLIED_MIN_Y, ALLIED_MAX_Y)
+  };
+}
+
+function autoLureAnchor(unit, target) {
+  if (!target || unit.damage <= 0) return null;
+  const targetOutsideBoundary = target.x > AUTO_CHASE_MAX_X - bodyRadius(target) * 0.25;
+  if (!targetOutsideBoundary) return null;
+  const desiredX = clamp(target.x - target.range - bodyRadius(unit) - 36, ALLIED_MIN_X, AUTO_CHASE_MAX_X - 18);
+  const desiredY = clamp(target.y + (unit.y > target.y ? 42 : -42), ALLIED_MIN_Y, ALLIED_MAX_Y);
+  if (Math.abs(unit.x - desiredX) < 10 && Math.abs(unit.y - desiredY) < 10) return null;
+  return { x: desiredX, y: desiredY };
+}
+
+function shouldAutoUseActive(unit) {
+  if (!unit || unit.hp <= 0 || unit.skillCooldown > 0 || !enemies.some((enemy) => enemy.hp > 0)) return false;
+  if (unit.ekAuraActive) return false;
+  if (unit.damage < 0 || unit.name === "Seraphim" || unit.name === "Helix" || unit.name === "Accipio") {
+    return squad.some((ally) => ally.hp > 0 && ally.hp / ally.maxHp < 0.82);
+  }
+  return true;
+}
+
+function shouldAutoUseUltimate(unit) {
+  if (!unit || unit.hp <= 0 || (unit.ultCharge || 0) < (unit.ultMax || 100)) return false;
+  const liveEnemies = enemies.filter((enemy) => enemy.hp > 0);
+  if (!liveEnemies.length) return false;
+  const bossAlive = liveEnemies.some((enemy) => enemy.boss);
+  const enemyClustered = liveEnemies.length >= 6;
+  const squadInDanger = squad.some((ally) => ally.hp > 0 && ally.hp / ally.maxHp <= 0.38);
+  return bossAlive || enemyClustered || squadInDanger;
+}
+
+function updateAutoBattle() {
+  if (!autoBattleEnabled || rewardEl.hidden === false || resultEl.hidden === false) return;
+  squad.forEach((unit) => {
+    if (unit.hp <= 0) return;
+    const allySkillAnchor = autoAllySkillAnchor(unit);
+    if (allySkillAnchor) {
+      unit.target = null;
+      unit.move = allySkillAnchor;
+      unit.assistId = null;
+      unit.command = "move";
+      return;
+    }
+    const ownSupportAnchor = autoSupportAnchor(unit);
+    if (ownSupportAnchor) {
+      unit.target = null;
+      unit.move = ownSupportAnchor;
+      unit.assistId = null;
+      unit.command = "move";
+      return;
+    }
+    const target = chooseAutoTarget(unit);
+    if (target) {
+      const lureAnchor = autoLureAnchor(unit, target);
+      if (lureAnchor) {
+        unit.target = null;
+        unit.move = lureAnchor;
+        unit.assistId = null;
+        unit.command = "move";
+        return;
+      }
+      unit.target = target.id;
+      unit.move = null;
+      unit.assistId = null;
+      unit.command = unit.damage < 0 ? "support" : "attack";
+    }
+    if (shouldAutoUseActive(unit)) activateSkill(unit);
+    if (shouldAutoUseUltimate(unit)) useUltimate(unit);
+  });
+}
+
 function syncAssistTarget(unit) {
   if (unit.command !== "assist" || unit.damage < 0 || !unit.assistId) return null;
   const assisted = squad.find((ally) => ally.id === unit.assistId && ally.hp > 0);
@@ -2923,7 +3089,9 @@ function stepUnit(unit, dt) {
     }
 
     const d = weaponDistance(unit, target);
-    if (d > unit.range) moveToward(unit, target, moveSpeed * dt, unit.damage > 0);
+    const limitAutoChase = unit.damage > 0;
+    const waitingAtAutoBoundary = autoBattleEnabled && limitAutoChase && unit.x >= AUTO_CHASE_MAX_X - 6 && target.x > unit.x;
+    if (d > unit.range && !waitingAtAutoBoundary) moveToward(unit, target, moveSpeed * dt, limitAutoChase);
     if (d <= unit.range && unit.cooldown <= 0) {
       unit.cooldown = unit.rate;
       unit.attackPulse = 0.22;
@@ -3009,7 +3177,7 @@ function pushDisplacementFactor(actor) {
 }
 
 function clampToBattlefield(actor, limitAutoChase = false) {
-  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? W * 0.75 : ALLIED_MAX_X);
+  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? AUTO_CHASE_MAX_X : ALLIED_MAX_X);
   actor.y = clamp(actor.y, ALLIED_MIN_Y, ALLIED_MAX_Y);
 }
 
@@ -3151,6 +3319,7 @@ function unitCombatRole(unit) {
 
 function update(dt) {
   if (!running || paused) return;
+  updateAutoBattle();
   squad.forEach((u) => stepUnit(u, dt));
   enemies.forEach((e) => stepEnemy(e, dt));
   updateAccipioMarks(dt);
@@ -3244,6 +3413,7 @@ async function showReward() {
   renderRewardChoices();
   hideLoading();
   rewardEl.hidden = false;
+  if (autoBattleEnabled) scheduleAutoRewardPick();
   setMessage("選擇一項強化");
 }
 
@@ -3306,6 +3476,13 @@ function rewardTierLabel(reward) {
   return "Common";
 }
 
+function rewardTierRank(reward) {
+  const tier = rewardTier(reward);
+  if (tier === "ultra") return 3;
+  if (tier === "rare") return 2;
+  return 1;
+}
+
 function drawRewardTier() {
   const roll = Math.random();
   if (roll < REWARD_TIER_WEIGHTS.ultra) return "ultra";
@@ -3339,6 +3516,30 @@ function chooseReward(index) {
   advanceRound();
   running = true;
   setPauseButtonVisible(true);
+}
+
+function clearAutoRewardTimer() {
+  if (!autoRewardTimer) return;
+  window.clearTimeout(autoRewardTimer);
+  autoRewardTimer = 0;
+}
+
+function scheduleAutoRewardPick() {
+  clearAutoRewardTimer();
+  autoRewardTimer = window.setTimeout(() => {
+    autoRewardTimer = 0;
+    if (!autoBattleEnabled || rewardEl.hidden || !rewardChoices.length) return;
+    chooseReward(chooseAutoRewardIndex());
+  }, 850);
+}
+
+function chooseAutoRewardIndex() {
+  const bestRank = Math.max(...rewardChoices.map(rewardTierRank));
+  const bestIndexes = rewardChoices
+    .map((reward, index) => ({ reward, index }))
+    .filter((entry) => rewardTierRank(entry.reward) === bestRank)
+    .map((entry) => entry.index);
+  return bestIndexes[Math.floor(Math.random() * bestIndexes.length)] || 0;
 }
 
 function endMission(won) {
@@ -5314,12 +5515,15 @@ formationSlotsEl.addEventListener("click", (event) => {
 rewardOptionsEl.addEventListener("click", (event) => {
   const card = event.target.closest(".reward-card");
   if (!card) return;
+  clearAutoRewardTimer();
   chooseReward(Number(card.dataset.rewardIndex));
 });
 
 leaderboardFormEl.addEventListener("submit", submitLeaderboard);
 
 pauseToggleEl.addEventListener("click", togglePause);
+
+autoBattleToggleEl?.addEventListener("click", toggleAutoBattle);
 
 pauseResumeEl.addEventListener("click", () => {
   setPaused(false);
@@ -5359,6 +5563,7 @@ window.addEventListener("load", () => {
   }, 500);
 }, { once: true });
 applyStaticLanguage();
+updateAutoBattleControl();
 commandEl.textContent = t("idle");
 initStars();
 resizeCanvas();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
     <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=55" />
+    <link rel="stylesheet" href="src/styles.css?v=57" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -21,10 +21,16 @@
             <small id="loading-copy">載入機體圖像...</small>
           </div>
         </div>
-        <button id="pause-toggle" class="pause-toggle" type="button" aria-label="暫停遊戲" aria-pressed="false" hidden>
-          <span class="pause-icon" aria-hidden="true"></span>
-          <span class="pause-label">暫停</span>
-        </button>
+        <div id="battle-controls" class="battle-controls" hidden>
+          <button id="auto-battle-toggle" class="auto-battle-toggle" type="button" aria-pressed="false">
+            <span>AUTO</span>
+            <strong>OFF</strong>
+          </button>
+          <button id="pause-toggle" class="pause-toggle" type="button" aria-label="暫停遊戲" aria-pressed="false" hidden>
+            <span class="pause-icon" aria-hidden="true"></span>
+            <span class="pause-label">暫停</span>
+          </button>
+        </div>
         <div id="pause-overlay" class="pause-overlay" hidden>
           <section class="pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
             <p class="kicker" data-i18n="pauseKicker">Tactical Pause</p>
@@ -44,7 +50,7 @@
               <span>Heart</span>
             </h1>
             <p data-i18n="titleSubtitle">軌道戰場 Roguelike 小隊指揮</p>
-            <span class="title-version">(ver.115)</span>
+            <span class="title-version">(ver.121)</span>
           </div>
           <div class="title-actions">
             <button id="start-btn" class="title-start" data-i18n="startBattle">開始作戰</button>
@@ -152,6 +158,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=117"></script>
+    <script src="src/main.js?v=122"></script>
   </body>
 </html>
