@@ -99,7 +99,7 @@ body.setup-mode #skill-bar {
   display: none;
 }
 
-body.setup-mode #pause-toggle,
+body.setup-mode #battle-controls,
 body.setup-mode #pause-overlay {
   display: none;
 }
@@ -120,6 +120,52 @@ body.paused-mode #game {
   pointer-events: auto;
 }
 
+.battle-controls {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 12;
+}
+
+.battle-controls[hidden] {
+  display: none;
+}
+
+.auto-battle-toggle {
+  align-items: center;
+  display: inline-grid;
+  gap: 6px;
+  grid-template-columns: auto auto;
+  min-height: 42px;
+  min-width: 94px;
+  padding: 0 12px;
+  border-color: rgba(122, 242, 255, 0.42);
+  background: rgba(5, 12, 20, 0.78);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.42), 0 0 18px rgba(75, 228, 255, 0.12);
+  color: #dffcff;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  touch-action: manipulation;
+}
+
+.auto-battle-toggle strong {
+  color: #ff7d8a;
+  font-size: 13px;
+}
+
+.auto-battle-toggle[aria-pressed="true"] {
+  border-color: rgba(255, 209, 102, 0.78);
+  box-shadow: 0 0 18px rgba(255, 209, 102, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.auto-battle-toggle[aria-pressed="true"] strong {
+  color: var(--gold);
+}
+
 .pause-toggle {
   align-items: center;
   display: inline-grid;
@@ -128,10 +174,6 @@ body.paused-mode #game {
   min-height: 42px;
   min-width: 96px;
   padding: 0 13px;
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  z-index: 12;
   background: rgba(5, 12, 20, 0.74);
   border-color: rgba(122, 242, 255, 0.62);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.42), 0 0 18px rgba(75, 228, 255, 0.16);
@@ -1869,11 +1911,18 @@ h1 {
     padding: 6px;
   }
 
-  .pause-toggle {
-    min-height: 40px;
-    min-width: 90px;
+  .battle-controls {
     right: 10px;
     top: 10px;
+  }
+
+  .auto-battle-toggle,
+  .pause-toggle {
+    min-height: 40px;
+  }
+
+  .pause-toggle {
+    min-width: 90px;
   }
 
   .skill-button {
@@ -2294,7 +2343,7 @@ h1 {
     padding: 6px;
   }
 
-  .pause-toggle {
+  .battle-controls {
     right: max(8px, env(safe-area-inset-right));
     top: max(8px, env(safe-area-inset-top));
   }
@@ -2543,13 +2592,20 @@ h1 {
     z-index: 7;
   }
 
-  body:not(.setup-mode) .pause-toggle {
+  body:not(.setup-mode) .battle-controls {
     left: max(8px, env(safe-area-inset-left));
-    min-height: 38px;
-    min-width: 82px;
-    padding: 0 10px;
     right: auto;
     top: max(8px, env(safe-area-inset-top));
+  }
+
+  body:not(.setup-mode) .auto-battle-toggle,
+  body:not(.setup-mode) .pause-toggle {
+    min-height: 38px;
+    padding: 0 10px;
+  }
+
+  body:not(.setup-mode) .pause-toggle {
+    min-width: 82px;
   }
 
   body:not(.setup-mode) .hud-head,
