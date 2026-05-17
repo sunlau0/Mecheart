@@ -120,17 +120,21 @@ body.paused-mode #game {
   pointer-events: auto;
 }
 
-.battle-controls {
+#stage-wrap > .battle-controls {
   align-items: center;
+  bottom: auto;
   display: inline-flex;
   gap: 8px;
+  left: auto;
+  margin: 0;
+  pointer-events: auto;
   position: absolute;
   right: 14px;
   top: 14px;
   z-index: 12;
 }
 
-.battle-controls[hidden] {
+#stage-wrap > .battle-controls[hidden] {
   display: none;
 }
 
@@ -1911,7 +1915,7 @@ h1 {
     padding: 6px;
   }
 
-  .battle-controls {
+  #stage-wrap > .battle-controls {
     right: 10px;
     top: 10px;
   }
@@ -2343,7 +2347,7 @@ h1 {
     padding: 6px;
   }
 
-  .battle-controls {
+  #stage-wrap > .battle-controls {
     right: max(8px, env(safe-area-inset-right));
     top: max(8px, env(safe-area-inset-top));
   }
@@ -2592,7 +2596,7 @@ h1 {
     z-index: 7;
   }
 
-  body:not(.setup-mode) .battle-controls {
+  body:not(.setup-mode) #stage-wrap > .battle-controls {
     left: max(8px, env(safe-area-inset-left));
     right: auto;
     top: max(8px, env(safe-area-inset-top));
