@@ -44,7 +44,6 @@ const ALLIED_MIN_X = 72;
 const ALLIED_MAX_X = W - 72;
 const ALLIED_MIN_Y = 72;
 const ALLIED_MAX_Y = H - 132;
-const AUTO_CHASE_MAX_X = W * 0.75;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
@@ -237,7 +236,7 @@ let leaderboardScore = 0;
 let leaderboardSubmitted = false;
 let paused = false;
 let pausedAt = 0;
-let autoBattleEnabled = false;
+let autoBattleEnabled = localStorage.getItem(AUTO_BATTLE_KEY) === "1";
 let autoRewardTimer = 0;
 const defaultSquadNames = ["Asterion", "Caliburn", "Seraphim", "Orion"];
 let selectedSquadNames = [...defaultSquadNames];
@@ -256,7 +255,7 @@ const squadSeeds = [
   { name: "Orion", faction: "Allied", role: "龍騎兵清場炮擊機", weapon: "多重鎖定光束炮 / 遙控炮莢", trait: "普通攻擊會同時射擊射程內所有敵機，擅長掃走整批低血目標。", tactic: "放在安全側翼覆蓋戰場。普攻可持續壓制射程內所有敵人；主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
   { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
-  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 34, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
+  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
   { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
   { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 300, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
   { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
@@ -513,15 +512,15 @@ const upgradePool = [
     type: "Nova 量子",
     name: "量子相位核心",
     icon: "assets/upgrade-nova-quantum-ai-v6.webp",
-    text: "Nova 傷害 +12、射程 +30、速度 +24、量子背刺傷害更高，範圍更大。",
+    text: "Nova 傷害 +8、射程 +30、速度 +24、量子背刺範圍更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Nova");
       if (!u) return;
-      u.damage += 12;
+      u.damage += 8;
       u.range += 30;
       u.speed += 24;
       u.rushRadius = (u.rushRadius || 190) + 35;
-      u.rushDamage = (u.rushDamage || 72) + 24;
+      u.rushDamage = (u.rushDamage || 54) + 16;
     }
   },
   {
@@ -1111,7 +1110,7 @@ const rewardEnglish = {
   "dragoon-pods": ["Orion Weapon", "Dragoon Pod Expansion", "Orion fires faster, gains +35 range, and launches more clearing pods with its active."],
   "valkyr-zero-core": ["Valkyr Skill", "GN Defence Core", "Valkyr gains +55 max HP and +12% defence. Taunt Beacon lasts longer; GN Field gets wider and stronger."],
   "lancer-rail-scope": ["Lancer Weapon", "Orbital Targeting Scope", "Lancer gains +14 damage and +35 range. Piercing Snipe and Orbital Pierce hit harder."],
-  "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +12 damage, +30 range and +24 speed. Quantum Backstab hits harder and gets a wider strike area."],
+  "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +8 damage, +30 range and +24 speed. Quantum Backstab gets a wider strike area."],
   "helix-beacon-grid": ["Helix Repair", "Regeneration Mirage Matrix", "Helix gains stronger healing, better range and survival. Regeneration Field lasts longer; Mirage Particles cloak wider."],
   "bastion-stabilizer": ["Bastion Artillery", "Heavy Cannon Stabiliser", "Bastion gains +16 damage and +30 range. Cannon Suppression gets a wider blast."],
   "mirage-phantom-core": ["Mirage Jammer", "Phantom Jammer Core", "Mirage gains +8 damage and +25 range. Jamming duration and area increase."],
@@ -1190,8 +1189,6 @@ function selectedSquadSeeds() {
 function reset() {
   paused = false;
   pausedAt = 0;
-  autoBattleEnabled = false;
-  localStorage.setItem(AUTO_BATTLE_KEY, "0");
   clearAutoRewardTimer();
   updatePauseControls();
   updateAutoBattleControl();
@@ -1869,8 +1866,7 @@ function activateSkill(unit) {
       .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : dist(unit, a) - dist(unit, b)))[0];
     if (target) {
       const radius = unit.rushRadius || 210;
-      const behindLimit = autoBattleEnabled ? AUTO_CHASE_MAX_X : ALLIED_MAX_X;
-      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, behindLimit);
+      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, ALLIED_MAX_X);
       const offsetY = target.y > H * 0.5 ? -28 : 28;
       const from = { x: unit.x, y: unit.y };
       unit.x = behindX;
@@ -1878,7 +1874,7 @@ function activateSkill(unit) {
       unit.target = target.id;
       enemies
         .filter((e) => e.hp > 0 && dist(unit, e) < radius)
-        .forEach((e) => hit(e, unit.rushDamage || 96, "#ff9b38", unit.id));
+        .forEach((e) => hit(e, unit.rushDamage || 72, "#ff9b38", unit.id));
       burst(unit.x, unit.y, "#ff9b38", 56);
       addSkillEffect("quantum-backstab", unit, { x: unit.x, y: unit.y, fromX: from.x, fromY: from.y, radius, color: "#ff9b38", life: 0.9, follow: false });
       setMessage("量子背刺");
@@ -2601,7 +2597,7 @@ function updateHimawariPoison(dt) {
 }
 
 function attackMultiplier(unit) {
-  return unit?.name === "Nova" && unit.quantumTime > 0 ? 3.6 : 1;
+  return unit?.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
 }
 
 function performNovaQuantumSlash(unit) {
@@ -2771,76 +2767,6 @@ function chooseAutoTarget(unit) {
     .sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || weaponDistance(unit, a) - weaponDistance(unit, b) || a.hp - b.hp)[0] || null;
 }
 
-function supportSkillRadius(unit) {
-  if (!unit || unit.hp <= 0) return 0;
-  if (unit.name === "Asterion") return 230;
-  if (unit.name === "Seraphim") return Math.max(300, unit.range + 80);
-  if (unit.name === "Helix") return unit.regenRadius || 260;
-  if (unit.name === "Valkyr") return unit.gnFieldRadius || 170;
-  return 0;
-}
-
-function enemyPressureOn(unit) {
-  return enemies
-    .filter((enemy) => enemy.hp > 0)
-    .sort((a, b) => dist(unit, a) - dist(unit, b))
-    .find((enemy) => dist(unit, enemy) <= enemy.range + bodyRadius(unit) * 0.35) || null;
-}
-
-function autoSupportAnchor(unit) {
-  const radius = supportSkillRadius(unit);
-  if (!radius || unit.skillCooldown > 0) return null;
-  const needsHelp = squad.filter((ally) => ally.hp > 0 && (
-    ally.hp / ally.maxHp < 0.82 ||
-    enemyPressureOn(ally) ||
-    ally.id === unit.id
-  ));
-  if (needsHelp.length < 2) return null;
-  const center = needsHelp.reduce((point, ally) => {
-    point.x += ally.x;
-    point.y += ally.y;
-    return point;
-  }, { x: 0, y: 0 });
-  center.x /= needsHelp.length;
-  center.y /= needsHelp.length;
-  const anchor = {
-    x: clamp(center.x, ALLIED_MIN_X, AUTO_CHASE_MAX_X),
-    y: clamp(center.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
-  };
-  const covered = needsHelp.filter((ally) => dist(anchor, ally) <= radius * 0.92).length;
-  if (covered < Math.min(2, needsHelp.length)) return null;
-  return dist(unit, anchor) > Math.max(20, radius * 0.18) ? anchor : null;
-}
-
-function autoAllySkillAnchor(unit) {
-  if (unit.hp / unit.maxHp > 0.62 && !enemyPressureOn(unit)) return null;
-  const providers = squad
-    .filter((ally) => ally.hp > 0 && ally.id !== unit.id && supportSkillRadius(ally) > 0 && (ally.skillCooldown <= 1.2 || ally.regenAuraTime > 0 || ally.guardianRegenTime > 0 || ally.gnFieldTime > 0))
-    .sort((a, b) => {
-      const aReady = a.skillCooldown <= 0 ? -80 : 0;
-      const bReady = b.skillCooldown <= 0 ? -80 : 0;
-      return dist(unit, a) + aReady - (dist(unit, b) + bReady);
-    });
-  const provider = providers[0];
-  if (!provider) return null;
-  const radius = supportSkillRadius(provider) * 0.78;
-  if (dist(unit, provider) <= radius) return null;
-  return {
-    x: clamp(provider.x - 28, ALLIED_MIN_X, AUTO_CHASE_MAX_X),
-    y: clamp(provider.y + (unit.y >= provider.y ? 34 : -34), ALLIED_MIN_Y, ALLIED_MAX_Y)
-  };
-}
-
-function autoLureAnchor(unit, target) {
-  if (!target || unit.damage <= 0) return null;
-  const targetOutsideBoundary = target.x > AUTO_CHASE_MAX_X - bodyRadius(target) * 0.25;
-  if (!targetOutsideBoundary) return null;
-  const desiredX = clamp(target.x - target.range - bodyRadius(unit) - 36, ALLIED_MIN_X, AUTO_CHASE_MAX_X - 18);
-  const desiredY = clamp(target.y + (unit.y > target.y ? 42 : -42), ALLIED_MIN_Y, ALLIED_MAX_Y);
-  if (Math.abs(unit.x - desiredX) < 10 && Math.abs(unit.y - desiredY) < 10) return null;
-  return { x: desiredX, y: desiredY };
-}
-
 function shouldAutoUseActive(unit) {
   if (!unit || unit.hp <= 0 || unit.skillCooldown > 0 || !enemies.some((enemy) => enemy.hp > 0)) return false;
   if (unit.ekAuraActive) return false;
@@ -2864,32 +2790,8 @@ function updateAutoBattle() {
   if (!autoBattleEnabled || rewardEl.hidden === false || resultEl.hidden === false) return;
   squad.forEach((unit) => {
     if (unit.hp <= 0) return;
-    const allySkillAnchor = autoAllySkillAnchor(unit);
-    if (allySkillAnchor) {
-      unit.target = null;
-      unit.move = allySkillAnchor;
-      unit.assistId = null;
-      unit.command = "move";
-      return;
-    }
-    const ownSupportAnchor = autoSupportAnchor(unit);
-    if (ownSupportAnchor) {
-      unit.target = null;
-      unit.move = ownSupportAnchor;
-      unit.assistId = null;
-      unit.command = "move";
-      return;
-    }
     const target = chooseAutoTarget(unit);
     if (target) {
-      const lureAnchor = autoLureAnchor(unit, target);
-      if (lureAnchor) {
-        unit.target = null;
-        unit.move = lureAnchor;
-        unit.assistId = null;
-        unit.command = "move";
-        return;
-      }
       unit.target = target.id;
       unit.move = null;
       unit.assistId = null;
@@ -3089,9 +2991,8 @@ function stepUnit(unit, dt) {
     }
 
     const d = weaponDistance(unit, target);
-    const limitAutoChase = unit.damage > 0;
-    const waitingAtAutoBoundary = autoBattleEnabled && limitAutoChase && unit.x >= AUTO_CHASE_MAX_X - 6 && target.x > unit.x;
-    if (d > unit.range && !waitingAtAutoBoundary) moveToward(unit, target, moveSpeed * dt, limitAutoChase);
+    const limitAutoChase = unit.damage > 0 && !(autoBattleEnabled && unit.command === "attack");
+    if (d > unit.range) moveToward(unit, target, moveSpeed * dt, limitAutoChase);
     if (d <= unit.range && unit.cooldown <= 0) {
       unit.cooldown = unit.rate;
       unit.attackPulse = 0.22;
@@ -3177,7 +3078,7 @@ function pushDisplacementFactor(actor) {
 }
 
 function clampToBattlefield(actor, limitAutoChase = false) {
-  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? AUTO_CHASE_MAX_X : ALLIED_MAX_X);
+  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? W * 0.75 : ALLIED_MAX_X);
   actor.y = clamp(actor.y, ALLIED_MIN_Y, ALLIED_MAX_Y);
 }
 
