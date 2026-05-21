@@ -13,11 +13,19 @@ const aceUnitListEl = document.getElementById("ace-unit-list");
 const formationSlotsEl = document.getElementById("formation-slots");
 const formationCountEl = document.getElementById("formation-count");
 const formationStartEl = document.getElementById("formation-start");
+const formationHomeEl = document.getElementById("formation-home");
 const resultEl = document.getElementById("result");
 const resultTitleEl = document.getElementById("result-title");
 const resultCopyEl = document.getElementById("result-copy");
+const arenaResultEl = document.getElementById("arena-result");
+const arenaResultTitleEl = document.getElementById("arena-result-title");
+const arenaResultCopyEl = document.getElementById("arena-result-copy");
+const arenaResultRematchEl = document.getElementById("arena-result-rematch");
+const arenaResultBackEl = document.getElementById("arena-result-back");
+const arenaResultHomeEl = document.getElementById("arena-result-home");
 const rewardEl = document.getElementById("reward");
 const rewardOptionsEl = document.getElementById("reward-options");
+const rewardHomeEl = document.getElementById("reward-home");
 const intelEl = document.getElementById("intel");
 const databaseListEl = document.getElementById("database-list");
 const skillButtonsEl = document.getElementById("skill-buttons");
@@ -30,13 +38,38 @@ const leaderboardMessageEl = document.getElementById("leaderboard-message");
 const playerNameEl = document.getElementById("player-name");
 const titleLeaderboardListEl = document.getElementById("title-leaderboard-list");
 const titleLeaderboardMessageEl = document.getElementById("title-leaderboard-message");
+const titleMasterLeaderboardListEl = document.getElementById("title-master-leaderboard-list");
+const arenaMasterLeaderboardListEl = document.getElementById("arena-master-leaderboard-list");
+const arenaMasterLeaderboardMessageEl = document.getElementById("arena-master-leaderboard-message");
 const pauseToggleEl = document.getElementById("pause-toggle");
 const pauseOverlayEl = document.getElementById("pause-overlay");
+const pauseCopyEl = document.querySelector("[data-i18n='pauseCopy']");
 const pauseResumeEl = document.getElementById("pause-resume");
+const pauseHomeEl = document.getElementById("pause-home");
 const pauseFormationEl = document.getElementById("pause-formation");
 const loadingEl = document.getElementById("loading-overlay");
 const loadingCopyEl = document.getElementById("loading-copy");
 const languageToggleEl = document.getElementById("language-toggle");
+const arenaBtnEl = document.getElementById("arena-btn");
+const arenaNameModalEl = document.getElementById("arena-name-modal");
+const arenaNameInputEl = document.getElementById("arena-name-input");
+const arenaNameConfirmEl = document.getElementById("arena-name-confirm");
+const arenaNameCancelEl = document.getElementById("arena-name-cancel");
+const arenaEl = document.getElementById("arena");
+const arenaBackEl = document.getElementById("arena-back");
+const arenaSaveEl = document.getElementById("arena-save");
+const arenaRefreshEl = document.getElementById("arena-refresh");
+const arenaCostEl = document.getElementById("arena-cost");
+const arenaCoreListEl = document.getElementById("arena-core-list");
+const arenaUnitListEl = document.getElementById("arena-unit-list");
+const arenaPositionGridEl = document.getElementById("arena-position-grid");
+const arenaOpponentListEl = document.getElementById("arena-opponent-list");
+const pilotNameLabelEl = document.getElementById("pilot-name-label");
+const pilotNameInputEl = document.getElementById("pilot-name-input");
+const pilotSaveNameEl = document.getElementById("pilot-save-name");
+const pilotRecoverEl = document.getElementById("pilot-recover");
+const pilotSyncMessageEl = document.getElementById("pilot-sync-message");
+const pilotCodeDisplayEl = document.getElementById("pilot-code-display");
 
 const W = 1280;
 const H = 720;
@@ -44,12 +77,14 @@ const ALLIED_MIN_X = 72;
 const ALLIED_MAX_X = W - 72;
 const ALLIED_MIN_Y = 72;
 const ALLIED_MAX_Y = H - 132;
+const AUTO_CHASE_MAX_X = W * 0.75;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const weaponDistance = (attacker, target) => Math.max(0, dist(attacker, target) - (target.faction === "Enemy" ? (target.radius || 0) * 0.72 : bodyRadius(target) * 0.35));
 const now = () => performance.now() / 1000;
 const battlefieldArt = "assets/battlefield-bg.webp";
-const BACKDROP_VERSION = 21;
+const arenaBattlefieldArt = "assets/arena-bg.webp";
+const BACKDROP_VERSION = 27;
 const UNIT_ART_VERSION = 48;
 const REWARD_ICON_VERSION = 39;
 const SKILL_ICON_VERSION = 48;
@@ -58,6 +93,7 @@ const REWARD_TIER_WEIGHTS = { common: 0.68, rare: 0.29, ultra: 0.03 };
 const REWARD_ULTRA_PITY_LIMIT = 8;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
+  if (path.includes("arena-bg")) return BACKDROP_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
   if (path.includes("upgrade-")) return REWARD_ICON_VERSION;
   return UNIT_ART_VERSION;
@@ -65,17 +101,26 @@ const assetVersion = (path) => {
 const assetSrc = (path, version = assetVersion(path)) => `${path}?v=${version}`;
 const LOCALE_KEY = "mecha-heart-language";
 const AUTO_BATTLE_KEY = "mecha-heart-auto-battle";
+const PILOT_PROFILE_KEY = "mecha-heart-pilot-profile";
+const MASTER_LEAGUE_RANKINGS_KEY = "mecha-heart-master-league-rankings";
+const MASTER_LEAGUE_CHAMPIONS_KEY = "mecha-heart-master-league-champions";
+const ARENA_TOTAL_COST = 1000;
+const ARENA_CORE_COST = 300;
+const ARENA_TIME_LIMIT = 90;
 const uiText = {
   zh: {
     canvasLabel: "宇宙心戰隊戰場",
     pauseKicker: "Tactical Pause",
     pauseTitle: "遊戲已暫停",
     pauseCopy: "戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。",
+    arenaPauseCopy: "戰場時間已停止。可以繼續作戰。",
     pauseResume: "繼續作戰",
     pauseFormation: "回編隊",
+    backMain: "回主畫面",
     titleKicker: "機動兵器戰線指揮",
     titleSubtitle: "軌道戰場 Roguelike 小隊指揮",
-    startBattle: "開始作戰",
+    startBattle: "挑戰模式",
+    masterLeague: "大師聯盟",
     aceRanking: "王牌排行榜",
     formationKicker: "出擊前整備",
     formationTitle: "隊伍編成",
@@ -140,11 +185,14 @@ const uiText = {
     pauseKicker: "Tactical Pause",
     pauseTitle: "Game Paused",
     pauseCopy: "Battle time is frozen. Resume the mission or return to loadout for a quick rebuild.",
+    arenaPauseCopy: "Battle time is frozen. Resume the mission when ready.",
     pauseResume: "Resume Mission",
     pauseFormation: "Back to Loadout",
+    backMain: "Main Menu",
     titleKicker: "Mobile Weapon Frontline Command",
     titleSubtitle: "Orbital roguelike squad command",
-    startBattle: "Deploy",
+    startBattle: "Challenge Mode",
+    masterLeague: "Master League",
     aceRanking: "Ace Leaderboard",
     formationKicker: "Pre-Launch Prep",
     formationTitle: "Squad Loadout",
@@ -217,6 +265,11 @@ const leaderboardDefaults = [
   { name: "Hayden", score: 85800 },
   { name: "Jeanis", score: 60080 }
 ];
+const masterLeagueDefaults = [
+  { name: "Sun2", score: 0, bandId: "bronze", team: ["Asterion", "Caliburn", "Seraphim", "Orion"] },
+  { name: "Candy", score: 0, bandId: "bronze", team: ["Nova", "Caliburn", "Mirage", "Helix"] },
+  { name: "Hayden", score: 0, bandId: "bronze", team: ["Valkyr", "Asterion", "Seraphim", "Lancer"] }
+];
 let running = false;
 let last = now();
 let wave = 1;
@@ -236,33 +289,203 @@ let leaderboardScore = 0;
 let leaderboardSubmitted = false;
 let paused = false;
 let pausedAt = 0;
-let autoBattleEnabled = localStorage.getItem(AUTO_BATTLE_KEY) === "1";
+let autoBattleEnabled = false;
 let autoRewardTimer = 0;
 const defaultSquadNames = ["Asterion", "Caliburn", "Seraphim", "Orion"];
 let selectedSquadNames = [...defaultSquadNames];
 let formationFocusName = "Asterion";
+let battleMode = "campaign";
+let arenaTimeLeft = ARENA_TIME_LIMIT;
+let arenaOpponent = null;
+let arenaOpponents = [];
+let arenaMasterChampions = loadLocalMasterChampions();
+let masterLeagueRankings = [...masterLeagueDefaults];
+let arenaSelectedOpponent = null;
+let arenaDifficulty = "normal";
+let arenaSelectedCore = "iron-wall";
+let arenaSelectedUnitName = defaultSquadNames[0];
+let arenaDefenseNames = [...defaultSquadNames];
+let arenaModules = {};
+let arenaAi = {};
+let arenaPositions = {};
+let arenaSyncing = false;
+let pilotProfile = loadPilotProfile();
+let pilotRecoveryCode = "";
+let pilotCloudReady = false;
+let masterLeagueRun = null;
+let masterLeagueSearching = false;
+let masterLeagueSearchTimer = 0;
+let arenaBattleStartHp = 1;
+let lastDefeatedChampionBandId = "";
 const squadSlots = [
   { x: 210, y: 165 },
   { x: 290, y: 290 },
   { x: 195, y: 415 },
   { x: 355, y: 450 }
 ];
+const arenaPositionSlots = [
+  { col: 0, row: 0, x: W - 255, y: 170 },
+  { col: 1, row: 0, x: W - 170, y: 170 },
+  { col: 2, row: 0, x: W - 85, y: 170 },
+  { col: 0, row: 1, x: W - 255, y: 300 },
+  { col: 1, row: 1, x: W - 170, y: 300 },
+  { col: 2, row: 1, x: W - 85, y: 300 },
+  { col: 0, row: 2, x: W - 255, y: 430 },
+  { col: 1, row: 2, x: W - 170, y: 430 },
+  { col: 2, row: 2, x: W - 85, y: 430 }
+];
+const arenaDefaultPositions = {
+  Asterion: 3,
+  Caliburn: 4,
+  Seraphim: 7,
+  Orion: 1
+};
+const arenaCoreOptions = [
+  { id: "iron-wall", name: "鐵壁核心", cost: ARENA_CORE_COST, text: "全隊 HP +10%，移速 -6%。", apply: (unit) => { unit.maxHp = Math.round(unit.maxHp * 1.1); unit.hp = unit.maxHp; unit.speed *= 0.94; } },
+  { id: "rush-core", name: "速攻核心", cost: ARENA_CORE_COST, text: "開場 15 秒傷害 +18%，之後傷害 -6%。", apply: (unit) => { unit.arenaRushTime = 15; unit.arenaLateDamagePenalty = 0.94; } },
+  { id: "ewar-core", name: "電戰核心", cost: ARENA_CORE_COST, text: "首次技能/普攻命中時附帶短暫干擾。", apply: (unit) => { unit.arenaEwarCharge = true; } },
+  { id: "repair-core", name: "維修核心", cost: ARENA_CORE_COST, text: "每架機低血自動回復一次，但傷害 -6%。", apply: (unit) => { unit.arenaEmergencyRepair = true; unit.damage *= unit.damage > 0 ? 0.94 : 1.08; } },
+  { id: "sniper-core", name: "狙擊核心", cost: ARENA_CORE_COST, text: "遠程機傷害 +15%，近戰機防禦稍弱。", apply: (unit) => { if (unit.range >= 260) unit.damage *= 1.15; else unit.arenaDefenseTaken = 1.08; } }
+];
+const arenaModuleOptions = [
+  { id: "opening-shield", tier: "C", cost: 80, name: "開場護盾", text: "開場獲得 5 秒護盾。", apply: (unit) => { unit.shield = Math.max(unit.shield || 0, 5); } },
+  { id: "range-tune", tier: "C", cost: 80, name: "射控微調", text: "普攻射程 +8%。", apply: (unit) => { unit.range *= 1.08; } },
+  { id: "cooldown-tune", tier: "UC", cost: 120, name: "冷卻調律", text: "主動技冷卻 -12%。", apply: (unit) => { unit.skillCooldownMultiplier = (unit.skillCooldownMultiplier || 1) * 0.88; } },
+  { id: "armor-weave", tier: "UC", cost: 120, name: "複合裝甲", text: "受到傷害 -8%，移速 -4%。", apply: (unit) => { unit.arenaDefenseTaken = (unit.arenaDefenseTaken || 1) * 0.92; unit.speed *= 0.96; } },
+  { id: "focus-lens", tier: "R", cost: 180, name: "集火透鏡", text: "攻擊同一目標時傷害逐步提高。", apply: (unit) => { unit.arenaFocusLens = true; } },
+  { id: "first-ult", tier: "R", cost: 180, name: "預充能核心", text: "開場大絕充能 +35%。", apply: (unit) => { unit.ultCharge = Math.max(unit.ultCharge || 0, 35); } },
+  { id: "duel-reactor", tier: "UR", cost: 260, name: "決鬥反應爐", text: "傷害 +22%，最大 HP -10%。", apply: (unit) => { unit.damage *= unit.damage > 0 ? 1.22 : 1; unit.maxHp = Math.round(unit.maxHp * 0.9); unit.hp = Math.min(unit.hp, unit.maxHp); } },
+  { id: "guardian-loop", tier: "UR", cost: 260, name: "守護循環", text: "首次瀕死時保留 1 HP 並獲得護盾。", apply: (unit) => { unit.arenaLastStand = true; } }
+];
+const arenaAiOptions = [
+  { id: "frontline", name: "前壓", text: "主動搶前，吸引距離最近的敵機並壓迫中線。" },
+  { id: "protect", name: "保後排", text: "優先處理接近後排和支援機的敵人，站位較保守。" },
+  { id: "focus", name: "集火", text: "跟隨隊友目標，優先擊破低血或被鎖定敵機。" },
+  { id: "anti-assault", name: "反刺客", text: "優先攻擊高速突入機，保護狙擊和維修單位。" },
+  { id: "survive", name: "保命", text: "低血時後撤，等待支援或冷卻回復。" }
+];
+const masterLeagueAiOptions = [
+  { id: "focus-tank", name: "集火坦克", text: "優先攻擊高耐久前排，盡快拆走坦線。", enName: "Focus Tanks", enText: "Prioritise durable frontline units and break the enemy tank line first." },
+  { id: "focus-attacker", name: "集火攻手", text: "優先攻擊輸出機，降低對方火力。", enName: "Focus Attackers", enText: "Prioritise damage dealers to reduce incoming firepower." },
+  { id: "focus-healer", name: "集火補師", text: "優先攻擊修復與支援機，切斷續航。", enName: "Focus Healers", enText: "Prioritise repair and support units to cut off sustain." },
+  { id: "guard-healer", name: "保補", text: "靠近補師，優先攔截威脅補師的敵機。", enName: "Guard Healers", enText: "Stay near healers and intercept enemies threatening support units." },
+  { id: "guard-attacker", name: "保攻手", text: "靠近主要輸出，優先處理壓近攻手的敵機。", enName: "Guard Attackers", enText: "Cover main damage dealers and punish enemies pushing into them." },
+  { id: "guard-tank", name: "保坦", text: "靠近坦機，幫前排分擔壓力。", enName: "Guard Tanks", enText: "Stay close to tanks and help the frontline absorb pressure." },
+  { id: "frontline", name: "前壓", text: "主動推前，優先咬住最近敵機。", enName: "Press Forward", enText: "Push forward aggressively and engage the nearest enemy first." },
+  { id: "skirmish", name: "遊擊", text: "保持距離打低血目標，避免長時間貼身硬拼。", enName: "Skirmish", enText: "Keep distance, pick off low-HP targets, and avoid extended close combat." }
+];
+const arenaAiAliases = {
+  focus: "focus-attacker",
+  protect: "guard-healer",
+  "anti-assault": "focus-attacker",
+  survive: "skirmish"
+};
+
+const arenaPresetOpponents = [
+  {
+    playerId: "preset-wall",
+    name: "Iron Wall Test Team",
+    rating: 980,
+    defense: {
+      squad: ["Valkyr", "Asterion", "Seraphim", "Lancer"],
+      positions: { Valkyr: 3, Asterion: 4, Seraphim: 7, Lancer: 1 },
+      modules: { Valkyr: "opening-shield", Asterion: "armor-weave", Seraphim: "cooldown-tune", Lancer: "range-tune" },
+      ai: { Valkyr: "frontline", Asterion: "guard-healer", Seraphim: "guard-tank", Lancer: "focus-attacker" },
+      core: "iron-wall",
+      cost: 700
+    }
+  },
+  {
+    playerId: "preset-rush",
+    name: "Quantum Rush Team",
+    rating: 1030,
+    defense: {
+      squad: ["Nova", "Caliburn", "Mirage", "Helix"],
+      positions: { Nova: 3, Caliburn: 4, Mirage: 1, Helix: 7 },
+      modules: { Nova: "duel-reactor", Caliburn: "focus-lens", Mirage: "cooldown-tune", Helix: "opening-shield" },
+      ai: { Nova: "focus-healer", Caliburn: "frontline", Mirage: "guard-attacker", Helix: "guard-tank" },
+      core: "rush-core",
+      cost: 940
+    }
+  },
+  {
+    playerId: "preset-sniper",
+    name: "Rail Scope Nest",
+    rating: 1060,
+    defense: {
+      squad: ["Lancer", "Orion", "Accipio", "Valkyr"],
+      positions: { Lancer: 1, Orion: 2, Accipio: 7, Valkyr: 3 },
+      modules: { Lancer: "first-ult", Orion: "range-tune", Accipio: "cooldown-tune", Valkyr: "armor-weave" },
+      ai: { Lancer: "focus-tank", Orion: "focus-attacker", Accipio: "guard-attacker", Valkyr: "frontline" },
+      core: "sniper-core",
+      cost: 800
+    }
+  },
+  {
+    playerId: "preset-ewar",
+    name: "Mirage Jam Cell",
+    rating: 1100,
+    defense: {
+      squad: ["Mirage", "Eumist (Eunice專用機)", "Bastion", "Asterion"],
+      positions: { Mirage: 4, "Eumist (Eunice專用機)": 7, Bastion: 1, Asterion: 3 },
+      modules: { Mirage: "first-ult", "Eumist (Eunice專用機)": "guardian-loop", Bastion: "focus-lens", Asterion: "opening-shield" },
+      ai: { Mirage: "guard-attacker", "Eumist (Eunice專用機)": "guard-tank", Bastion: "focus-tank", Asterion: "guard-healer" },
+      core: "ewar-core",
+      cost: 920
+    }
+  },
+  {
+    playerId: "preset-sustain",
+    name: "Repair Loop Guard",
+    rating: 1140,
+    defense: {
+      squad: ["Helix", "Seraphim", "MEGA(EK專用機)", "Himawari (Candy專用機)"],
+      positions: { Helix: 7, Seraphim: 8, "MEGA(EK專用機)": 3, "Himawari (Candy專用機)": 4 },
+      modules: { Helix: "cooldown-tune", Seraphim: "guardian-loop", "MEGA(EK專用機)": "armor-weave", "Himawari (Candy專用機)": "focus-lens" },
+      ai: { Helix: "guard-tank", Seraphim: "guard-tank", "MEGA(EK專用機)": "frontline", "Himawari (Candy專用機)": "skirmish" },
+      core: "repair-core",
+      cost: 980
+    }
+  }
+];
+const masterLeagueDifficulties = [
+  { id: "easy", label: "Easy", base: 260, multiplier: 0.85, hp: 0.9, damage: 0.88, ratingOffset: -140 },
+  { id: "normal", label: "Normal", base: 380, multiplier: 1.0, hp: 1.0, damage: 1.0, ratingOffset: 0 },
+  { id: "hard", label: "Hard", base: 540, multiplier: 1.25, hp: 1.12, damage: 1.12, ratingOffset: 160 }
+];
+const masterLeagueBands = [
+  { id: "bronze", name: "青銅", title: "青銅盟主", min: 0 },
+  { id: "silver", name: "白銀", title: "白銀盟主", min: 2500 },
+  { id: "gold", name: "黃金", title: "黃金盟主", min: 6500 },
+  { id: "platinum", name: "白金", title: "白金盟主", min: 12000 },
+  { id: "diamond", name: "鑽石", title: "鑽石盟主", min: 20000 },
+  { id: "master", name: "大師", title: "大師盟主", min: 32000 }
+];
+const masterLeagueScoring = {
+  costPar: 900,
+  costBonusMax: 120,
+  hpBonusMax: 260,
+  timeBonusMax: 220,
+  streakStep: 70,
+  deathPenalty: 160,
+  championBonus: 520
+};
 
 const squadSeeds = [
-  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp" },
-  { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/caliburn-profile.webp", sprite: "assets/sd-caliburn.webp" },
-  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp" },
-  { name: "Orion", faction: "Allied", role: "龍騎兵清場炮擊機", weapon: "多重鎖定光束炮 / 遙控炮莢", trait: "普通攻擊會同時射擊射程內所有敵機，擅長掃走整批低血目標。", tactic: "放在安全側翼覆蓋戰場。普攻可持續壓制射程內所有敵人；主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp" },
-  { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp" },
-  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp" },
-  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 26, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp" },
-  { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp" },
-  { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 300, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp" },
-  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp" },
-  { name: "Eumist (Eunice專用機)", ace: true, faction: "Allied", role: "霧刃循環支援機", weapon: "霞霧光刃 / 霧痕治癒核心", trait: "邊輸出邊補血。每次造成傷害會疊加霧痕，疊滿後消耗霧痕為全隊小補；但會隨時被阿媽捉去溫書補習，原地停止 3 秒。", tactic: "放在中前排持續斬擊同一批敵人，讓霧痕爆開形成穩定續航。八重霞適合敵群壓入時回血，朧可清場並為全隊提供短暫減傷。", color: "#66f2e4", x: 245, y: 315, maxHp: 126, range: 215, damage: 24, rate: 0.82, speed: 172, skill: "八重霞", activeDesc: "向四周發出連續霧刃斬擊，部分總傷害轉化為全隊治療，最低血友方額外回復。", ultimate: "朧", ultimateDesc: "展開大範圍霧域，高速斬擊敵方全體，將部分傷害轉化為治療，並令全隊短時間減傷。", passive: "霧痕循環", passiveDesc: "每次本機造成傷害時疊加 1 層霧痕；每層令本機對該敵人傷害 +4%。疊滿 5 層時消耗霧痕，治療全隊並額外治療最低血友方。", activeIcon: "assets/skill-eumist-yaegasumi.webp", ultimateIcon: "assets/skill-eumist-oboro.webp", art: "assets/player-eumist-profile.webp", sprite: "assets/player-eumist-sd.webp" },
-  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。每次啟動 EK 光環會獲得 15 秒防禦力 +100%；EK 定律會植入場上最大威脅敵人，1 秒後以擴大範圍爆炸並波及附近機體，MEGA 自身獲得 3 秒無敵。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；每次啟動獲得防禦力 +100% 15 秒，啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "為場上最大威脅敵人植入 EK 定律，1 秒後以擴大 50% 範圍爆炸並波及附近機體；MEGA 自身獲得無敵 3 秒。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp" },
-  { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp" },
-  { name: "Accipio", ace: true, faction: "Allied", role: "後方支援 / 多重鎖定補助機", weapon: "Solace 光束步槍 / IT 支援無人機 / XDR 防護核心", trait: "以多重鎖定標記敵人，令敵人成為全隊回血節點；危急時可復活隊友，無人陣亡時則展開平鏡止牛凍結戰場。", tactic: "Accipio 為開發者 Sun 的專用機。放在隊伍後方，以 400 射程鎖定最多 5 名敵機並打上治療標記。先用普攻鋪 recovery point，再用 IT Remote Support 將標記轉成全隊護盾。", color: "#62f6b0", x: 185, y: 470, maxHp: 158, range: 400, damage: 20, rate: 1.05, speed: 138, spriteScale: 1.18, skill: "IT Remote Support", activeDesc: "全隊即時回血並獲得 HOT；若場上有治療標記，會消耗全部標記並按層數轉化成全隊護盾。", ultimate: "XDR Cyber Protection", ultimateDesc: "有隊友陣亡時復活 1 名友方；否則施放平鏡止牛，為全隊加大型護盾、減傷並停止範圍敵機。", passive: "Sun 支援協定・傷膝版", passiveDesc: "身處全隊後方時，治療標記回血提升。隨機觸發後方戰術指揮強化全隊，或膝患復發令 Accipio 暫時不能移動、普攻及新增標記。", activeIcon: "assets/skill-accipio-remote-support.webp", ultimateIcon: "assets/skill-accipio-xdr-protection.webp", art: "assets/player-accipio-profile.webp", sprite: "assets/player-accipio-sd.webp" }
+  { name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp", spriteFacing: "right" },
+  { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/caliburn-profile.webp", sprite: "assets/sd-caliburn.webp", spriteFacing: "right" },
+  { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp", spriteFacing: "right" },
+  { name: "Orion", faction: "Allied", role: "龍騎兵清場炮擊機", weapon: "多重鎖定光束炮 / 遙控炮莢", trait: "普通攻擊會同時射擊射程內所有敵機，擅長掃走整批低血目標。", tactic: "放在安全側翼覆蓋戰場。普攻可持續壓制射程內所有敵人；主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp", spriteFacing: "left" },
+  { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp", spriteFacing: "right" },
+  { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp", spriteFacing: "right" },
+  { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 34, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp", spriteFacing: "right" },
+  { name: "Helix", faction: "Allied", role: "範圍維修與隱形支援機", weapon: "再生力場 / 幻象粒子散布器", trait: "持續範圍回血，不負責爆發救急；大絕可隱形脫離敵人鎖定。", tactic: "放在隊伍中央或主坦身後，開主動技讓範圍內友軍持續回血；被狙擊或被敵群追擊時用幻象粒子脫身。", color: "#7cffc4", x: 200, y: 470, maxHp: 138, range: 245, damage: -22, rate: 0.72, speed: 158, skill: "再生力場", activeDesc: "範圍內友軍在一段時間內持續回血。", ultimate: "幻象粒子", ultimateDesc: "Helix 隱形一段時間，鎖定它的敵人會失去目標並改攻擊其他機。", activeIcon: "assets/skill-helix-active.webp", ultimateIcon: "assets/skill-helix-ultimate.webp", art: "assets/player-helix-profile.webp", sprite: "assets/player-helix-sd.webp", spriteFacing: "left" },
+  { name: "Bastion", faction: "Allied", role: "重裝破甲炮擊機", weapon: "肩部重粒子炮 / 破甲榴彈", trait: "攻擊慢但單發極重，對 Boss 和厚血敵人特別有效。", tactic: "放在坦機後方專打高 HP 目標。主動技和大絕會轟炸目標周圍小範圍。", color: "#f6c34f", x: 255, y: 340, maxHp: 158, range: 300, damage: 64, rate: 2.7, speed: 52, skill: "重炮壓制", activeDesc: "炮擊最高 HP 敵人，對 Boss 額外傷害，並波及附近敵機。", ultimate: "要塞齊射", ultimateDesc: "集中轟炸最高威脅目標，對 Boss 造成巨額破甲傷害並小範圍濺射。", activeIcon: "assets/skill-bastion-suppression-green-v2.webp", ultimateIcon: "assets/skill-bastion-salvo-green-v2.webp", art: "assets/player-bastion-profile.webp", sprite: "assets/player-bastion-sd.webp", spriteFacing: "right" },
+  { name: "Mirage", faction: "Allied", role: "電子干擾中距離機", weapon: "幻象浮游炮 / 干擾脈衝", trait: "輸出中等，但可降低敵軍移速和火力，保護後排。", tactic: "放在隊伍中央，主動技可拖慢湧入敵群。", color: "#c37bff", x: 245, y: 230, maxHp: 120, range: 220, damage: 20, rate: 0.88, speed: 168, skill: "持續干擾", activeDesc: "持續干擾附近敵人，短時間降低移速和傷害。", ultimate: "海市蜃樓域", ultimateDesc: "大範圍癱瘓敵軍火控，並於生效期間造成持續傷害。", activeIcon: "assets/skill-mirage-jammer-ai-v6.webp", ultimateIcon: "assets/skill-mirage-domain-ai-v6.webp", art: "assets/player-mirage-profile.webp", sprite: "assets/player-mirage-sd.webp", spriteFacing: "left" },
+  { name: "Eumist (Eunice專用機)", ace: true, faction: "Allied", role: "霧刃循環支援機", weapon: "霞霧光刃 / 霧痕治癒核心", trait: "邊輸出邊補血。每次造成傷害會疊加霧痕，疊滿後消耗霧痕為全隊小補；但會隨時被阿媽捉去溫書補習，原地停止 3 秒。", tactic: "放在中前排持續斬擊同一批敵人，讓霧痕爆開形成穩定續航。八重霞適合敵群壓入時回血，朧可清場並為全隊提供短暫減傷。", color: "#66f2e4", x: 245, y: 315, maxHp: 126, range: 215, damage: 24, rate: 0.82, speed: 172, skill: "八重霞", activeDesc: "向四周發出連續霧刃斬擊，部分總傷害轉化為全隊治療，最低血友方額外回復。", ultimate: "朧", ultimateDesc: "展開大範圍霧域，高速斬擊敵方全體，將部分傷害轉化為治療，並令全隊短時間減傷。", passive: "霧痕循環", passiveDesc: "每次本機造成傷害時疊加 1 層霧痕；每層令本機對該敵人傷害 +4%。疊滿 5 層時消耗霧痕，治療全隊並額外治療最低血友方。", activeIcon: "assets/skill-eumist-yaegasumi.webp", ultimateIcon: "assets/skill-eumist-oboro.webp", art: "assets/player-eumist-profile.webp", sprite: "assets/player-eumist-sd.webp", spriteFacing: "left" },
+  { name: "MEGA(EK專用機)", ace: true, faction: "Allied", role: "皇牌機師專用坦機", weapon: "EK環刃 / 近身全方位斬擊", trait: "重裝近戰坦機，普攻會斬擊自身附近敵人；但會隨機迷路 3 秒並四圍衝。", tactic: "放在前線吸引敵軍。每次啟動 EK 光環會獲得 15 秒防禦力 +100%；EK 定律會植入場上最大威脅敵人，1 秒後以擴大範圍爆炸並波及附近機體，MEGA 自身獲得 3 秒無敵。", color: "#48a8ff", x: 225, y: 320, maxHp: 225, range: 150, damage: 24, rate: 1.05, speed: 108, skill: "EK光環", activeDesc: "啟動/停止 EK 光環；每次啟動獲得防禦力 +100% 15 秒，啟動期間持續吸引附近敵機，停止後冷卻 10 秒。", ultimate: "EK定律", ultimateDesc: "為場上最大威脅敵人植入 EK 定律，1 秒後以擴大 50% 範圍爆炸並波及附近機體；MEGA 自身獲得無敵 3 秒。", activeIcon: "assets/skill-miles-fan-ek-aura.webp", ultimateIcon: "assets/skill-miles-fan-ek-law.webp", art: "assets/player-mega-ek-profile.webp", sprite: "assets/player-mega-ek-sd.webp", spriteFacing: "left" },
+  { name: "Himawari (Candy專用機)", ace: true, faction: "Allied", role: "皇牌機師專用重裝支援機", weapon: "扇形激死你炮，連擊敵人會使敵人爆炸", trait: "略胖女性風重裝機，速度極慢。普攻會向前方扇形範圍攻擊；同一敵人連續被命中三次會引發小型爆炸。機體性能難以捉摸，經常不分敵我方，隨機師心情為友方機體上增益或減益。", tactic: "放在中後排用扇形 AOE 清線。持續鎖定同一敵人可觸發連擊爆炸；美女廚房適合毒殺厚血目標，發脾氣可震開身邊所有機體並全場雷射掃射。", color: "#ff7bd6", x: 225, y: 320, maxHp: 168, range: 255, damage: 22, rate: 1.35, speed: 42, spriteScale: 1.18, skill: "美女廚房", activeDesc: "向目標駕駛員投餵有毒食物，無視防禦，6 秒內按目標最大 HP 百分比造成持續傷害。對高血量敵機特別有效。", ultimate: "發脾氣", ultimateDesc: "震飛身邊所有機體，包括友方，並對全畫面敵機進行粗雷射掃射，造成大範圍爆發傷害。", passive: "我幫緊你", passiveDesc: "隨機時間對一名友方機體施加 3 秒狀態。可能是強化或干擾：攻擊力 +80%、防禦力 +80%、速度 -80%、攻擊力 -80%、防禦力 -80%。中狀態機體會有明顯標示。", activeIcon: "assets/skill-himawari-kitchen.webp", ultimateIcon: "assets/skill-himawari-tantrum.webp", art: "assets/player-himawari-profile.webp", sprite: "assets/player-himawari-sd.webp", spriteFacing: "left" },
+  { name: "Accipio", ace: true, faction: "Allied", role: "後方支援 / 多重鎖定補助機", weapon: "Solace 光束步槍 / IT 支援無人機 / XDR 防護核心", trait: "以多重鎖定標記敵人，令敵人成為全隊回血節點；危急時可復活隊友，無人陣亡時則展開平鏡止牛凍結戰場。", tactic: "Accipio 為開發者 Sun 的專用機。放在隊伍後方，以 400 射程鎖定最多 5 名敵機並打上治療標記。先用普攻鋪 recovery point，再用 IT Remote Support 將標記轉成全隊護盾。", color: "#62f6b0", x: 185, y: 470, maxHp: 158, range: 400, damage: 20, rate: 1.05, speed: 138, spriteScale: 1.18, skill: "IT Remote Support", activeDesc: "全隊即時回血並獲得 HOT；若場上有治療標記，會消耗全部標記並按層數轉化成全隊護盾。", ultimate: "XDR Cyber Protection", ultimateDesc: "有隊友陣亡時復活 1 名友方；否則施放平鏡止牛，為全隊加大型護盾、減傷並停止範圍敵機。", passive: "Sun 支援協定・傷膝版", passiveDesc: "身處全隊後方時，治療標記回血提升。隨機觸發後方戰術指揮強化全隊，或膝患復發令 Accipio 暫時不能移動、普攻及新增標記。", activeIcon: "assets/skill-accipio-remote-support.webp", ultimateIcon: "assets/skill-accipio-xdr-protection.webp", art: "assets/player-accipio-profile.webp", sprite: "assets/player-accipio-sd.webp", spriteFacing: "left" }
 ];
 
 const enemyTypes = {
@@ -512,15 +735,15 @@ const upgradePool = [
     type: "Nova 量子",
     name: "量子相位核心",
     icon: "assets/upgrade-nova-quantum-ai-v6.webp",
-    text: "Nova 傷害 +8、射程 +30、速度 +24、量子背刺範圍更大。",
+    text: "Nova 傷害 +12、射程 +30、速度 +24、量子背刺傷害更高，範圍更大。",
     apply() {
       const u = squad.find((unit) => unit.name === "Nova");
       if (!u) return;
-      u.damage += 8;
+      u.damage += 12;
       u.range += 30;
       u.speed += 24;
       u.rushRadius = (u.rushRadius || 190) + 35;
-      u.rushDamage = (u.rushDamage || 54) + 16;
+      u.rushDamage = (u.rushDamage || 72) + 24;
     }
   },
   {
@@ -1110,7 +1333,7 @@ const rewardEnglish = {
   "dragoon-pods": ["Orion Weapon", "Dragoon Pod Expansion", "Orion fires faster, gains +35 range, and launches more clearing pods with its active."],
   "valkyr-zero-core": ["Valkyr Skill", "GN Defence Core", "Valkyr gains +55 max HP and +12% defence. Taunt Beacon lasts longer; GN Field gets wider and stronger."],
   "lancer-rail-scope": ["Lancer Weapon", "Orbital Targeting Scope", "Lancer gains +14 damage and +35 range. Piercing Snipe and Orbital Pierce hit harder."],
-  "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +8 damage, +30 range and +24 speed. Quantum Backstab gets a wider strike area."],
+  "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +12 damage, +30 range and +24 speed. Quantum Backstab hits harder and gets a wider strike area."],
   "helix-beacon-grid": ["Helix Repair", "Regeneration Mirage Matrix", "Helix gains stronger healing, better range and survival. Regeneration Field lasts longer; Mirage Particles cloak wider."],
   "bastion-stabilizer": ["Bastion Artillery", "Heavy Cannon Stabiliser", "Bastion gains +16 damage and +30 range. Cannon Suppression gets a wider blast."],
   "mirage-phantom-core": ["Mirage Jammer", "Phantom Jammer Core", "Mirage gains +8 damage and +25 range. Jamming duration and area increase."],
@@ -1165,6 +1388,135 @@ function localizeStatus(status) {
   return value ? { ...status, label: value[0], shortLabel: value[1] } : status;
 }
 
+function localizeArenaAiOption(option) {
+  if (currentLanguage !== "en" || !option) return option;
+  return {
+    ...option,
+    name: option.enName || option.name,
+    text: option.enText || option.text
+  };
+}
+
+const arenaCoreEnglish = {
+  "iron-wall": ["Iron Wall Core", "All units gain HP +10%, but movement speed -6%."],
+  "rush-core": ["Rush Core", "Opening 15 seconds damage +18%, then damage -6%."],
+  "ewar-core": ["E-War Core", "First active skill hit briefly disrupts enemy movement and fire control."],
+  "repair-core": ["Repair Core", "Each unit auto-repairs once at low HP, but damage -6%."],
+  "sniper-core": ["Sniper Core", "Long-range units gain damage +15%; shorter-range units take +8% damage."]
+};
+
+const arenaModuleEnglish = {
+  "opening-shield": ["Opening Shield", "Start battle with 5 shield."],
+  "range-tune": ["Range Tuning", "Basic attack range +8%."],
+  "cooldown-tune": ["Cooldown Governor", "Active skill cooldown -12%."],
+  "armor-weave": ["Armour Weave", "Damage taken -8%, movement speed -4%."],
+  "focus-lens": ["Focus Lens", "Basic attacks deal more damage to the current focused target."],
+  "first-ult": ["First Strike Capacitor", "Start battle with ultimate charge +35%."],
+  "duel-reactor": ["Duel Reactor", "Damage +22%, but max HP -10%."],
+  "guardian-loop": ["Guardian Loop", "Survive one lethal hit at 1 HP and gain a short shield."]
+};
+
+const masterBandEnglish = {
+  bronze: ["Bronze", "Bronze Champion"],
+  silver: ["Silver", "Silver Champion"],
+  gold: ["Gold", "Gold Champion"],
+  platinum: ["Platinum", "Platinum Champion"],
+  diamond: ["Diamond", "Diamond Champion"],
+  master: ["Master", "Master Champion"]
+};
+
+function localizeArenaCoreOption(option) {
+  if (currentLanguage !== "en" || !option) return option;
+  const values = arenaCoreEnglish[option.id];
+  return values ? { ...option, name: values[0], text: values[1] } : option;
+}
+
+function localizeArenaModuleOption(option) {
+  if (currentLanguage !== "en" || !option) return option;
+  const values = arenaModuleEnglish[option.id];
+  return values ? { ...option, name: values[0], text: values[1] } : option;
+}
+
+function masterBandName(band) {
+  if (currentLanguage !== "en") return band?.name || "";
+  return masterBandEnglish[band?.id]?.[0] || band?.name || "";
+}
+
+function masterBandTitle(band) {
+  if (currentLanguage !== "en") return band?.title || "";
+  return masterBandEnglish[band?.id]?.[1] || band?.title || "";
+}
+
+function loadPilotProfile() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PILOT_PROFILE_KEY) || "{}");
+    if (saved?.playerId && saved?.secret) return saved;
+  } catch {
+    // Ignore damaged local cache and create a fresh profile below.
+  }
+  const profile = {
+    playerId: makeLocalToken(8),
+    secret: makeLocalToken(12),
+    name: localStorage.getItem("mecha-heart-player-name") || "Pilot",
+    ownedModules: [],
+    ownedCores: [],
+    pvpDefense: null,
+    pvpStats: { rating: 1000, wins: 0, losses: 0 }
+  };
+  localStorage.setItem(PILOT_PROFILE_KEY, JSON.stringify(profile));
+  return profile;
+}
+
+function makeLocalToken(length) {
+  const alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+}
+
+function savePilotProfileLocal(profile) {
+  pilotProfile = { ...(pilotProfile || {}), ...profile };
+  localStorage.setItem(PILOT_PROFILE_KEY, JSON.stringify(pilotProfile));
+}
+
+function loadLocalMasterChampions() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MASTER_LEAGUE_CHAMPIONS_KEY) || "{}");
+    return saved && typeof saved === "object" ? saved : {};
+  } catch {
+    return {};
+  }
+}
+
+function championTimestamp(record) {
+  const time = Date.parse(record?.updatedAt || "");
+  return Number.isFinite(time) ? time : 0;
+}
+
+function mergeChampionMaps(...maps) {
+  return maps.reduce((merged, map) => {
+    Object.entries(map || {}).forEach(([bandId, record]) => {
+      if (!record) return;
+      if (!merged[bandId] || championTimestamp(record) >= championTimestamp(merged[bandId])) merged[bandId] = record;
+    });
+    return merged;
+  }, {});
+}
+
+function saveLocalMasterChampions(champions = arenaMasterChampions) {
+  arenaMasterChampions = mergeChampionMaps(arenaMasterChampions, champions);
+  localStorage.setItem(MASTER_LEAGUE_CHAMPIONS_KEY, JSON.stringify(arenaMasterChampions));
+  return arenaMasterChampions;
+}
+
+function makeLocalRecoveryCode() {
+  const id = String(pilotProfile?.playerId || "").toUpperCase();
+  const secret = String(pilotProfile?.secret || "").toUpperCase();
+  if (pilotRecoveryCode) return pilotRecoveryCode;
+  if (id.length < 8 || secret.length < 12) return "MH-....";
+  return `MH-${id.slice(0, 4)}-${id.slice(4, 8)}-${secret.slice(0, 4)}-${secret.slice(4, 8)}-${secret.slice(8, 12)}`;
+}
+
 let squad = [];
 let enemies = [];
 let shots = [];
@@ -1186,9 +1538,100 @@ function selectedSquadSeeds() {
     : defaultSquadNames.map((name) => squadSeeds.find((unit) => unit.name === name));
 }
 
+function createBattleUnit(source, id, slot, options = {}) {
+  return {
+    ...source,
+    id,
+    x: slot.x,
+    y: slot.y,
+    hp: source.maxHp,
+    target: null,
+    move: { x: slot.x, y: slot.y },
+    cooldown: 0,
+    skillCooldown: 0,
+    shield: 0,
+    attackPulse: 0,
+    aim: null,
+    command: "idle",
+    assistId: null,
+    ultCharge: 0,
+    ultMax: 100,
+    regenAuraTime: 0,
+    stealthTime: 0,
+    regenGlow: 0,
+    guardianRegenTime: 0,
+    gnFieldTime: 0,
+    ekAuraActive: false,
+    ekDefenseTime: 0,
+    invulnerableTime: 0,
+    lostTime: 0,
+    lostCooldown: source.name === "MEGA(EK專用機)" ? 6 + Math.random() * 8 : 0,
+    lostPoint: null,
+    lostRetarget: 0,
+    himawariPassiveCooldown: source.name === "Himawari (Candy專用機)" ? 5 + Math.random() * 6 : 0,
+    eumistTutoringCooldown: source.name === "Eumist (Eunice專用機)" ? 5 + Math.random() * 9 : 0,
+    eumistTutoringTime: 0,
+    accipioPassiveCooldown: source.name === "Accipio" ? 5 + Math.random() * 7 : 0,
+    accipioKneeTime: 0,
+    accipioCommandTime: 0,
+    accipioHotTime: 0,
+    accipioHotSource: null,
+    accipioShieldTime: 0,
+    accipioProtectionTime: 0,
+    himawariStatus: null,
+    battleStats: makeBattleStats(),
+    ...options
+  };
+}
+
+function makeBattleStats() {
+  return {
+    damage: 0,
+    healing: 0,
+    taken: 0,
+    kills: 0,
+    assists: 0,
+    skillUses: 0,
+    ultUses: 0
+  };
+}
+
+function ensureBattleStats(unit) {
+  if (!unit) return null;
+  if (!unit.battleStats) unit.battleStats = makeBattleStats();
+  return unit.battleStats;
+}
+
+function recordBattleDamage(source, target, amount) {
+  if (!target || amount <= 0) return;
+  ensureBattleStats(target).taken += amount;
+  if (!source) return;
+  ensureBattleStats(source).damage += amount;
+  target.damageLedger = target.damageLedger || {};
+  target.damageLedger[source.id] = { amount: (target.damageLedger[source.id]?.amount || 0) + amount, time: now() };
+}
+
+function recordBattleKill(source, target) {
+  if (!source || !target) return;
+  ensureBattleStats(source).kills += 1;
+  const cutoff = now() - 14;
+  Object.entries(target.damageLedger || {}).forEach(([sourceId, entry]) => {
+    if (sourceId === source.id || (entry.time || 0) < cutoff) return;
+    const helper = squad.find((unit) => unit.id === sourceId && unit.hp > 0);
+    if (helper) ensureBattleStats(helper).assists += 1;
+  });
+}
+
+function recordBattleHealing(source, amount) {
+  if (!source || amount <= 0) return;
+  ensureBattleStats(source).healing += amount;
+}
+
 function reset() {
   paused = false;
   pausedAt = 0;
+  autoBattleEnabled = false;
+  localStorage.setItem(AUTO_BATTLE_KEY, "0");
   clearAutoRewardTimer();
   updatePauseControls();
   updateAutoBattleControl();
@@ -1234,7 +1677,8 @@ function reset() {
     accipioHotSource: null,
     accipioShieldTime: 0,
     accipioProtectionTime: 0,
-    himawariStatus: null
+    himawariStatus: null,
+    battleStats: makeBattleStats()
     });
   });
   enemies = [];
@@ -1368,6 +1812,8 @@ function refreshLanguageSensitiveViews() {
     renderDatabase();
     renderFormation();
   }
+  if (!arenaEl.hidden) renderArena();
+  if (!arenaResultEl.hidden) renderMasterLeaderboards(masterLeagueRankings);
   if (squad.length) {
     renderIntel(focusedUnit || squad[0]);
     updateHud();
@@ -1404,6 +1850,11 @@ function translateMessage(text) {
     "分數已提交。": "Score submitted.",
     "即時排行榜已更新": "Live leaderboard updated",
     "本機預覽排行榜": "Local leaderboard preview",
+    "本機 Master League 排行榜已更新": "Local Master League ranking updated",
+    "讀取 Master League 排行榜中...": "Loading Master League ranking...",
+    "即時 Master League 排行榜": "Live Master League ranking",
+    "本機 Master League 排行榜": "Local Master League ranking",
+    "即時 Master League 排行榜已更新": "Live Master League ranking updated",
     "最多只能派出 4 架機體，請先移除一架。": "You can only deploy 4 mecha. Remove one first.",
     "請選擇 4 架機體出擊。": "Choose 4 mecha before deployment.",
     "載入機體圖像...": "Loading mecha images...",
@@ -1520,6 +1971,7 @@ function normalizeLeaderboard(rankings) {
 }
 
 function renderLeaderboardList(listEl, rankings, highlightScore = null) {
+  if (!listEl) return [];
   const normalized = normalizeLeaderboard(rankings || leaderboardDefaults);
   listEl.innerHTML = normalized.map((entry, index) => `
     <li class="${highlightScore !== null && entry.score === highlightScore ? "current-score" : ""}">
@@ -1531,6 +1983,91 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
   return normalized;
 }
 
+function normalizeMasterLeaderboard(rankings = []) {
+  const bestByName = new Map();
+  rankings
+    .filter((entry) => entry && Number.isFinite(Number(entry.score)))
+    .map((entry) => ({
+      name: sanitizePlayerName(entry.name || "Pilot"),
+      score: Math.max(0, Math.floor(Number(entry.score) || 0)),
+      bandId: entry.bandId || masterBandForScore(Number(entry.score) || 0).id,
+      team: Array.isArray(entry.team) ? entry.team.slice(0, 4) : Array.isArray(entry.defense?.squad) ? entry.defense.squad.slice(0, 4) : []
+    }))
+    .forEach((entry) => {
+      const key = entry.name.toLowerCase();
+      if (!bestByName.has(key) || entry.score > bestByName.get(key).score) bestByName.set(key, entry);
+    });
+  return [...bestByName.values()]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+}
+
+function loadLocalMasterLeaderboard() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MASTER_LEAGUE_RANKINGS_KEY) || "[]");
+    const merged = normalizeMasterLeaderboard([...saved, ...masterLeagueDefaults]);
+    masterLeagueRankings = merged;
+    return merged;
+  } catch {
+    masterLeagueRankings = normalizeMasterLeaderboard(masterLeagueDefaults);
+    return masterLeagueRankings;
+  }
+}
+
+function saveLocalMasterLeaderboard(entry) {
+  const next = normalizeMasterLeaderboard([entry, ...masterLeagueRankings, ...loadLocalMasterLeaderboard()]);
+  masterLeagueRankings = next;
+  localStorage.setItem(MASTER_LEAGUE_RANKINGS_KEY, JSON.stringify(next));
+  renderMasterLeaderboards(next, "本機 Master League 排行榜已更新");
+  return next;
+}
+
+function renderMasterLeaderboardList(listEl, rankings = masterLeagueRankings, highlightScore = null) {
+  if (!listEl) return [];
+  const normalized = normalizeMasterLeaderboard(rankings.length ? rankings : masterLeagueDefaults);
+  listEl.innerHTML = normalized.map((entry, index) => {
+    const band = masterLeagueBands.find((item) => item.id === entry.bandId) || masterBandForScore(entry.score);
+    return `
+      <li class="${highlightScore !== null && entry.score === highlightScore ? "current-score" : ""}">
+        <span class="rank-number">${index + 1}</span>
+        <strong>${escapeHtml(entry.name)}<small>${masterBandName(band)} / ${escapeHtml(entry.team.join(" / ") || "-")}</small></strong>
+        <em>${formatScore(entry.score)}</em>
+      </li>
+    `;
+  }).join("");
+  return normalized;
+}
+
+function renderMasterLeaderboards(rankings = masterLeagueRankings, message = "") {
+  const normalized = normalizeMasterLeaderboard(rankings.length ? rankings : masterLeagueDefaults);
+  masterLeagueRankings = normalized;
+  renderMasterLeaderboardList(titleMasterLeaderboardListEl, normalized);
+  renderMasterLeaderboardList(arenaMasterLeaderboardListEl, normalized, masterLeagueRun?.score ?? null);
+  const arenaBoardHead = arenaMasterLeaderboardListEl?.closest(".arena-master-board")?.querySelector(".leaderboard-head h3");
+  if (arenaBoardHead) arenaBoardHead.textContent = currentLanguage === "en" ? "Ranking" : "排行榜";
+  if (arenaMasterLeaderboardMessageEl) {
+    arenaMasterLeaderboardMessageEl.textContent = currentLanguage === "en"
+      ? (message ? translateMessage(message) : "Master League Top 10")
+      : (message || "Master League Top 10");
+  }
+}
+
+function setTitleLeaderboardTab(tabName) {
+  const isMaster = tabName === "master";
+  document.querySelectorAll("[data-title-board]").forEach((button) => {
+    const active = button.dataset.titleBoard === tabName;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  if (titleLeaderboardListEl) titleLeaderboardListEl.hidden = isMaster;
+  if (titleMasterLeaderboardListEl) titleMasterLeaderboardListEl.hidden = !isMaster;
+  const heading = document.querySelector("#title-leaderboard .leaderboard-head h3");
+  if (heading) heading.textContent = isMaster ? (currentLanguage === "en" ? "Master League Ranking" : "Master League Ranking") : t("aceRanking");
+  if (titleLeaderboardMessageEl) titleLeaderboardMessageEl.textContent = isMaster
+    ? (currentLanguage === "en" ? "Top 10 Arena players, scores and squads." : "Top 10 Arena players, scores and squads.")
+    : (currentLanguage === "en" ? "Live leaderboard" : "Live leaderboard");
+}
+
 function renderResultLeaderboard(rankings, message = "") {
   renderLeaderboardList(leaderboardListEl, rankings, leaderboardScore);
   leaderboardMessageEl.textContent = translateMessage(message || "輸入姓名後可提交今局分數。");
@@ -1538,6 +2075,7 @@ function renderResultLeaderboard(rankings, message = "") {
 
 function renderTitleLeaderboard(rankings, message = "") {
   renderLeaderboardList(titleLeaderboardListEl, rankings);
+  renderMasterLeaderboards(masterLeagueRankings);
   titleLeaderboardMessageEl.textContent = translateMessage(message || "挑戰最高分數，打入王牌榜。");
 }
 
@@ -1547,25 +2085,31 @@ function renderLeaderboards(rankings, resultMessage = "", titleMessage = "") {
 }
 
 function updatePauseControls() {
+  const arenaPause = battleMode === "arena";
   pauseOverlayEl.hidden = !paused;
   pauseToggleEl.setAttribute("aria-pressed", paused ? "true" : "false");
   pauseToggleEl.setAttribute("aria-label", paused ? (currentLanguage === "en" ? "Resume game" : "繼續遊戲") : (currentLanguage === "en" ? "Pause game" : "暫停遊戲"));
   pauseToggleEl.querySelector(".pause-label").textContent = paused ? (currentLanguage === "en" ? "Resume" : "繼續") : (currentLanguage === "en" ? "Pause" : "暫停");
+  if (pauseCopyEl) pauseCopyEl.textContent = arenaPause ? t("arenaPauseCopy") : t("pauseCopy");
+  if (pauseFormationEl) pauseFormationEl.hidden = arenaPause;
+  pauseOverlayEl?.classList.toggle("arena-pause", arenaPause);
   document.body.classList.toggle("paused-mode", paused);
 }
 
 function setPauseButtonVisible(visible) {
   if (battleControlsEl) battleControlsEl.hidden = !visible;
   pauseToggleEl.hidden = !visible;
-  if (!visible && paused) {
+  if (!visible) {
     paused = false;
     pausedAt = 0;
-    updatePauseControls();
   }
+  updatePauseControls();
+  updateAutoBattleControl();
 }
 
 function updateAutoBattleControl() {
   if (!autoBattleToggleEl) return;
+  autoBattleToggleEl.hidden = battleMode === "arena";
   autoBattleToggleEl.setAttribute("aria-pressed", autoBattleEnabled ? "true" : "false");
   autoBattleToggleEl.querySelector("strong").textContent = autoBattleEnabled ? "ON" : "OFF";
 }
@@ -1579,6 +2123,7 @@ function setAutoBattleEnabled(value) {
 }
 
 function toggleAutoBattle() {
+  if (battleMode === "arena") return;
   setAutoBattleEnabled(!autoBattleEnabled);
 }
 
@@ -1611,6 +2156,8 @@ function togglePause() {
 }
 
 async function loadLeaderboard() {
+  loadLocalMasterLeaderboard();
+  renderMasterLeaderboards(masterLeagueRankings, "讀取 Master League 排行榜中...");
   renderLeaderboards(leaderboardDefaults, "讀取排行榜中...", "讀取排行榜中...");
   try {
     const response = await fetch("/api/leaderboard", { cache: "no-store" });
@@ -1620,6 +2167,14 @@ async function loadLeaderboard() {
     renderLeaderboards(data.rankings, fallbackMessage, data.writable === false ? "預設排行榜" : "即時排行榜");
   } catch {
     renderLeaderboards(leaderboardDefaults, "暫時未能連線排行榜，先顯示預設排名。", "暫時顯示預設排行榜");
+  }
+  try {
+    const response = await fetch(`/api/arena?playerId=${encodeURIComponent(pilotProfile?.playerId || "")}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.rankings) renderMasterLeaderboards(data.rankings, "即時 Master League 排行榜");
+  } catch {
+    renderMasterLeaderboards(masterLeagueRankings, "本機 Master League 排行榜");
   }
 }
 
@@ -1770,6 +2325,7 @@ function activateSkill(unit) {
   }
   const baseSkillCooldown = unit.name === "MEGA(EK專用機)" ? 0 : (unit.name === "Accipio" ? 12 : 10);
   unit.skillCooldown = baseSkillCooldown <= 0 ? 0 : Math.max(3.5, baseSkillCooldown * (unit.skillCooldownMultiplier || 1) - (unit.skillCooldownFlat || 0));
+  ensureBattleStats(unit).skillUses += 1;
   unit.buttonPulse = 0.35;
   unit.attackPulse = 0.26;
   if (unit.name === "Asterion") {
@@ -1866,7 +2422,8 @@ function activateSkill(unit) {
       .sort((a, b) => (unit.target === a.id ? -1 : unit.target === b.id ? 1 : dist(unit, a) - dist(unit, b)))[0];
     if (target) {
       const radius = unit.rushRadius || 210;
-      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, ALLIED_MAX_X);
+      const behindLimit = battleMode === "arena" ? ALLIED_MAX_X : (autoBattleEnabled ? AUTO_CHASE_MAX_X : ALLIED_MAX_X);
+      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, behindLimit);
       const offsetY = target.y > H * 0.5 ? -28 : 28;
       const from = { x: unit.x, y: unit.y };
       unit.x = behindX;
@@ -1874,7 +2431,7 @@ function activateSkill(unit) {
       unit.target = target.id;
       enemies
         .filter((e) => e.hp > 0 && dist(unit, e) < radius)
-        .forEach((e) => hit(e, unit.rushDamage || 72, "#ff9b38", unit.id));
+        .forEach((e) => hit(e, unit.rushDamage || 96, "#ff9b38", unit.id));
       burst(unit.x, unit.y, "#ff9b38", 56);
       addSkillEffect("quantum-backstab", unit, { x: unit.x, y: unit.y, fromX: from.x, fromY: from.y, radius, color: "#ff9b38", life: 0.9, follow: false });
       setMessage("量子背刺");
@@ -1968,6 +2525,7 @@ function useUltimate(unit) {
     return;
   }
   unit.ultCharge = 0;
+  ensureBattleStats(unit).ultUses += 1;
   unit.buttonPulse = 0.45;
   unit.attackPulse = 0.32;
 
@@ -2224,6 +2782,7 @@ function hit(target, amount, color, sourceId = null) {
   }
   target.hp = Math.max(0, target.hp - finalAmount);
   const dealt = hpBefore - target.hp;
+  recordBattleDamage(source, target, dealt);
   if (dealt > 0 && source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
     applyEumistMistMark(source, target);
   }
@@ -2232,6 +2791,7 @@ function hit(target, amount, color, sourceId = null) {
   }
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
+    recordBattleKill(source, target);
     if (source?.name !== "Accipio") chargeUltimate(sourceId, target.boss ? 55 : 28);
     score += target.points || 50;
     if (target.boss) score += wave * 100;
@@ -2402,6 +2962,7 @@ function healAlly(source, ally, amount, color = "#66f2e4") {
   ally.hp = clamp(ally.hp + finalAmount, 0, ally.maxHp);
   const healed = ally.hp - hpBefore;
   if (healed > 0) {
+    recordBattleHealing(source, healed);
     ally.regenGlow = Math.max(ally.regenGlow || 0, 0.45);
     if (source.name !== "Accipio") chargeUltimateByHealing(source, healed);
     addSkillEffect(source.name === "Accipio" ? "accipio-heal" : "mist-heal", ally, { radius: bodyRadius(ally) + (source.name === "Accipio" ? 14 : 34), color, life: source.name === "Accipio" ? 0.36 : 0.55, follow: true });
@@ -2579,6 +3140,10 @@ function updateHimawariPoison(dt) {
   skillEffects
     .filter((effect) => effect.type === "himawari-poison")
     .forEach((effect) => {
+      if (effect.source && !squad.some((unit) => unit.id === effect.source && unit.hp > 0)) {
+        effect.life = 0;
+        return;
+      }
       const target = enemies.find((enemy) => enemy.id === effect.targetId && enemy.hp > 0);
       if (!target) {
         effect.life = 0;
@@ -2597,7 +3162,7 @@ function updateHimawariPoison(dt) {
 }
 
 function attackMultiplier(unit) {
-  return unit?.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
+  return unit?.name === "Nova" && unit.quantumTime > 0 ? 3.6 : 1;
 }
 
 function performNovaQuantumSlash(unit) {
@@ -2666,6 +3231,10 @@ function updateMirageDomains(dt) {
   skillEffects
     .filter((effect) => effect.type === "mirage-domain")
     .forEach((effect) => {
+      if (effect.source && !squad.some((unit) => unit.id === effect.source && unit.hp > 0)) {
+        effect.life = 0;
+        return;
+      }
       effect.tick = (effect.tick || 0) + dt;
       enemies
         .filter((enemy) => enemy.hp > 0 && dist(enemy, effect) < effect.radius)
@@ -2700,8 +3269,16 @@ function applyGnField(unit, dt) {
     });
 }
 
+function battleActorAlive(sourceId) {
+  return !sourceId || [...squad, ...enemies].some((actor) => actor.id === sourceId && actor.hp > 0);
+}
+
 function updateGravityFields(dt) {
   gravityFields.forEach((field) => {
+    if (!battleActorAlive(field.source)) {
+      field.life = 0;
+      return;
+    }
     field.life -= dt;
     enemies
       .filter((enemy) => enemy.hp > 0 && dist(enemy, field) < field.radius)
@@ -2760,11 +3337,189 @@ function acquireTarget(unit, allowOutOfRange = false) {
     .sort((a, b) => weaponDistance(unit, a) - weaponDistance(unit, b))[0] || null;
 }
 
-function chooseAutoTarget(unit) {
+function livingAutoTargets() {
+  return enemies.filter((enemy) => enemy.hp > 0 && (enemy.boss || enemy.x <= W + bodyRadius(enemy)));
+}
+
+function arenaUnitRole(unit) {
+  const roleText = `${unit?.role || ""} ${unit?.name || ""}`;
+  if ((unit?.damage || 0) < 0 || /修復|治癒|補|Accipio|Eumist|repair|heal|recovery/i.test(roleText)) return "healer";
+  if ((unit?.maxHp || 0) >= 165 || /坦|前衛|重盾|重裝|防線|tank|shield|front/i.test(roleText)) return "tank";
+  return "attacker";
+}
+
+function arenaUnitsByRole(units, role) {
+  return units.filter((unit) => unit.hp > 0 && arenaUnitRole(unit) === role);
+}
+
+function arenaFocusTarget(unit, living, role) {
+  const candidates = arenaUnitsByRole(living, role);
+  const pool = candidates.length ? candidates : living;
+  return [...pool].sort((a, b) => {
+    if (role === "tank") return b.maxHp - a.maxHp || weaponDistance(unit, a) - weaponDistance(unit, b);
+    if (role === "healer") return (a.hp / a.maxHp) - (b.hp / b.maxHp) || weaponDistance(unit, a) - weaponDistance(unit, b);
+    return Math.max(1, b.damage || 0) - Math.max(1, a.damage || 0) || (a.hp / a.maxHp) - (b.hp / b.maxHp) || weaponDistance(unit, a) - weaponDistance(unit, b);
+  })[0] || null;
+}
+
+function arenaProtectedAllies(unit, role = "healer") {
+  const roleAllies = arenaUnitsByRole(squad, role).filter((ally) => ally.id !== unit.id);
+  const pool = roleAllies.length ? roleAllies : squad.filter((ally) => ally.hp > 0 && ally.id !== unit.id);
+  return squad
+    .filter((ally) => pool.includes(ally))
+    .sort((a, b) => {
+      const hurtA = a.hp / a.maxHp;
+      const hurtB = b.hp / b.maxHp;
+      const pressureA = enemyPressureOn(a) ? -0.4 : 0;
+      const pressureB = enemyPressureOn(b) ? -0.4 : 0;
+      return hurtA + pressureA - (hurtB + pressureB);
+    });
+}
+
+function arenaPressureScore(unit, enemy, protectedAllies) {
+  const crossedLine = unit.faction === "Enemy" ? enemy.x > W * 0.42 : enemy.x < W * 0.58;
+  const anchor = protectedAllies[0] || unit;
+  const anchorDistance = dist(enemy, anchor);
+  const alliedPressure = protectedAllies.some((ally) => dist(enemy, ally) < enemy.range + bodyRadius(ally) + 86);
+  return (crossedLine ? -520 : 0) + (alliedPressure ? -360 : 0) + anchorDistance + weaponDistance(unit, enemy) * 0.28;
+}
+
+function chooseArenaAiTarget(unit) {
   if (unit.damage < 0) return acquireTarget(unit, true);
-  return enemies
-    .filter((enemy) => enemy.hp > 0 && (enemy.boss || enemy.x <= W + bodyRadius(enemy)))
+  const living = livingAutoTargets();
+  if (!living.length) return null;
+  const ai = normalizeArenaAiId(unit.arenaAi);
+  if (ai === "focus-tank") return arenaFocusTarget(unit, living, "tank");
+  if (ai === "focus-attacker") return arenaFocusTarget(unit, living, "attacker");
+  if (ai === "focus-healer") return arenaFocusTarget(unit, living, "healer");
+  if (ai.startsWith("guard-")) {
+    const protectedAllies = arenaProtectedAllies(unit, ai.replace("guard-", ""));
+    return [...living].sort((a, b) => arenaPressureScore(unit, a, protectedAllies) - arenaPressureScore(unit, b, protectedAllies))[0];
+  }
+  if (ai === "frontline") {
+    return [...living].sort((a, b) => weaponDistance(unit, a) - weaponDistance(unit, b) || b.hp - a.hp)[0];
+  }
+  if (ai === "skirmish") {
+    return [...living].sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp) || weaponDistance(unit, b) - weaponDistance(unit, a))[0];
+  }
+  const leader = squad.find((ally) => ally.hp > 0 && ally.id !== unit.id && ally.target);
+  const shared = leader ? living.find((enemy) => enemy.id === leader.target) : null;
+  return shared || [...living].sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp) || weaponDistance(unit, a) - weaponDistance(unit, b))[0];
+}
+
+function chooseAutoTarget(unit) {
+  if (battleMode === "arena" && unit.arenaAi) return chooseArenaAiTarget(unit);
+  if (unit.damage < 0) return acquireTarget(unit, true);
+  return livingAutoTargets()
     .sort((a, b) => (b.boss ? 1 : 0) - (a.boss ? 1 : 0) || weaponDistance(unit, a) - weaponDistance(unit, b) || a.hp - b.hp)[0] || null;
+}
+
+function arenaAiAnchor(unit, target) {
+  if (battleMode !== "arena" || !target || unit.damage <= 0) return null;
+  const ai = normalizeArenaAiId(unit.arenaAi);
+  const enemySide = unit.faction === "Enemy";
+  const safeX = enemySide ? W - 105 : 105;
+  const forwardX = enemySide ? W * 0.62 : W * 0.38;
+  if (ai === "skirmish" && (unit.hp / unit.maxHp < 0.72 || weaponDistance(unit, target) < unit.range * 0.58)) {
+    return {
+      x: clamp(safeX, ALLIED_MIN_X, ALLIED_MAX_X),
+      y: clamp(unit.y + (unit.y >= target.y ? 62 : -62), ALLIED_MIN_Y, ALLIED_MAX_Y)
+    };
+  }
+  if (ai.startsWith("guard-")) {
+    const anchor = arenaProtectedAllies(unit, ai.replace("guard-", ""))[0];
+    if (anchor && dist(unit, anchor) > Math.max(82, unit.range * 0.42)) {
+      const threatDistance = dist(target, anchor);
+      const threatReach = (target.range || 0) + bodyRadius(anchor) + 140;
+      const crossedLine = unit.faction === "Enemy" ? target.x > W * 0.42 : target.x < W * 0.58;
+      const targetInRange = weaponDistance(unit, target) <= unit.range * 0.96;
+      const activeThreat = threatDistance <= threatReach || crossedLine || enemyPressureOn(anchor);
+      if (!activeThreat || targetInRange) return null;
+      return {
+        x: clamp(anchor.x + (enemySide ? -52 : 52), ALLIED_MIN_X, ALLIED_MAX_X),
+        y: clamp(anchor.y + (unit.y >= anchor.y ? 38 : -38), ALLIED_MIN_Y, ALLIED_MAX_Y)
+      };
+    }
+  }
+  if (ai === "frontline" && weaponDistance(unit, target) > Math.max(18, Math.min(unit.range * 0.46, 82))) {
+    const approach = bodyRadius(target) + bodyRadius(unit) + (unit.name === "MEGA(EK專用機)" ? 16 : Math.max(28, unit.range * 0.32));
+    return {
+      x: clamp(enemySide ? Math.min(target.x + approach, forwardX) : Math.max(target.x - approach, forwardX), ALLIED_MIN_X, ALLIED_MAX_X),
+      y: clamp(target.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+    };
+  }
+  return null;
+}
+
+function supportSkillRadius(unit) {
+  if (!unit || unit.hp <= 0) return 0;
+  if (unit.name === "Asterion") return 230;
+  if (unit.name === "Seraphim") return Math.max(300, unit.range + 80);
+  if (unit.name === "Helix") return unit.regenRadius || 260;
+  if (unit.name === "Valkyr") return unit.gnFieldRadius || 170;
+  return 0;
+}
+
+function enemyPressureOn(unit) {
+  return enemies
+    .filter((enemy) => enemy.hp > 0)
+    .sort((a, b) => dist(unit, a) - dist(unit, b))
+    .find((enemy) => dist(unit, enemy) <= enemy.range + bodyRadius(unit) * 0.35) || null;
+}
+
+function autoSupportAnchor(unit) {
+  const radius = supportSkillRadius(unit);
+  if (!radius || unit.skillCooldown > 0) return null;
+  const needsHelp = squad.filter((ally) => ally.hp > 0 && (
+    ally.hp / ally.maxHp < 0.82 ||
+    enemyPressureOn(ally) ||
+    ally.id === unit.id
+  ));
+  if (needsHelp.length < 2) return null;
+  const center = needsHelp.reduce((point, ally) => {
+    point.x += ally.x;
+    point.y += ally.y;
+    return point;
+  }, { x: 0, y: 0 });
+  center.x /= needsHelp.length;
+  center.y /= needsHelp.length;
+  const anchor = {
+    x: clamp(center.x, ALLIED_MIN_X, battleMode === "arena" ? ALLIED_MAX_X : AUTO_CHASE_MAX_X),
+    y: clamp(center.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+  };
+  const covered = needsHelp.filter((ally) => dist(anchor, ally) <= radius * 0.92).length;
+  if (covered < Math.min(2, needsHelp.length)) return null;
+  return dist(unit, anchor) > Math.max(20, radius * 0.18) ? anchor : null;
+}
+
+function autoAllySkillAnchor(unit) {
+  if (unit.hp / unit.maxHp > 0.62 && !enemyPressureOn(unit)) return null;
+  const providers = squad
+    .filter((ally) => ally.hp > 0 && ally.id !== unit.id && supportSkillRadius(ally) > 0 && (ally.skillCooldown <= 1.2 || ally.regenAuraTime > 0 || ally.guardianRegenTime > 0 || ally.gnFieldTime > 0))
+    .sort((a, b) => {
+      const aReady = a.skillCooldown <= 0 ? -80 : 0;
+      const bReady = b.skillCooldown <= 0 ? -80 : 0;
+      return dist(unit, a) + aReady - (dist(unit, b) + bReady);
+    });
+  const provider = providers[0];
+  if (!provider) return null;
+  const radius = supportSkillRadius(provider) * 0.78;
+  if (dist(unit, provider) <= radius) return null;
+  return {
+    x: clamp(provider.x - 28, ALLIED_MIN_X, battleMode === "arena" ? ALLIED_MAX_X : AUTO_CHASE_MAX_X),
+    y: clamp(provider.y + (unit.y >= provider.y ? 34 : -34), ALLIED_MIN_Y, ALLIED_MAX_Y)
+  };
+}
+
+function autoLureAnchor(unit, target) {
+  if (!target || unit.damage <= 0) return null;
+  if (battleMode === "arena") return null;
+  const targetOutsideBoundary = target.x > AUTO_CHASE_MAX_X - bodyRadius(target) * 0.25;
+  if (!targetOutsideBoundary) return null;
+  const desiredX = clamp(target.x - target.range - bodyRadius(unit) - 36, ALLIED_MIN_X, AUTO_CHASE_MAX_X - 18);
+  const desiredY = clamp(target.y + (unit.y > target.y ? 42 : -42), ALLIED_MIN_Y, ALLIED_MAX_Y);
+  if (Math.abs(unit.x - desiredX) < 10 && Math.abs(unit.y - desiredY) < 10) return null;
+  return { x: desiredX, y: desiredY };
 }
 
 function shouldAutoUseActive(unit) {
@@ -2787,11 +3542,54 @@ function shouldAutoUseUltimate(unit) {
 }
 
 function updateAutoBattle() {
-  if (!autoBattleEnabled || rewardEl.hidden === false || resultEl.hidden === false) return;
+  if (!autoBattleEnabled || rewardEl.hidden === false || resultEl.hidden === false || arenaResultEl.hidden === false) return;
   squad.forEach((unit) => {
     if (unit.hp <= 0) return;
     const target = chooseAutoTarget(unit);
+    const ai = battleMode === "arena" ? normalizeArenaAiId(unit.arenaAi) : "";
+    if (target && ai === "frontline") {
+      const arenaAnchor = arenaAiAnchor(unit, target);
+      unit.target = target.id;
+      unit.move = arenaAnchor || null;
+      unit.assistId = null;
+      unit.command = arenaAnchor ? "move" : (unit.damage < 0 ? "support" : "attack");
+      if (shouldAutoUseActive(unit)) activateSkill(unit);
+      if (shouldAutoUseUltimate(unit)) useUltimate(unit);
+      return;
+    }
+    const allySkillAnchor = autoAllySkillAnchor(unit);
+    if (allySkillAnchor) {
+      unit.target = null;
+      unit.move = allySkillAnchor;
+      unit.assistId = null;
+      unit.command = "move";
+      return;
+    }
+    const ownSupportAnchor = autoSupportAnchor(unit);
+    if (ownSupportAnchor) {
+      unit.target = null;
+      unit.move = ownSupportAnchor;
+      unit.assistId = null;
+      unit.command = "move";
+      return;
+    }
     if (target) {
+      const arenaAnchor = arenaAiAnchor(unit, target);
+      if (arenaAnchor) {
+        unit.target = target.id;
+        unit.move = arenaAnchor;
+        unit.assistId = null;
+        unit.command = "move";
+        return;
+      }
+      const lureAnchor = autoLureAnchor(unit, target);
+      if (lureAnchor) {
+        unit.target = null;
+        unit.move = lureAnchor;
+        unit.assistId = null;
+        unit.command = "move";
+        return;
+      }
       unit.target = target.id;
       unit.move = null;
       unit.assistId = null;
@@ -2918,7 +3716,7 @@ function stepUnit(unit, dt) {
     unit.lostTime = Math.max(0, (unit.lostTime || 0) - dt);
     unit.lostCooldown = Math.max(0, (unit.lostCooldown || 0) - dt);
     unit.lostRetarget = Math.max(0, (unit.lostRetarget || 0) - dt);
-    if (unit.lostTime <= 0 && unit.lostCooldown <= 0) {
+    if (unit.lostTime <= 0 && unit.lostCooldown <= 0 && !(battleMode === "arena" && normalizeArenaAiId(unit.arenaAi) === "frontline")) {
       unit.lostTime = 3;
       unit.lostCooldown = 10 + Math.random() * 12;
       unit.lostRetarget = 0;
@@ -2984,15 +3782,18 @@ function stepUnit(unit, dt) {
         unit.aim = { x: target.x, y: target.y };
         const hpBefore = target.hp;
         target.hp = clamp(target.hp + (-unit.damage * healingOutputFactor(unit)), 0, target.maxHp);
-        chargeUltimateByHealing(unit, target.hp - hpBefore);
+        const healed = target.hp - hpBefore;
+        recordBattleHealing(unit, healed);
+        chargeUltimateByHealing(unit, healed);
         shots.push({ x: unit.x, y: unit.y, tx: target.x, ty: target.y, color: unit.color, life: 0.42, maxLife: 0.42, heal: true, source: unit.id });
       }
       return;
     }
 
     const d = weaponDistance(unit, target);
-    const limitAutoChase = unit.damage > 0 && !(autoBattleEnabled && unit.command === "attack");
-    if (d > unit.range) moveToward(unit, target, moveSpeed * dt, limitAutoChase);
+    const limitAutoChase = battleMode !== "arena" && unit.damage > 0;
+    const waitingAtAutoBoundary = autoBattleEnabled && limitAutoChase && unit.x >= AUTO_CHASE_MAX_X - 6 && target.x > unit.x;
+    if (d > unit.range && !waitingAtAutoBoundary) moveToward(unit, target, moveSpeed * dt, limitAutoChase);
     if (d <= unit.range && unit.cooldown <= 0) {
       unit.cooldown = unit.rate;
       unit.attackPulse = 0.22;
@@ -3057,7 +3858,7 @@ function moveToward(actor, target, amount, limitAutoChase = false) {
   const d = Math.hypot(dx, dy) || 1;
   actor.x += (dx / d) * Math.min(amount, d);
   actor.y += (dy / d) * Math.min(amount, d);
-  if (actor.faction === "Allied") clampToBattlefield(actor, limitAutoChase);
+  if (actor.faction === "Allied" || actor.arenaDefender) clampToBattlefield(actor, limitAutoChase);
 }
 
 function moveAwayFrom(actor, target, amount) {
@@ -3078,7 +3879,7 @@ function pushDisplacementFactor(actor) {
 }
 
 function clampToBattlefield(actor, limitAutoChase = false) {
-  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? W * 0.75 : ALLIED_MAX_X);
+  actor.x = clamp(actor.x, ALLIED_MIN_X, limitAutoChase ? AUTO_CHASE_MAX_X : ALLIED_MAX_X);
   actor.y = clamp(actor.y, ALLIED_MIN_Y, ALLIED_MAX_Y);
 }
 
@@ -3220,9 +4021,13 @@ function unitCombatRole(unit) {
 
 function update(dt) {
   if (!running || paused) return;
+  if (battleMode === "arena") {
+    arenaTimeLeft = Math.max(0, arenaTimeLeft - dt);
+    autoBattleEnabled = true;
+  }
   updateAutoBattle();
   squad.forEach((u) => stepUnit(u, dt));
-  enemies.forEach((e) => stepEnemy(e, dt));
+  enemies.forEach((e) => battleMode === "arena" ? updateArenaDefender(e, dt) : stepEnemy(e, dt));
   updateAccipioMarks(dt);
   updateAccipioHot(dt);
   updateGravityFields(dt);
@@ -3232,8 +4037,16 @@ function update(dt) {
 
   shots.forEach((shot) => {
     shot.life -= dt;
+    if (shot.life <= 0 && shot.arenaDamage && !shot.resolved) {
+      shot.resolved = true;
+      if (!battleActorAlive(shot.source)) return;
+      const source = enemies.find((e) => e.id === shot.source);
+      const target = squad.find((u) => u.id === shot.arenaTarget);
+      damageArenaAttacker(target, shot.arenaDamage, shot.color, source);
+    }
     if (shot.life <= 0 && shot.damage && !shot.resolved) {
       shot.resolved = true;
+      if (!battleActorAlive(shot.source)) return;
       const target = enemies.find((e) => e.id === shot.target);
       if (target) {
         hit(target, shot.damage, shot.color, shot.source);
@@ -3260,11 +4073,16 @@ function update(dt) {
   skillEffects = skillEffects.filter((effect) => effect.life > 0);
   enemies = enemies.filter((e) => e.hp > 0);
 
-  if (!enemies.length && now() > nextWaveAt) {
+  if (battleMode === "arena") {
+    if (!enemies.length) endArena(true);
+    else if (!squad.some((u) => u.hp > 0) || arenaTimeLeft <= 0) endArena(false);
+  }
+
+  if (battleMode !== "arena" && !enemies.length && now() > nextWaveAt) {
     completeRound();
   }
 
-  if (!squad.some((u) => u.hp > 0)) endMission(false);
+  if (battleMode !== "arena" && !squad.some((u) => u.hp > 0)) endMission(false);
   if (messageTime && now() > messageTime) {
     commandEl.textContent = t("idle");
     messageTime = 0;
@@ -3456,11 +4274,26 @@ function endMission(won) {
   resultEl.classList.toggle("won", won);
   renderResultCopy(won);
   resultEl.hidden = false;
-  loadLeaderboard();
+  leaderboardEl.hidden = battleMode === "arena";
+  if (battleMode !== "arena") loadLeaderboard();
 }
 
 function renderResultCopy(won) {
   resultTitleEl.textContent = won ? t("missionClear") : t("missionEnd");
+  if (battleMode === "arena") {
+    const survivors = squad.filter((unit) => unit.hp > 0).length;
+    resultCopyEl.innerHTML = `
+      <div class="result-score">
+        <span>Arena Score</span>
+        <strong>${score}</strong>
+      </div>
+      <div class="result-lines">
+        <span>${won ? `擊破 ${arenaOpponent?.name || "opponent"} 的防守隊` : "防守隊守住了戰線"}</span>
+        <span>剩餘時間 ${Math.ceil(arenaTimeLeft)} 秒 / 存活 ${survivors} 機</span>
+      </div>
+    `;
+    return;
+  }
   resultCopyEl.innerHTML = `
     <div class="result-score">
       <span>${t("finalScore")}</span>
@@ -3497,7 +4330,7 @@ function renderHudCardsShell() {
 }
 
 function updateHud() {
-  waveEl.textContent = wave % 3 === 0 ? `${wave} BOSS` : String(wave);
+  waveEl.textContent = battleMode === "arena" ? `Arena ${Math.ceil(arenaTimeLeft)}s` : (wave % 3 === 0 ? `${wave} BOSS` : String(wave));
   scoreEl.textContent = String(score);
   bestScoreEl.textContent = String(bestScore);
   enemyCountEl.textContent = String(enemies.length);
@@ -3674,6 +4507,1607 @@ function toggleFormationUnit(name) {
   renderFormation();
 }
 
+function arenaCoreById(id) {
+  return localizeArenaCoreOption(arenaCoreOptions.find((core) => core.id === id) || arenaCoreOptions[0]);
+}
+
+function arenaModuleById(id) {
+  return localizeArenaModuleOption(arenaModuleOptions.find((module) => module.id === id) || null);
+}
+
+function normalizeArenaAiId(id) {
+  return arenaAiAliases[id] || id || "focus-attacker";
+}
+
+function arenaAiById(id) {
+  const normalized = normalizeArenaAiId(id);
+  return localizeArenaAiOption(masterLeagueAiOptions.find((ai) => ai.id === normalized) || masterLeagueAiOptions[0]);
+}
+
+function normalizeArenaBuild() {
+  if (arenaDefenseNames.length !== 4) arenaDefenseNames = [...selectedSquadNames].slice(0, 4);
+  if (arenaDefenseNames.length !== 4) arenaDefenseNames = [...defaultSquadNames];
+  arenaDefenseNames.forEach((name, index) => {
+    if (!arenaPositions[name] && arenaPositions[name] !== 0) arenaPositions[name] = arenaDefaultPositions[name] ?? index;
+    arenaAi[name] = arenaAi[name] ? normalizeArenaAiId(arenaAi[name]) : (index === 0 ? "frontline" : index === 2 ? "guard-healer" : "focus-attacker");
+  });
+  if (!arenaCoreById(arenaSelectedCore)) arenaSelectedCore = arenaCoreOptions[0].id;
+  arenaSelectedUnitName = arenaDefenseNames.includes(arenaSelectedUnitName) ? arenaSelectedUnitName : arenaDefenseNames[0];
+}
+
+function arenaBuildCost() {
+  return ARENA_CORE_COST + arenaDefenseNames.reduce((total, name) => total + (arenaModuleById(arenaModules[name])?.cost || 0), 0);
+}
+
+function arenaBuildPayload() {
+  normalizeArenaBuild();
+  return {
+    squad: [...arenaDefenseNames],
+    positions: { ...arenaPositions },
+    modules: { ...arenaModules },
+    ai: { ...arenaAi },
+    core: arenaSelectedCore,
+    cost: arenaBuildCost()
+  };
+}
+
+function masterBandForScore(score) {
+  return [...masterLeagueBands].reverse().find((band) => score >= band.min) || masterLeagueBands[0];
+}
+
+function nextMasterBand(score) {
+  return masterLeagueBands.find((band) => band.min > score) || null;
+}
+
+function masterBandById(id) {
+  return masterLeagueBands.find((band) => band.id === id) || masterLeagueBands[0];
+}
+
+function nextMasterBandForRun() {
+  const currentIndex = Math.max(0, masterLeagueBands.findIndex((band) => band.id === (masterLeagueRun?.bandId || "bronze")));
+  return masterLeagueBands[currentIndex + 1] || null;
+}
+
+function cloneDefense(defense) {
+  return JSON.parse(JSON.stringify(defense || {}));
+}
+
+function startMasterLeagueRun() {
+  if (arenaBuildCost() > ARENA_TOTAL_COST) {
+    renderPilotPanel("Cost 超出上限，不能參賽。");
+    return;
+  }
+  masterLeagueRun = {
+    active: true,
+    score: 0,
+    streak: 0,
+    round: 1,
+    bandId: "bronze",
+    lockedBuild: cloneDefense(arenaBuildPayload()),
+    pendingChampionBand: null,
+    lastScoreDetail: null
+  };
+  arenaSelectedOpponent = null;
+  generateMasterOpponentChoices();
+  renderArena();
+}
+
+function queueMasterOpponentSearch() {
+  if (masterLeagueSearchTimer) window.clearTimeout(masterLeagueSearchTimer);
+  if (masterLeagueRun?.pendingChampionBand) {
+    masterLeagueSearching = false;
+    const band = masterBandById(masterLeagueRun.pendingChampionBand);
+    arenaSelectedOpponent = makeChampionOpponent(band);
+    masterLeagueRun.choices = [arenaSelectedOpponent];
+    renderArena();
+    return;
+  }
+  masterLeagueSearching = true;
+  if (masterLeagueRun) masterLeagueRun.choices = [];
+  arenaSelectedOpponent = null;
+  renderArena();
+  masterLeagueSearchTimer = window.setTimeout(() => {
+    if (!masterLeagueRun?.active) return;
+    generateMasterOpponentChoices();
+    masterLeagueSearching = false;
+    renderArena();
+  }, 2000);
+}
+
+function confirmMasterLeagueEntry() {
+  if (arenaBuildCost() > ARENA_TOTAL_COST) {
+    renderPilotPanel("Cost 超出上限，請先調整核心或模組。");
+    return;
+  }
+  masterLeagueRun = {
+    active: true,
+    score: 0,
+    streak: 0,
+    round: 1,
+    bandId: "bronze",
+    lockedBuild: cloneDefense(arenaBuildPayload()),
+    pendingChampionBand: null,
+    lastScoreDetail: null,
+    choices: []
+  };
+  queueMasterOpponentSearch();
+}
+
+function requestMasterLeagueTeamName() {
+  const currentName = sanitizePlayerName(pilotProfile?.name || localStorage.getItem("mecha-heart-player-name") || "Pilot");
+  if (!arenaNameModalEl || !arenaNameInputEl) {
+    localStorage.setItem("mecha-heart-player-name", currentName);
+    savePilotProfileLocal({ ...pilotProfile, name: currentName });
+    return Promise.resolve(true);
+  }
+  const title = arenaNameModalEl.querySelector("#arena-name-title");
+  const copy = arenaNameModalEl.querySelector(".arena-name-panel > p:not(.kicker)");
+  const label = arenaNameModalEl.querySelector("label span");
+  if (currentLanguage === "en") {
+    if (title) title.textContent = "Choose Your Challenge Squad Name";
+    if (copy) copy.textContent = "This name is recorded for the current Master League run. If you defeat a champion, it will be shown to the next challenger.";
+    if (label) label.textContent = "Squad Name";
+    if (arenaNameInputEl) arenaNameInputEl.placeholder = "Enter squad name";
+    if (arenaNameConfirmEl) arenaNameConfirmEl.textContent = "Start Formation";
+    if (arenaNameCancelEl) arenaNameCancelEl.textContent = "Back";
+  } else {
+    if (title) title.textContent = "請決定挑戰隊伍名稱";
+    if (copy) copy.textContent = "呢個名字會記錄喺今次 Master League Run，同成功挑戰盟主後顯示俾下一位玩家。";
+    if (label) label.textContent = "戰隊名";
+    if (arenaNameInputEl) arenaNameInputEl.placeholder = "輸入戰隊名";
+    if (arenaNameConfirmEl) arenaNameConfirmEl.textContent = "開始編隊";
+    if (arenaNameCancelEl) arenaNameCancelEl.textContent = "返回";
+  }
+  arenaNameInputEl.value = currentName;
+  arenaNameModalEl.hidden = false;
+  arenaNameInputEl.focus();
+  arenaNameInputEl.select();
+  return new Promise((resolve) => {
+    const close = (accepted) => {
+      arenaNameModalEl.hidden = true;
+      arenaNameCancelEl?.removeEventListener("click", cancel);
+      arenaNameModalEl.removeEventListener("submit", submit);
+      arenaNameModalEl.removeEventListener("keydown", keydown);
+      resolve(accepted);
+    };
+    const accept = () => {
+      const name = sanitizePlayerName(arenaNameInputEl.value);
+      localStorage.setItem("mecha-heart-player-name", name);
+      savePilotProfileLocal({ ...pilotProfile, name });
+      close(true);
+    };
+    const cancel = () => close(false);
+    const submit = (event) => {
+      event.preventDefault();
+      accept();
+    };
+    const keydown = (event) => {
+      if (event.key === "Escape") cancel();
+    };
+    arenaNameCancelEl?.addEventListener("click", cancel);
+    arenaNameModalEl.addEventListener("submit", submit);
+    arenaNameModalEl.addEventListener("keydown", keydown);
+  });
+}
+
+function masterSeedNumber(text) {
+  let hash = 2166136261;
+  String(text).split("").forEach((char) => {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  });
+  return hash >>> 0;
+}
+
+function seededPick(list, seed, offset = 0) {
+  const index = ((seed + offset * 2654435761) >>> 0) % list.length;
+  return list[index] || list[0];
+}
+
+function rotateArray(list, count) {
+  const offset = ((count % list.length) + list.length) % list.length;
+  return [...list.slice(offset), ...list.slice(0, offset)];
+}
+
+function generatedMasterDefense(seed, targetRating, difficulty) {
+  const available = squadSeeds.filter((unit) => !unit.ace);
+  const rotated = rotateArray(available, seed % available.length);
+  const squadNames = rotated
+    .sort((a, b) => ((masterSeedNumber(`${seed}:${a.name}`) % 1000) - (masterSeedNumber(`${seed}:${b.name}`) % 1000)))
+    .slice(0, 4)
+    .map((unit) => unit.name);
+  const core = arenaCoreOptions[(seed + Math.floor(targetRating / 500)) % arenaCoreOptions.length];
+  const positions = {};
+  const modules = {};
+  const ai = {};
+  const slotOrder = [3, 4, 5, 0, 1, 2, 6, 7, 8];
+  const moduleBudget = difficulty.id === "hard" ? 4 : difficulty.id === "normal" ? 3 : 2;
+  squadNames.forEach((name, index) => {
+    positions[name] = slotOrder[(index + seed) % slotOrder.length];
+    ai[name] = masterLeagueAiOptions[(seed + index + Math.floor(targetRating / 750)) % masterLeagueAiOptions.length].id;
+    const candidate = arenaModuleOptions[(seed + index * 3 + Math.floor(targetRating / 420)) % arenaModuleOptions.length];
+    if (index < moduleBudget && !Object.values(modules).includes(candidate.id)) modules[name] = candidate.id;
+  });
+  const cost = ARENA_CORE_COST + Object.values(modules).reduce((sum, moduleId) => sum + (arenaModuleById(moduleId)?.cost || 0), 0);
+  return { squad: squadNames, positions, modules, ai, core: core.id, cost };
+}
+
+function makeGeneratedMasterOpponent(difficulty, index, band) {
+  const runScore = masterLeagueRun?.score || 0;
+  const round = masterLeagueRun?.round || 1;
+  const seed = masterSeedNumber(`${pilotProfile?.playerId || "local"}:${runScore}:${round}:${difficulty.id}:${index}:${Date.now()}:${Math.random()}`);
+  const targetRating = Math.max(820, 900 + Math.floor(runScore / 7) + round * 42 + difficulty.ratingOffset);
+  const callsigns = ["Iron", "Quantum", "Rail", "Nova", "Mirage", "Helix", "Bastion", "Orion", "Valkyr"];
+  const forms = ["Aegis", "Rush", "Scope", "Pulse", "Anchor", "Vector", "Array", "Crown", "Lance"];
+  const suffix = ["Cell", "Team", "Nest", "Guard", "Wing", "Frame", "Node", "Line", "Wall"];
+  const name = `${seededPick(callsigns, seed, 1)} ${seededPick(forms, seed, 2)} ${seededPick(suffix, seed, 3)}`;
+  return {
+    playerId: `ghost-${band.id}-${round}-${difficulty.id}-${seed.toString(36)}`,
+    name: `${difficulty.label} / ${name}`,
+    rating: targetRating,
+    difficulty,
+    band,
+    defense: generatedMasterDefense(seed, targetRating, difficulty)
+  };
+}
+
+function generateMasterOpponentChoices() {
+  if (masterLeagueRun?.pendingChampionBand) {
+    const band = masterBandById(masterLeagueRun.pendingChampionBand);
+    arenaSelectedOpponent = makeChampionOpponent(band);
+    masterLeagueRun.choices = [arenaSelectedOpponent];
+    return;
+  }
+  const band = masterBandById(masterLeagueRun?.bandId || "bronze");
+  const choices = masterLeagueDifficulties.map((difficulty, index) => {
+    const targetRating = 900 + Math.floor((masterLeagueRun?.score || 0) / 7) + (masterLeagueRun?.round || 1) * 42 + difficulty.ratingOffset;
+    const pool = (arenaOpponents.length ? arenaOpponents : arenaPresetOpponents)
+      .filter((opponent) => Math.abs((opponent.rating || 1000) - targetRating) < 650)
+      .sort((a, b) => Math.abs((a.rating || 1000) - targetRating) - Math.abs((b.rating || 1000) - targetRating));
+    if (!pool.length || index > 0) return makeGeneratedMasterOpponent(difficulty, index, band);
+    const source = pool[(index + (masterLeagueRun?.round || 1) - 1 + Math.floor((masterLeagueRun?.score || 0) / 1000)) % pool.length] || arenaPresetOpponents[index];
+    const opponent = {
+      ...source,
+      name: `${difficulty.label} / ${source.name}`,
+      rating: Math.max(100, (source.rating || 1000) + difficulty.ratingOffset + (masterLeagueRun?.round || 1) * 18),
+      difficulty,
+      band,
+      defense: cloneDefense(source.defense)
+    };
+    return opponent;
+  });
+  masterLeagueRun.choices = choices;
+}
+
+function makeChampionOpponent(targetBand) {
+  const champion = arenaMasterChampions?.[targetBand.id];
+  const source = champion || arenaOpponents.find((opponent) => masterBandForScore(opponent.masterScore || opponent.rating || 0).id === targetBand.id) || arenaPresetOpponents[Math.min(masterLeagueBands.indexOf(targetBand), arenaPresetOpponents.length - 1)];
+  return {
+    ...source,
+    name: `${targetBand.title} / ${source.name}`,
+    championName: source.name || "Pilot",
+    championTeamName: source.teamName || source.name || "Pilot",
+    rating: Math.max(source.rating || source.masterScore || 1000, targetBand.min + 260),
+    difficulty: { ...masterLeagueDifficulties[2], id: "champion", label: "盟主戰", multiplier: 1.35, hp: 1.16, damage: 1.16 },
+    championBand: targetBand,
+    defense: cloneDefense(source.defense)
+  };
+}
+
+function promotionOpponentForRun() {
+  if (!masterLeagueRun?.pendingChampionBand) return null;
+  const targetBand = masterBandById(masterLeagueRun.pendingChampionBand);
+  if (!arenaSelectedOpponent?.championBand || arenaSelectedOpponent.championBand.id !== targetBand.id) {
+    arenaSelectedOpponent = makeChampionOpponent(targetBand);
+  }
+  masterLeagueRun.choices = [arenaSelectedOpponent];
+  return arenaSelectedOpponent;
+}
+
+function promotionTeamText(opponent) {
+  return opponent?.defense?.squad?.join(" / ") || "Unknown squad";
+}
+
+function promotionChampionLabel(opponent) {
+  return opponent?.championTeamName || opponent?.championName || opponent?.name?.replace(`${opponent?.championBand?.title || ""} / `, "") || "Pilot";
+}
+
+function fallbackChampionForBand(band) {
+  const preset = arenaPresetOpponents[Math.min(Math.max(0, masterLeagueBands.indexOf(band)), arenaPresetOpponents.length - 1)] || arenaPresetOpponents[0];
+  return {
+    name: preset.name,
+    teamName: preset.name,
+    defense: preset.defense,
+    masterScore: band.min,
+    updatedAt: ""
+  };
+}
+
+function renderChampionBoard() {
+  const visibleBands = masterLeagueBands.filter((band) => band.id !== "bronze");
+  return `
+    <div class="champion-board">
+      ${visibleBands.map((band) => {
+        const champion = arenaMasterChampions?.[band.id] || fallbackChampionForBand(band);
+        const squadText = champion.defense?.squad?.join(" / ") || "-";
+        return `
+          <article class="champion-row">
+            <span>${masterBandName(band)}</span>
+            <strong>${champion.teamName || champion.name || "Pilot"}</strong>
+            ${renderChampionIconStrip(champion.defense)}
+            <small>${squadText}</small>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderMechaIconStrip(defense, className) {
+  return `
+    <div class="${className}">
+      ${(defense?.squad || []).slice(0, 4).map((name) => {
+        const unit = squadSeeds.find((seed) => seed.name === name);
+        return unit ? `<span><img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name}" /><em>${unit.name}</em></span>` : "";
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderOpponentIconStrip(defense) {
+  return renderMechaIconStrip(defense, "opponent-icon-strip");
+}
+
+function renderChampionIconStrip(defense) {
+  return renderMechaIconStrip(defense, "champion-icon-strip");
+}
+
+function rememberLocalChampion(targetBand, runScore) {
+  if (!targetBand || !pilotProfile || !masterLeagueRun?.lockedBuild) return;
+  const record = {
+    playerId: pilotProfile.playerId,
+    name: pilotProfile.name || "Pilot",
+    teamName: pilotProfile.name || "Pilot",
+    rating: pilotProfile.pvpStats?.rating || 1000,
+    masterScore: runScore,
+    defense: cloneDefense(currentLeagueTacticalBuild()),
+    bandId: targetBand.id,
+    updatedAt: new Date().toISOString()
+  };
+  arenaMasterChampions = {
+    ...arenaMasterChampions,
+    [targetBand.id]: record,
+    overall: !arenaMasterChampions.overall || runScore > (arenaMasterChampions.overall.masterScore || 0)
+      ? record
+      : arenaMasterChampions.overall
+  };
+  saveLocalMasterChampions(arenaMasterChampions);
+}
+
+function selectMasterOpponent(opponent) {
+  arenaSelectedOpponent = opponent;
+  renderArena();
+}
+
+function activeLeagueBuild() {
+  return masterLeagueRun?.lockedBuild || arenaBuildPayload();
+}
+
+function syncEditableFromLockedBuild() {
+  if (!masterLeagueRun?.lockedBuild) return;
+  const locked = masterLeagueRun.lockedBuild;
+  arenaDefenseNames = [...locked.squad];
+  arenaModules = { ...(locked.modules || {}) };
+  arenaSelectedCore = locked.core || arenaSelectedCore;
+  Object.keys(arenaAi).forEach((name) => { if (!arenaDefenseNames.includes(name)) delete arenaAi[name]; });
+  Object.keys(arenaPositions).forEach((name) => { if (!arenaDefenseNames.includes(name)) delete arenaPositions[name]; });
+  arenaDefenseNames.forEach((name) => {
+    arenaAi[name] = normalizeArenaAiId(arenaAi[name] || locked.ai?.[name] || "focus-attacker");
+    arenaPositions[name] = arenaPositions[name] ?? locked.positions?.[name] ?? arenaDefaultPositions[name] ?? 0;
+  });
+  arenaSelectedUnitName = arenaDefenseNames.includes(arenaSelectedUnitName) ? arenaSelectedUnitName : arenaDefenseNames[0];
+}
+
+function currentLeagueTacticalBuild() {
+  const locked = activeLeagueBuild();
+  return {
+    ...cloneDefense(locked),
+    ai: { ...arenaAi },
+    positions: { ...arenaPositions },
+    cost: locked.cost
+  };
+}
+
+function calculateMasterBattleScore(won) {
+  const difficulty = arenaOpponent?.difficulty || masterLeagueDifficulties[1];
+  const survivors = squad.filter((unit) => unit.hp > 0);
+  const remainingHp = squad.reduce((sum, unit) => sum + Math.max(0, unit.hp), 0);
+  const hpRatio = clamp(remainingHp / Math.max(1, arenaBattleStartHp), 0, 1);
+  const base = Math.round(difficulty.base * difficulty.multiplier);
+  const hpBonus = Math.round(hpRatio * masterLeagueScoring.hpBonusMax);
+  const timeBonus = Math.round((arenaTimeLeft / ARENA_TIME_LIMIT) * masterLeagueScoring.timeBonusMax);
+  const cost = activeLeagueBuild().cost || ARENA_TOTAL_COST;
+  const costBonus = Math.round(clamp((masterLeagueScoring.costPar - cost) / 2.4, 0, masterLeagueScoring.costBonusMax));
+  const streakBonus = (masterLeagueRun?.streak || 0) * masterLeagueScoring.streakStep;
+  const deathPenalty = (4 - survivors.length) * masterLeagueScoring.deathPenalty;
+  const championBonus = arenaOpponent?.championBand ? masterLeagueScoring.championBonus : 0;
+  const total = won ? Math.max(0, base + hpBonus + timeBonus + costBonus + streakBonus + championBonus - deathPenalty) : 0;
+  return { total, base, hpBonus, timeBonus, costBonus, streakBonus, deathPenalty, championBonus, difficulty: difficulty.label, survivors: survivors.length };
+}
+
+function applyProfileDefense() {
+  const defense = pilotProfile?.pvpDefense;
+  if (!defense?.squad?.length) return;
+  arenaDefenseNames = defense.squad.filter((name) => squadSeeds.some((unit) => unit.name === name)).slice(0, 4);
+  arenaModules = { ...(defense.modules || {}) };
+  arenaAi = { ...(defense.ai || {}) };
+  arenaPositions = { ...(defense.positions || {}) };
+  arenaSelectedCore = defense.core || arenaSelectedCore;
+  normalizeArenaBuild();
+}
+
+function renderPilotPanel(message = "") {
+  if (!pilotNameLabelEl) return;
+  const panel = pilotNameLabelEl.closest(".pilot-panel");
+  const nameLocked = Boolean(masterLeagueRun?.active);
+  panel?.classList.toggle("champion-panel", nameLocked);
+  const pilotKicker = pilotNameLabelEl.closest(".pilot-panel")?.querySelector(".kicker");
+  if (pilotKicker) pilotKicker.textContent = "戰隊名";
+  if (pilotKicker) pilotKicker.textContent = nameLocked ? "League Champions" : "戰隊名";
+  pilotNameLabelEl.textContent = nameLocked ? "各階盟主" : (pilotProfile?.name || "Pilot");
+  pilotNameInputEl.value = pilotProfile?.name || "Pilot";
+  pilotNameInputEl.disabled = nameLocked;
+  pilotSaveNameEl.disabled = nameLocked;
+  pilotRecoverEl.disabled = nameLocked;
+  pilotCodeDisplayEl.textContent = "";
+  if (pilotKicker) pilotKicker.textContent = nameLocked ? (currentLanguage === "en" ? "League Champions" : "各階盟主") : (currentLanguage === "en" ? "Squad Name" : "戰隊名");
+  pilotNameLabelEl.textContent = nameLocked ? (currentLanguage === "en" ? "League Champions" : "各階盟主") : (pilotProfile?.name || "Pilot");
+  if (!nameLocked && currentLanguage === "en") {
+    pilotSyncMessageEl.textContent = message || "Each Master League run uses a locked squad name. Enter a team name before joining.";
+    return;
+  }
+  if (nameLocked) {
+    pilotSyncMessageEl.innerHTML = renderChampionBoard();
+    return;
+  }
+  pilotSyncMessageEl.textContent = message || "每次 Master League 都係獨立 Run；輸入戰隊名後即可參賽。";
+  return;
+  pilotSyncMessageEl.textContent = message || "每次 Master League 都係獨立 Run；輸入名字後即可參賽。";
+}
+
+function renderArena() {
+  if (!arenaEl) return;
+  if (masterLeagueRun?.active) syncEditableFromLockedBuild();
+  normalizeArenaBuild();
+  arenaEl.classList.toggle("arena-run-mode", Boolean(masterLeagueRun?.active));
+  arenaEl.classList.toggle("arena-build-mode", !masterLeagueRun?.active);
+  arenaEl.classList.toggle("arena-searching-mode", Boolean(masterLeagueSearching));
+  const arenaTitle = arenaEl.querySelector(".arena-head h2");
+  const arenaCopy = arenaEl.querySelector(".arena-head h2 + p");
+  const panelTitles = arenaEl.querySelectorAll(".arena-panel h3");
+  if (panelTitles[1]) panelTitles[1].textContent = masterLeagueRun?.active ? "出戰機體" : "編成機體";
+  if (panelTitles[2]) panelTitles[2].textContent = masterLeagueRun?.active ? "出戰陣型" : "編成陣型";
+  if (arenaTitle) arenaTitle.textContent = masterLeagueRun?.active ? "Master League Arena" : "競技場編隊";
+  if (arenaCopy) arenaCopy.textContent = masterLeagueRun?.active
+    ? "隊伍已鎖定。偵察對手後，可以調整 AI 方針同站位，再開始自動對戰。"
+    : "用 1000 Cost 組出參賽隊伍。確認後會鎖定機體、核心同模組。";
+  if (arenaTitle) arenaTitle.textContent = masterLeagueRun?.active ? "Master League Arena" : "Master League";
+  if (arenaCopy) arenaCopy.textContent = masterLeagueRun?.active
+    ? "隊伍已鎖定。調整 AI 方針同站位後，直接選擇對手開戰。"
+    : "用 1000 Cost 組出參賽戰隊。模組係主要差異點，確認後會鎖定機體、核心同模組。";
+  renderPilotPanel();
+  if (currentLanguage === "en") {
+    if (panelTitles[0]) panelTitles[0].textContent = "Tactical Core";
+    if (panelTitles[1]) panelTitles[1].textContent = masterLeagueRun?.active ? "Deployment Mecha" : "Mecha Roster";
+    if (panelTitles[2]) panelTitles[2].textContent = masterLeagueRun?.active ? "Deployment Formation" : "Formation";
+    if (panelTitles[3]) panelTitles[3].textContent = "Challenge Opponents";
+    if (arenaTitle) arenaTitle.textContent = masterLeagueRun?.active ? "Master League Arena" : "Master League";
+    if (arenaCopy) arenaCopy.textContent = masterLeagueRun?.active
+      ? "Squad locked. Adjust AI tactics and formation, then choose an opponent to fight."
+      : "Build a challenge squad within 1000 Cost. Core modules define the main tactical style; individual modules tune each mecha.";
+  } else if (panelTitles[3]) {
+    panelTitles[3].textContent = "挑戰對手";
+  }
+  const cost = arenaBuildCost();
+  const currentBand = masterLeagueRun?.active ? masterBandById(masterLeagueRun.bandId) : masterBandForScore(masterLeagueRun?.score || 0);
+  arenaCostEl.textContent = masterLeagueRun?.active ? `${masterBandName(currentBand)} ${masterLeagueRun.score} pts` : `Cost ${cost} / ${ARENA_TOTAL_COST}`;
+  arenaCostEl.classList.toggle("over", cost > ARENA_TOTAL_COST);
+  arenaSaveEl.hidden = Boolean(masterLeagueRun?.active);
+  arenaSaveEl.disabled = cost > ARENA_TOTAL_COST || arenaSyncing || Boolean(masterLeagueRun?.active);
+  const arenaActionText = masterLeagueRun?.active ? ["隊伍已鎖定", "結束挑戰"] : ["確定參賽", "刷新資料"];
+  arenaSaveEl.textContent = masterLeagueRun?.active ? "隊伍已鎖定" : "同步防守隊";
+  arenaRefreshEl.textContent = masterLeagueRun?.active ? "結束挑戰" : "刷新對手";
+
+  arenaSaveEl.textContent = arenaActionText[0];
+  arenaRefreshEl.textContent = arenaActionText[1];
+
+  const costPercent = clamp((cost / ARENA_TOTAL_COST) * 100, 0, 100);
+  const nextBandForCost = masterLeagueRun?.active ? nextMasterBandForRun() : nextMasterBand(masterLeagueRun?.score || 0);
+  arenaCostEl.innerHTML = masterLeagueRun?.active
+    ? `<span>Band</span><strong>${masterBandName(currentBand)} ${masterLeagueRun.score} pts</strong><i><em style="width:${clamp(((masterLeagueRun.score || 0) / Math.max(1, nextBandForCost?.min || masterLeagueRun.score || 1)) * 100, 0, 100)}%"></em></i>`
+    : `<span>Total Cost</span><strong>${cost} / ${ARENA_TOTAL_COST}</strong><i><em style="width:${costPercent}%"></em></i>`;
+  arenaSaveEl.textContent = masterLeagueRun?.active ? "隊伍已鎖定" : "確定參賽";
+  arenaRefreshEl.textContent = masterLeagueRun?.active ? "結束挑戰" : "刷新資料";
+
+  if (currentLanguage === "en") {
+    arenaSaveEl.textContent = masterLeagueRun?.active ? "Squad Locked" : "Confirm Entry";
+    arenaRefreshEl.textContent = masterLeagueRun?.active ? "End Challenge" : "Refresh Data";
+  }
+
+  arenaCoreListEl.innerHTML = arenaCoreOptions.map((rawCore) => {
+    const core = localizeArenaCoreOption(rawCore);
+    return `
+    <button class="arena-option ${core.id === arenaSelectedCore ? "selected" : ""}" data-core-id="${core.id}" type="button" ${masterLeagueRun?.active ? "disabled" : ""}>
+      <strong>${core.name}</strong>
+      <span>${core.cost} Cost</span>
+      <small>${core.text}</small>
+    </button>
+  `;
+  }).join("");
+
+  const unitCards = arenaDefenseNames.map((name) => {
+    const unit = squadSeeds.find((seed) => seed.name === name);
+    const module = arenaModuleById(arenaModules[name]);
+    const ai = arenaAiById(arenaAi[name]);
+    return `
+      <article class="arena-unit ${name === arenaSelectedUnitName ? "selected" : ""}" data-unit-name="${name}">
+        <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name}" />
+        <div>
+          <h4>${unit.name}</h4>
+          <p>${module ? `${module.tier} / ${module.name} / ${module.cost}` : "No module / 0 Cost"}</p>
+          <p>AI: ${ai.name}</p>
+        </div>
+        <button class="arena-unit-focus" data-unit-name="${name}" type="button">${currentLanguage === "en" ? "Set" : "設定"}</button>
+      </article>
+    `;
+  }).join("");
+  const roster = squadSeeds.map((unit) => `
+    <button class="arena-roster-unit ${arenaDefenseNames.includes(unit.name) ? "selected" : ""}" data-arena-pick="${unit.name}" type="button">
+      <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name}" />
+      <span>${unit.name}</span>
+    </button>
+  `).join("");
+  const selectedModule = arenaModuleById(arenaModules[arenaSelectedUnitName]);
+  const selectedAi = arenaAiById(arenaAi[arenaSelectedUnitName]);
+  const selectedUnit = squadSeeds.find((seed) => seed.name === arenaSelectedUnitName) || squadSeeds[0];
+  const displaySelectedUnit = localizeUnit(selectedUnit);
+  const selectedUnitDetail = selectedUnit ? `
+    <section class="arena-mecha-brief">
+      <img src="${assetSrc(selectedUnit.art || selectedUnit.sprite)}" alt="${selectedUnit.name}" />
+      <div>
+        <p class="kicker">Mecha Intel</p>
+        <h4>${displaySelectedUnit.name}</h4>
+        <dl>
+          <div><dt>${currentLanguage === "en" ? "Role" : "定位"}</dt><dd>${displaySelectedUnit.role || "-"}</dd></div>
+          <div><dt>${currentLanguage === "en" ? "Weapon" : "武裝"}</dt><dd>${displaySelectedUnit.weapon || "-"}</dd></div>
+        </dl>
+        <p>${displaySelectedUnit.trait || ""}</p>
+        <small>${displaySelectedUnit.tactic || ""}</small>
+      </div>
+    </section>
+  ` : "";
+  const moduleCards = `
+    <section class="arena-module-library">
+      <div class="arena-module-head">
+        <strong>${arenaSelectedUnitName} ${currentLanguage === "en" ? "Modules" : "模組"}</strong>
+        <span>${selectedModule ? `${selectedModule.tier} / ${selectedModule.name} / ${selectedModule.cost} Cost` : `${currentLanguage === "en" ? "Unequipped" : "未裝備"} / 0 Cost`}</span>
+      </div>
+      <div class="arena-module-grid">
+        <button class="arena-module-card ${!selectedModule ? "selected" : ""}" data-module-id="" type="button" ${masterLeagueRun?.active ? "disabled" : ""}>
+          <strong>No Module</strong>
+          <span>0 Cost</span>
+          <small>${currentLanguage === "en" ? "Costs nothing and keeps the unit at baseline performance." : "不消耗 Cost，保持基礎性能。"}</small>
+        </button>
+        ${arenaModuleOptions.map((rawOption) => {
+          const option = localizeArenaModuleOption(rawOption);
+          const duplicate = Object.entries(arenaModules).some(([unitName, moduleId]) => unitName !== arenaSelectedUnitName && moduleId === option.id);
+          const selected = option.id === arenaModules[arenaSelectedUnitName];
+          return `
+            <button class="arena-module-card tier-${option.tier.toLowerCase()} ${selected ? "selected" : ""}" data-module-id="${option.id}" type="button" ${duplicate || masterLeagueRun?.active ? "disabled" : ""}>
+              <strong>${option.tier} / ${option.name}</strong>
+              <span>${option.cost} Cost${duplicate ? ` / ${currentLanguage === "en" ? "Already used" : "已被其他機體裝備"}` : ""}</span>
+              <small>${option.text}</small>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+  const tacticCards = `
+    <section class="arena-tactic-library">
+      <div class="arena-module-head">
+        <strong>${arenaSelectedUnitName} AI ${currentLanguage === "en" ? "Tactic" : "方針"}</strong>
+        <span>${selectedAi.name}</span>
+      </div>
+      <div class="arena-tactic-grid">
+        ${masterLeagueAiOptions.map((rawOption) => {
+          const option = localizeArenaAiOption(rawOption);
+          return `
+          <button class="arena-tactic-card ${option.id === normalizeArenaAiId(arenaAi[arenaSelectedUnitName]) ? "selected" : ""}" data-ai-id="${option.id}" type="button">
+            <strong>${option.name}</strong>
+            <small>${option.text}</small>
+          </button>
+        `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+  arenaUnitListEl.innerHTML = `${unitCards}${masterLeagueRun?.active ? "" : selectedUnitDetail}${moduleCards}${tacticCards}${masterLeagueRun?.active ? "" : `<div class="arena-roster">${roster}</div>`}`;
+
+  arenaPositionGridEl.innerHTML = arenaPositionSlots.map((slot, index) => {
+    const occupant = arenaDefenseNames.find((name) => Number(arenaPositions[name]) === index);
+    const unit = occupant ? squadSeeds.find((seed) => seed.name === occupant) : null;
+    return `
+      <button class="arena-cell ${occupant ? "filled" : ""} ${occupant === arenaSelectedUnitName ? "selected" : ""}" data-position-index="${index}" type="button">
+        ${unit ? `<img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name}" /><span>${unit.name}</span>` : "<span>Empty</span>"}
+      </button>
+    `;
+  }).join("");
+
+  arenaOpponentListEl.innerHTML = renderMasterOpponentPanelV3();
+  return;
+  arenaOpponentListEl.innerHTML = arenaOpponents.length ? arenaOpponents.map((opponent, index) => `
+    <article class="arena-opponent">
+      <div>
+        <strong>${opponent.name}</strong>
+        <span>Rating ${opponent.rating || 1000}</span>
+        <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+      </div>
+      <button data-opponent-index="${index}" type="button">挑戰</button>
+    </article>
+  `).join("") : `<p class="arena-empty">暫時未有其他防守隊。先同步你的隊伍，或者稍後刷新。</p>`;
+}
+
+function renderMasterOpponentPanel() {
+  if (!masterLeagueRun?.active) {
+    return `
+      <article class="arena-opponent master-start-card">
+        <div>
+          <strong>Master League</strong>
+          <span>鎖定目前隊伍開始短 Run</span>
+          <small>每關 Easy / Normal / Hard 三選一，輸一次即結束。</small>
+        </div>
+        <button data-master-start type="button">開始</button>
+      </article>
+      ${arenaOpponents.slice(0, 5).map((opponent) => `
+        <article class="arena-opponent preview-only">
+          <div>
+            <strong>${opponent.name}</strong>
+            <span>Rating ${opponent.rating || 1000}</span>
+            <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+          </div>
+        </article>
+      `).join("")}
+    `;
+  }
+
+  const currentBand = masterBandById(masterLeagueRun.bandId);
+  const nextBand = nextMasterBandForRun();
+  const runHead = `
+    <article class="arena-opponent master-run-status">
+      <div>
+        <strong>Round ${masterLeagueRun.round} / ${currentBand.title}</strong>
+        <span>Score ${masterLeagueRun.score}${nextBand ? ` / 升 ${nextBand.name}: ${nextBand.min}` : " / 最高 Band"}</span>
+        <small>Streak ${masterLeagueRun.streak}，偵察後可改 AI 方針同站位。</small>
+      </div>
+    </article>
+  `;
+
+  if (arenaSelectedOpponent) {
+    const opponent = arenaSelectedOpponent;
+    return `${runHead}
+      <article class="arena-opponent selected-opponent">
+        <div>
+          <strong>${opponent.name}</strong>
+          <span>${opponent.difficulty?.label || "Normal"} / Rating ${opponent.rating || 1000}</span>
+          <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+        </div>
+        <button data-master-fight type="button">開戰</button>
+      </article>
+      ${(opponent.defense?.squad || []).map((name) => {
+        const unit = squadSeeds.find((seed) => seed.name === name);
+        const module = arenaModuleById(opponent.defense?.modules?.[name]);
+        const ai = arenaAiById(opponent.defense?.ai?.[name]);
+        return `
+          <article class="arena-opponent scout-row">
+            <div>
+              <strong>${name}</strong>
+              <span>${unit?.role || "Unknown"}</span>
+              <small>${module ? `${module.tier} ${module.name}` : "No module"} / AI: ${ai.name}</small>
+            </div>
+          </article>
+        `;
+      }).join("")}
+      <article class="arena-opponent">
+        <div>
+          <strong>重新選擇</strong>
+          <span>返回三個難度對手。</span>
+        </div>
+        <button data-master-cancel-opponent type="button">返回</button>
+      </article>
+    `;
+  }
+
+  const choices = masterLeagueRun.choices || [];
+  return `${runHead}${choices.map((opponent, index) => `
+    <article class="arena-opponent">
+      <div>
+        <strong>${opponent.difficulty.label}</strong>
+        <span>${opponent.name.replace(`${opponent.difficulty.label} / `, "")}</span>
+        <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+      </div>
+      <button data-master-choice="${index}" type="button">偵察</button>
+    </article>
+  `).join("")}`;
+}
+
+function renderMasterOpponentPanelV2() {
+  if (!masterLeagueRun?.active) {
+    return `
+      <article class="arena-opponent master-start-card">
+        <div>
+          <strong>Master League</strong>
+          <span>先確定參賽隊伍，再進入對手搜尋。</span>
+          <small>隊伍鎖定後，每關仍可調整 AI 方針同站位。</small>
+        </div>
+        <button data-master-start type="button">確定參賽</button>
+      </article>
+    `;
+  }
+
+  const currentBand = masterBandById(masterLeagueRun.bandId);
+  const nextBand = nextMasterBandForRun();
+  const runHead = `
+    <article class="arena-opponent master-run-status">
+      <div>
+        <strong>Round ${masterLeagueRun.round} / ${currentBand.title}</strong>
+        <span>Score ${masterLeagueRun.score}${nextBand ? ` / 下一階 ${nextBand.name}: ${nextBand.min}` : " / 最高 Band"}</span>
+        <small>偵察後可以調整 AI 方針同站位，然後按「對戰開始」。</small>
+      </div>
+    </article>
+  `;
+
+  const promotionOpponent = promotionOpponentForRun();
+  if (promotionOpponent) {
+    const squadText = promotionTeamText(promotionOpponent);
+    const moduleCount = Object.values(promotionOpponent.defense?.modules || {}).filter(Boolean).length;
+    return `${runHead}
+      <div class="master-choice-list">
+        <button class="arena-opponent master-choice-card difficulty-champion promotion-card" data-master-choice="0" type="button">
+          ${renderOpponentIconStrip(promotionOpponent.defense)}
+          <div>
+            <strong>升階戰：${promotionOpponent.championBand.title}</strong>
+            <span>${promotionOpponent.name} / Rating ${promotionOpponent.rating || 1000}</span>
+            <small>現任盟主戰隊名：${promotionChampionLabel(promotionOpponent)}</small>
+            <small>現任該階級盟主隊：${squadText}</small>
+            <small>${moduleCount} Modules / ${promotionOpponent.defense?.core || "core"} / 打贏先升上 ${promotionOpponent.championBand.name}</small>
+          </div>
+        </button>
+      </div>`;
+  }
+
+  if (masterLeagueSearching) {
+    return `${runHead}
+      <article class="arena-opponent arena-search-card">
+        <div class="arena-search-spinner" aria-hidden="true"></div>
+        <div>
+          <strong>正在尋找對手...</strong>
+          <span>Master League matching signal</span>
+          <small>系統會提供 Easy / Normal / Hard 三個 Ghost Team。</small>
+        </div>
+      </article>
+    `;
+  }
+
+  if (arenaSelectedOpponent) {
+    const opponent = arenaSelectedOpponent;
+    return `${runHead}
+      <article class="arena-opponent selected-opponent">
+        <div>
+          <strong>${opponent.name}</strong>
+          <span>${opponent.difficulty?.label || "Normal"} / Rating ${opponent.rating || 1000}</span>
+          <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+        </div>
+        <button data-master-fight type="button">對戰開始</button>
+      </article>
+      ${(opponent.defense?.squad || []).map((name) => {
+        const unit = squadSeeds.find((seed) => seed.name === name);
+        const module = arenaModuleById(opponent.defense?.modules?.[name]);
+        const ai = arenaAiById(opponent.defense?.ai?.[name]);
+        return `
+          <article class="arena-opponent scout-row">
+            <div>
+              <strong>${name}</strong>
+              <span>${unit?.role || "Unknown"}</span>
+              <small>${module ? `${module.tier} ${module.name}` : "No module"} / AI: ${ai.name}</small>
+            </div>
+          </article>
+        `;
+      }).join("")}
+      <article class="arena-opponent">
+        <div>
+          <strong>重新選擇對手</strong>
+          <span>返回三選一列表，再揀 Easy / Normal / Hard。</span>
+        </div>
+        <button data-master-cancel-opponent type="button">返回</button>
+      </article>
+    `;
+  }
+
+  const choices = masterLeagueRun.choices || [];
+  return `${runHead}${choices.map((opponent, index) => `
+    <article class="arena-opponent">
+      <div>
+        <strong>${opponent.difficulty.label}</strong>
+        <span>${opponent.name.replace(`${opponent.difficulty.label} / `, "")}</span>
+        <small>${opponent.defense?.squad?.join(" / ") || "Unknown squad"}</small>
+      </div>
+      <button data-master-choice="${index}" type="button">偵察</button>
+    </article>
+  `).join("")}`;
+}
+
+function renderMasterOpponentPanelV3() {
+  if (!masterLeagueRun?.active) {
+    return `
+      <article class="arena-opponent master-start-card">
+        <div>
+          <strong>Master League Arena</strong>
+          <span>${currentLanguage === "en" ? "Build a 1000 Cost challenge squad before entering the arena." : "用 1000 Cost 組出參賽戰隊，確認後會鎖定機體同核心同模組。"}</span>
+          <small>${currentLanguage === "en" ? "You can tune AI tactics and formation before each match." : "每場前可調整 AI 方針同站位，再選擇對手開戰。"}</small>
+        </div>
+        <button data-master-start type="button">${currentLanguage === "en" ? "Start Formation" : "開始編隊"}</button>
+      </article>
+    `;
+  }
+
+  const currentBandV3 = masterBandById(masterLeagueRun.bandId);
+  const nextBand = nextMasterBandForRun();
+  const runHead = `
+    <article class="arena-opponent master-run-status">
+      <div>
+        <strong>Round ${masterLeagueRun.round} / ${masterBandTitle(currentBandV3)}</strong>
+        <span>Score ${masterLeagueRun.score}${nextBand ? ` / ${currentLanguage === "en" ? "Next Band" : "下一階"} ${masterBandName(nextBand)}: ${nextBand.min}` : ` / ${currentLanguage === "en" ? "Top Band" : "最高 Band"}`}</span>
+        <small>${currentLanguage === "en" ? "Adjust AI tactics and positions first, then pick one Easy / Normal / Hard opponent." : "先調整 AI 方針同站位；揀 Easy / Normal / Hard 其中一隊就即刻開戰。"}</small>
+      </div>
+    </article>
+  `;
+
+  const promotionOpponent = promotionOpponentForRun();
+  if (promotionOpponent) {
+    const squadText = promotionTeamText(promotionOpponent);
+    const moduleCount = Object.values(promotionOpponent.defense?.modules || {}).filter(Boolean).length;
+    return `${runHead}
+      <div class="master-choice-list">
+        <button class="arena-opponent master-choice-card difficulty-champion promotion-card" data-master-choice="0" type="button">
+          ${renderOpponentIconStrip(promotionOpponent.defense)}
+          <div>
+            <strong>${currentLanguage === "en" ? "Promotion Match" : "升階戰"}: ${masterBandTitle(promotionOpponent.championBand)}</strong>
+            <span>${promotionOpponent.name} / Rating ${promotionOpponent.rating || 1000}</span>
+            <small>${currentLanguage === "en" ? "Current champion" : "現任盟主"}: ${promotionChampionLabel(promotionOpponent)}</small>
+            <small>${currentLanguage === "en" ? "Champion squad" : "盟主戰隊組合"}: ${squadText}</small>
+            <small>${moduleCount} Modules / ${promotionOpponent.defense?.core || "core"} / ${currentLanguage === "en" ? "Win to enter" : "打贏先升上"} ${masterBandName(promotionOpponent.championBand)}</small>
+          </div>
+        </button>
+      </div>`;
+  }
+
+  if (masterLeagueSearching) {
+    return `${runHead}
+      <article class="arena-opponent arena-search-card">
+        <div class="arena-search-spinner" aria-hidden="true"></div>
+        <div>
+          <strong>${currentLanguage === "en" ? "Searching opponents..." : "正在尋找對手..."}</strong>
+          <span>Master League matching signal</span>
+          <small>${currentLanguage === "en" ? "System is generating three Ghost Teams." : "系統正在配對三隊 Ghost Team。"}</small>
+        </div>
+      </article>
+    `;
+  }
+
+  const choices = masterLeagueRun.choices || [];
+  return `${runHead}<div class="master-choice-list">${choices.map((opponent, index) => {
+    const squadText = opponent.defense?.squad?.join(" / ") || "Unknown squad";
+    const moduleCount = Object.values(opponent.defense?.modules || {}).filter(Boolean).length;
+    return `
+      <button class="arena-opponent master-choice-card difficulty-${opponent.difficulty.id}" data-master-choice="${index}" type="button">
+        ${renderOpponentIconStrip(opponent.defense)}
+        <div>
+          <strong>${opponent.difficulty.label}</strong>
+          <span>${opponent.name.replace(`${opponent.difficulty.label} / `, "")} / Rating ${opponent.rating || 1000}</span>
+          <small>${squadText}</small>
+          <small>${moduleCount} Modules / ${opponent.defense?.core || "core"} / ${currentLanguage === "en" ? "Pick to fight" : "揀選即開戰"}</small>
+        </div>
+      </button>
+    `;
+  }).join("")}</div>`;
+}
+
+async function syncPilotProfile(message = "Pilot profile synced.") {
+  renderPilotPanel("同步玩家檔案中...");
+  try {
+    const response = await fetch("/api/player", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        playerId: pilotProfile.playerId,
+        secret: pilotProfile.secret,
+        profile: {
+          ...pilotProfile,
+          name: pilotNameInputEl?.value || pilotProfile.name,
+          pvpDefense: arenaBuildPayload()
+        }
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.message || "Sync failed.");
+    pilotRecoveryCode = data.recoveryCode || "";
+    savePilotProfileLocal(data.profile);
+    pilotCloudReady = true;
+    renderPilotPanel(message);
+  } catch (error) {
+    pilotCloudReady = false;
+    renderPilotPanel(`本機已保存；雲端同步失敗：${error.message}`);
+  }
+}
+
+async function recoverPilotProfile() {
+  const code = window.prompt("輸入 Pilot Code");
+  if (!code) return;
+  renderPilotPanel("讀取 Pilot Code 中...");
+  try {
+    const response = await fetch("/api/player", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "recover", code })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.message || "Recover failed.");
+    pilotRecoveryCode = data.recoveryCode || "";
+    savePilotProfileLocal(data.profile);
+    pilotCloudReady = true;
+    applyProfileDefense();
+    renderArena();
+    renderPilotPanel("Pilot Code 已還原。");
+  } catch (error) {
+    renderPilotPanel(`還原失敗：${error.message}`);
+  }
+}
+
+async function saveArenaDefense() {
+  if (arenaBuildCost() > ARENA_TOTAL_COST) {
+    renderPilotPanel("Cost 超出上限，請調整模組。");
+    return;
+  }
+  arenaSyncing = true;
+  renderArena();
+  try {
+    await syncPilotProfile("玩家檔案已同步。");
+    const response = await fetch("/api/arena", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        playerId: pilotProfile.playerId,
+        secret: pilotProfile.secret,
+        name: pilotProfile.name,
+        defense: arenaBuildPayload()
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.message || "Arena save failed.");
+    savePilotProfileLocal({ ...pilotProfile, pvpDefense: data.defense, pvpStats: data.pvpStats || pilotProfile.pvpStats });
+    renderPilotPanel("Arena build synced.");
+    await loadArenaOpponents();
+  } catch (error) {
+    renderPilotPanel(`Arena 同步失敗：${error.message}`);
+  } finally {
+    arenaSyncing = false;
+    renderArena();
+  }
+}
+
+async function loadArenaOpponents() {
+  try {
+    const response = await fetch(`/api/arena?playerId=${encodeURIComponent(pilotProfile.playerId)}`, { cache: "no-store" });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.message || "Load opponents failed.");
+    saveLocalMasterChampions(data.champions || {});
+    if (data.rankings) renderMasterLeaderboards(data.rankings, "即時 Master League 排行榜");
+    const liveOpponents = data.opponents || [];
+    const seen = new Set(liveOpponents.map((opponent) => opponent.playerId));
+    arenaOpponents = [
+      ...liveOpponents,
+      ...arenaPresetOpponents.filter((opponent) => opponent.playerId !== pilotProfile.playerId && !seen.has(opponent.playerId))
+    ].slice(0, 12);
+  } catch {
+    arenaOpponents = [...arenaPresetOpponents];
+    arenaMasterChampions = loadLocalMasterChampions();
+  }
+  renderArena();
+}
+
+async function showArena() {
+  running = false;
+  setPauseButtonVisible(false);
+  showLoading("Loading Arena...");
+  if (masterLeagueRun?.active) syncEditableFromLockedBuild();
+  else applyProfileDefense();
+  await loadFormationArt();
+  document.body.classList.add("setup-mode");
+  briefingEl.hidden = true;
+  arenaResultEl.hidden = true;
+  formationEl.hidden = true;
+  rewardEl.hidden = true;
+  resultEl.hidden = true;
+  arenaEl.hidden = false;
+  renderArena();
+  hideLoading();
+  loadArenaOpponents();
+  loadBattleArt();
+}
+
+function showBriefing() {
+  running = false;
+  paused = false;
+  pausedAt = 0;
+  setPauseButtonVisible(false);
+  document.body.classList.add("setup-mode");
+  arenaEl.hidden = true;
+  arenaResultEl.hidden = true;
+  formationEl.hidden = true;
+  rewardEl.hidden = true;
+  resultEl.hidden = true;
+  briefingEl.hidden = false;
+  resizeCanvas();
+}
+
+function applyArenaBuildToUnit(unit, defense, isDefender = false) {
+  const core = arenaCoreById(defense.core);
+  core?.apply?.(unit);
+  const module = arenaModuleById(defense.modules?.[unit.name]);
+  module?.apply?.(unit);
+  unit.hp = unit.maxHp;
+  unit.arenaCore = core?.id || "";
+  unit.arenaModule = module?.id || "";
+  unit.arenaAi = normalizeArenaAiId(defense.ai?.[unit.name] || "focus-attacker");
+  unit.arenaDefender = isDefender;
+  unit.faction = isDefender ? "Enemy" : "Allied";
+  if (isDefender) {
+    unit.radius = bodyRadius(unit) * 0.72;
+    unit.points = 420;
+    unit.pvpSprite = true;
+    unit.type = "arena";
+    unit.boss = false;
+  }
+}
+
+function makeArenaDefenders(opponent) {
+  const defense = opponent?.defense || arenaBuildPayload();
+  const difficulty = opponent?.difficulty || masterLeagueDifficulties[1];
+  return defense.squad.map((name, index) => {
+    const seed = squadSeeds.find((unit) => unit.name === name) || squadSeeds[index] || squadSeeds[0];
+    const slot = arenaPositionSlots[Number(defense.positions?.[name])] || arenaPositionSlots[index] || { x: W - 170, y: 190 + index * 90 };
+    const unit = createBattleUnit(seed, `pvp-e${index}`, slot, { faction: "Enemy", move: { x: slot.x, y: slot.y }, command: "defend" });
+    applyArenaBuildToUnit(unit, defense, true);
+    unit.maxHp = Math.round(unit.maxHp * (difficulty.hp || 1));
+    unit.hp = unit.maxHp;
+    if (unit.damage > 0) unit.damage = Math.round(unit.damage * (difficulty.damage || 1) * 10) / 10;
+    return unit;
+  });
+}
+
+function prepareArenaAttackSquad() {
+  const defense = masterLeagueRun?.active ? currentLeagueTacticalBuild() : arenaBuildPayload();
+  return defense.squad.map((name, index) => {
+    const seed = squadSeeds.find((unit) => unit.name === name) || squadSeeds[index] || squadSeeds[0];
+    const defenseSlot = arenaPositionSlots[Number(defense.positions?.[name])] || arenaPositionSlots[index] || { x: W - 170, y: 190 + index * 90 };
+    const attackX = 95 + (defenseSlot.col ?? index % 3) * 80;
+    const slot = {
+      x: clamp(attackX, ALLIED_MIN_X, ALLIED_MAX_X),
+      y: defenseSlot.y
+    };
+    const unit = createBattleUnit(seed, `u${index}`, slot);
+    applyArenaBuildToUnit(unit, defense, false);
+    unit.move = { x: slot.x, y: slot.y };
+    return unit;
+  });
+}
+
+async function startArenaChallenge(opponent) {
+  if (!opponent?.defense?.squad?.length) return;
+  showLoading("Loading Arena battle...");
+  await syncPilotProfile("Pilot profile synced.");
+  await loadBattleArt();
+  battleMode = "arena";
+  arenaOpponent = opponent;
+  arenaTimeLeft = ARENA_TIME_LIMIT;
+  paused = false;
+  autoBattleEnabled = true;
+  localStorage.setItem(AUTO_BATTLE_KEY, "1");
+  clearAutoRewardTimer();
+  arenaEl.hidden = true;
+  arenaResultEl.hidden = true;
+  document.body.classList.remove("setup-mode");
+  resizeCanvas();
+  squad = prepareArenaAttackSquad();
+  arenaBattleStartHp = squad.reduce((sum, unit) => sum + unit.maxHp, 0);
+  enemies = makeArenaDefenders(opponent);
+  shots = [];
+  sparks = [];
+  gravityFields = [];
+  skillEffects = [];
+  wave = 1;
+  score = 0;
+  nextWaveAt = Number.POSITIVE_INFINITY;
+  focusedUnit = squad[0];
+  selected = null;
+  pointer = null;
+  hudCardsSignature = "";
+  skillBarSignature = "";
+  renderIntel(focusedUnit);
+  updateHud();
+  running = true;
+  setPauseButtonVisible(true);
+  updateAutoBattleControl();
+  setMessage(`Arena: VS ${opponent.name}`);
+  last = now();
+  hideLoading();
+}
+
+function arenaTargetFor(defender, living) {
+  const originalEnemies = enemies;
+  enemies = living;
+  try {
+    return chooseArenaAiTarget(defender);
+  } finally {
+    enemies = originalEnemies;
+  }
+}
+
+function arenaDefenderDamage(defender, target) {
+  let damage = Math.max(1, defender.damage);
+  if (defender.arenaRushTime > 0) damage *= 1.18;
+  else if (defender.arenaLateDamagePenalty) damage *= defender.arenaLateDamagePenalty;
+  if (defender.arenaFocusLens) {
+    defender.focusLensTarget = target.id;
+    defender.focusLensStacks = Math.min(5, (defender.focusLensStacks || 0) + 1);
+    damage *= 1 + (defender.focusLensStacks || 0) * 0.045;
+  }
+  return damage;
+}
+
+function damageArenaAttacker(target, amount, color, source) {
+  if (!target || target.hp <= 0) return;
+  const finalAmount = amount * unitDefenseFactor(target) * himawariDefenseFactor(target);
+  const hpBefore = target.hp;
+  target.hp = clamp(target.hp - finalAmount, 0, target.maxHp);
+  const dealt = hpBefore - target.hp;
+  recordBattleDamage(source, target, dealt);
+  if (hpBefore > 0 && target.hp <= 0) recordBattleKill(source, target);
+  chargeUltimateByDamageTaken(target, dealt);
+  burst(target.x, target.y, color, 8);
+  if (source?.arenaEwarCharge) {
+    source.arenaEwarCharge = false;
+    target.skillCooldown = Math.max(target.skillCooldown || 0, 1.8);
+    addSkillEffect("impact-grid", null, { x: target.x, y: target.y, radius: 96, color: "#c37bff", life: 0.5, follow: false });
+  }
+}
+
+function healArenaDefender(source, ally, amount) {
+  if (!ally || ally.hp <= 0) return;
+  const hpBefore = ally.hp;
+  ally.hp = clamp(ally.hp + amount, 0, ally.maxHp);
+  recordBattleHealing(source, ally.hp - hpBefore);
+  ally.regenGlow = Math.max(ally.regenGlow || 0, 0.3);
+  shots.push({ x: source.x, y: source.y, tx: ally.x, ty: ally.y, color: source.color, life: 0.28, maxLife: 0.28, heal: true, source: source.id });
+}
+
+function withArenaDefenderContext(callback) {
+  const playerSquad = squad;
+  const defenderSquad = enemies;
+  squad = defenderSquad;
+  enemies = playerSquad;
+  try {
+    callback();
+  } finally {
+    squad = playerSquad;
+    enemies = defenderSquad;
+  }
+}
+
+function convertArenaDefenderShots(startIndex, defender) {
+  const attackerIds = new Set(squad.map((unit) => unit.id));
+  for (let index = startIndex; index < shots.length; index += 1) {
+    const shot = shots[index];
+    if (shot.source !== defender.id || !shot.damage || !attackerIds.has(shot.target)) continue;
+    shot.arenaDamage = shot.damage;
+    shot.arenaTarget = shot.target;
+    delete shot.damage;
+    delete shot.target;
+  }
+}
+
+function updateArenaDefenderSmart(defender, dt) {
+  if (defender.hp <= 0) return;
+  const shotStart = shots.length;
+  withArenaDefenderContext(() => {
+    const frontlineTarget = chooseAutoTarget(defender);
+    if (frontlineTarget && normalizeArenaAiId(defender.arenaAi) === "frontline") {
+      defender.target = frontlineTarget.id;
+      defender.assistId = null;
+      defender.command = defender.damage < 0 ? "support" : "attack";
+      const arenaAnchor = arenaAiAnchor(defender, frontlineTarget);
+      defender.move = arenaAnchor || null;
+      if (arenaAnchor) defender.command = "move";
+      if (shouldAutoUseActive(defender)) activateSkill(defender);
+      if (shouldAutoUseUltimate(defender)) useUltimate(defender);
+      stepUnit(defender, dt);
+      convertArenaDefenderShots(shotStart, defender);
+      return;
+    }
+    const allySkillAnchor = autoAllySkillAnchor(defender);
+    const ownSupportAnchor = allySkillAnchor ? null : autoSupportAnchor(defender);
+    const anchor = allySkillAnchor || ownSupportAnchor;
+    if (anchor) {
+      defender.target = null;
+      defender.move = {
+        x: clamp(anchor.x, ALLIED_MIN_X, ALLIED_MAX_X),
+        y: clamp(anchor.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+      };
+      defender.assistId = null;
+      defender.command = "move";
+    } else {
+      const target = chooseAutoTarget(defender);
+      if (target) {
+        defender.target = target.id;
+        defender.assistId = null;
+        defender.command = defender.damage < 0 ? "support" : "attack";
+        const arenaAnchor = arenaAiAnchor(defender, target);
+        if (arenaAnchor) {
+          defender.target = target.id;
+          defender.move = arenaAnchor;
+          defender.command = "move";
+        } else if (defender.damage > 0 && defender.range > 130 && weaponDistance(defender, target) < defender.range * 0.34) {
+          defender.move = {
+            x: clamp(defender.x + Math.sign(defender.x - target.x || 1) * 78, ALLIED_MIN_X, ALLIED_MAX_X),
+            y: clamp(defender.y + (defender.y >= target.y ? 52 : -52), ALLIED_MIN_Y, ALLIED_MAX_Y)
+          };
+          defender.command = "move";
+        } else {
+          defender.move = null;
+        }
+      }
+    }
+    if (shouldAutoUseActive(defender)) activateSkill(defender);
+    if (shouldAutoUseUltimate(defender)) useUltimate(defender);
+    stepUnit(defender, dt);
+  });
+  convertArenaDefenderShots(shotStart, defender);
+}
+
+function updateArenaDefender(defender, dt) {
+  return updateArenaDefenderSmart(defender, dt);
+  if (defender.hp <= 0) return;
+  defender.cooldown = Math.max(0, defender.cooldown - dt);
+  defender.skillCooldown = Math.max(0, (defender.skillCooldown || 0) - dt);
+  defender.attackPulse = Math.max(0, (defender.attackPulse || 0) - dt);
+  defender.arenaRushTime = Math.max(0, (defender.arenaRushTime || 0) - dt);
+  if (defender.arenaEmergencyRepair && defender.hp / defender.maxHp < 0.32) {
+    defender.arenaEmergencyRepair = false;
+    defender.hp = clamp(defender.hp + defender.maxHp * 0.24, 1, defender.maxHp);
+    defender.shield = Math.max(defender.shield || 0, 3.5);
+    addSkillEffect("repair-shield", defender, { radius: 120, color: "#62e6a7", life: 0.75 });
+  }
+  if (defender.arenaLastStand && defender.hp <= defender.maxHp * 0.1) {
+    defender.arenaLastStand = false;
+    defender.hp = Math.max(defender.hp, 1);
+    defender.shield = Math.max(defender.shield || 0, 5);
+    addSkillEffect("guardian", defender, { radius: 128, color: "#ffd166", life: 0.8 });
+  }
+  const livingAttackers = squad.filter((unit) => unit.hp > 0 && (unit.stealthTime || 0) <= 0);
+  if (!livingAttackers.length) return;
+  if (defender.damage < 0) {
+    const ally = enemies.filter((unit) => unit.hp > 0 && unit.hp < unit.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+    if (ally && dist(defender, ally) > defender.range * 0.92) moveToward(defender, ally, defender.speed * dt);
+    if (ally && dist(defender, ally) <= defender.range && defender.cooldown <= 0) {
+      defender.cooldown = defender.rate;
+      healArenaDefender(defender, ally, Math.abs(defender.damage) * 0.9);
+    }
+    return;
+  }
+  const target = arenaTargetFor(defender, livingAttackers);
+  if (!target) return;
+  defender.target = target.id;
+  const d = weaponDistance(defender, target);
+  if (d > defender.range) moveToward(defender, target, defender.speed * dt);
+  if (d <= defender.range && defender.cooldown <= 0) {
+    defender.cooldown = defender.rate + Math.random() * 0.16;
+    defender.attackPulse = 0.2;
+    defender.aim = { x: target.x, y: target.y };
+    const damage = arenaDefenderDamage(defender, target);
+    shots.push({ x: defender.x, y: defender.y, tx: target.x, ty: target.y, color: defender.color, life: 0.24, maxLife: 0.24, arenaDamage: damage, arenaTarget: target.id, source: defender.id });
+  }
+}
+
+async function submitArenaResult(won) {
+  try {
+    if (!pilotCloudReady) await syncPilotProfile("提交結果前同步玩家檔案...");
+    if (!pilotCloudReady) throw new Error("Pilot profile is not synced.");
+    const defeatedChampionBandId = lastDefeatedChampionBandId;
+    const masterLeague = masterLeagueRun ? {
+      score: masterLeagueRun.score || 0,
+      bandId: masterLeagueRun.bandId || masterBandForScore(masterLeagueRun.score || 0).id,
+      championBandId: defeatedChampionBandId || arenaOpponent?.championBand?.id || "",
+      defense: currentLeagueTacticalBuild(),
+      active: Boolean(masterLeagueRun.active)
+    } : null;
+    const response = await fetch("/api/arena", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "result", playerId: pilotProfile.playerId, secret: pilotProfile.secret, opponentId: arenaOpponent?.playerId, won, score, masterLeague })
+    });
+    const data = await response.json();
+    if (response.ok && data.ok) {
+      if (data.champions) saveLocalMasterChampions(data.champions);
+      if (data.rankings) renderMasterLeaderboards(data.rankings, "即時 Master League 排行榜已更新");
+      savePilotProfileLocal({ ...pilotProfile, pvpStats: data.pvpStats, masterLeague: data.masterLeague || pilotProfile.masterLeague });
+    }
+  } catch (error) {
+    renderPilotPanel(`Arena 結果提交失敗：${error.message}`);
+  } finally {
+    lastDefeatedChampionBandId = "";
+  }
+}
+
+async function endArena(won) {
+  if (!running) return;
+  running = false;
+  const scoreDetail = calculateMasterBattleScore(won);
+  score = scoreDetail.total;
+  if (masterLeagueRun?.active) {
+    masterLeagueRun.lastScoreDetail = scoreDetail;
+    if (won) {
+      masterLeagueRun.score += scoreDetail.total;
+      masterLeagueRun.streak += 1;
+      if (arenaOpponent?.championBand) {
+        lastDefeatedChampionBandId = arenaOpponent.championBand.id;
+        rememberLocalChampion(arenaOpponent.championBand, masterLeagueRun.score);
+        masterLeagueRun.bandId = arenaOpponent.championBand.id;
+        masterLeagueRun.pendingChampionBand = null;
+        masterLeagueRun.round += 1;
+        queueMasterOpponentSearch();
+      } else {
+        const nextBand = nextMasterBandForRun();
+        if (nextBand && masterLeagueRun.score >= nextBand.min) {
+          masterLeagueRun.pendingChampionBand = nextBand.id;
+          arenaSelectedOpponent = makeChampionOpponent(nextBand);
+          masterLeagueRun.choices = [arenaSelectedOpponent];
+          masterLeagueSearching = false;
+        } else {
+          masterLeagueRun.round += 1;
+          queueMasterOpponentSearch();
+        }
+      }
+    } else {
+      if (masterLeagueSearchTimer) window.clearTimeout(masterLeagueSearchTimer);
+      masterLeagueSearching = false;
+      masterLeagueRun.active = false;
+    }
+  }
+  if (masterLeagueRun?.score > 0) {
+    saveLocalMasterLeaderboard({
+      name: pilotProfile?.name || "Pilot",
+      score: masterLeagueRun.score,
+      bandId: masterLeagueRun.bandId || masterBandForScore(masterLeagueRun.score).id,
+      team: currentLeagueTacticalBuild().squad
+    });
+  }
+  await submitArenaResult(won);
+  showArenaResult(won);
+}
+
+function showArenaResultLegacy(won) {
+  running = false;
+  setPauseButtonVisible(false);
+  document.body.classList.add("setup-mode");
+  resizeCanvas();
+  const survivors = squad.filter((unit) => unit.hp > 0);
+  const defenderSurvivors = enemies.filter((unit) => unit.hp > 0);
+  arenaResultTitleEl.textContent = won ? "Arena Victory" : "Arena Defeat";
+  arenaResultCopyEl.innerHTML = `
+    <div>
+      <span class="kicker">Arena Score</span>
+      <div class="arena-result-score">${score}</div>
+    </div>
+    <div class="arena-result-lines">
+      <span>${won ? `擊破 ${arenaOpponent?.name || "opponent"} 的防守隊。` : `${arenaOpponent?.name || "Opponent"} 守住了戰線。`}</span>
+      <span>剩餘時間 ${Math.ceil(arenaTimeLeft)} 秒 / 攻方存活 ${survivors.length} 機 / 守方存活 ${defenderSurvivors.length} 機</span>
+    </div>
+    <div class="arena-result-build">
+      <span>對手核心：${arenaCoreById(arenaOpponent?.defense?.core)?.name || "Unknown"}</span>
+      <span>對手隊伍：${arenaOpponent?.defense?.squad?.join(" / ") || "Unknown"}</span>
+      <span>你的 Arena rating：${pilotProfile?.pvpStats?.rating || 1000}</span>
+    </div>
+  `;
+  resultEl.hidden = true;
+  rewardEl.hidden = true;
+  formationEl.hidden = true;
+  arenaEl.hidden = true;
+  briefingEl.hidden = true;
+  arenaResultEl.hidden = false;
+}
+
+function arenaBattleDuration() {
+  return Math.max(1, ARENA_TIME_LIMIT - arenaTimeLeft);
+}
+
+function arenaReportRows() {
+  const duration = arenaBattleDuration();
+  return squad.map((unit) => {
+    const stats = ensureBattleStats(unit);
+    const efficiency = stats.damage + stats.healing * 0.82 + stats.kills * 180 + stats.assists * 90 - stats.taken * 0.22;
+    return {
+      unit,
+      stats,
+      dps: stats.damage / duration,
+      hps: stats.healing / duration,
+      efficiency
+    };
+  }).sort((a, b) => b.efficiency - a.efficiency);
+}
+
+function arenaRoleTitle(row) {
+  const { unit, stats } = row;
+  if (stats.healing >= stats.damage * 0.8 && stats.healing > 20) return "LIFELINE";
+  if (stats.taken >= 120 && unit.maxHp >= 150) return "ANCHOR";
+  if (stats.kills >= 2) return "EXECUTOR";
+  if (row.dps >= 18) return "DAMAGE CORE";
+  if (stats.assists >= 2) return "FIRE CONTROL";
+  return unit.damage < 0 ? "SUPPORT" : "LINE UNIT";
+}
+
+function arenaTacticalAnalysis(won, rows) {
+  const top = rows[0];
+  const damageLead = [...rows].sort((a, b) => b.stats.damage - a.stats.damage)[0];
+  const healLead = [...rows].sort((a, b) => b.stats.healing - a.stats.healing)[0];
+  const tankLead = [...rows].sort((a, b) => b.stats.taken - a.stats.taken)[0];
+  const totalDamage = rows.reduce((sum, row) => sum + row.stats.damage, 0);
+  const totalHealing = rows.reduce((sum, row) => sum + row.stats.healing, 0);
+  const totalKills = rows.reduce((sum, row) => sum + row.stats.kills, 0);
+  if (currentLanguage === "en") {
+    const tone = won
+      ? `${top.unit.name} was the MVP with the strongest ${arenaRoleTitle(top)} contribution.`
+      : `${top.unit.name} still led the tactical contribution, but the squad could not break through.`;
+    const pressure = tankLead?.stats.taken > totalDamage * 0.32
+      ? `${tankLead.unit.name} absorbed heavy pressure; consider wider backline spacing or a guard tactic next run.`
+      : "Incoming pressure was fairly even, with no single unit carrying all the damage.";
+    const sustain = totalHealing > 0
+      ? `${healLead.unit.name} provided ${Math.round(healLead.stats.healing)} healing and added real sustain.`
+      : "The squad had almost no healing output; survival will depend on shields, spacing, or guard tactics.";
+    const killNote = totalKills >= 4
+      ? `${damageLead.unit.name} drove the finishing rhythm with clean kill conversion.`
+      : `${damageLead.unit.name} led damage, but kill conversion can still improve.`;
+    return [tone, killNote, sustain, pressure];
+  }
+  const tone = won
+    ? `${top.unit.name} 係今場 MVP，${arenaRoleTitle(top)} 指標最高。`
+    : `${top.unit.name} 仍然打出最高戰術貢獻，但隊伍未能完成突破。`;
+  const pressure = tankLead?.stats.taken > totalDamage * 0.32
+    ? `${tankLead.unit.name} 承受火力偏高，下場可考慮拉開後排或改保命方針。`
+    : "承傷分佈平均，陣型未有明顯崩口。";
+  const sustain = totalHealing > 0
+    ? `${healLead.unit.name} 提供 ${Math.round(healLead.stats.healing)} 修復量，續航有實際貢獻。`
+    : "隊伍幾乎無修復來源，勝負會更依賴首波爆發。";
+  const killNote = totalKills >= 4
+    ? `${damageLead.unit.name} 主導收割，輸出節奏乾淨。`
+    : `${damageLead.unit.name} 輸出最高，但擊殺轉化仍可再提高。`;
+  return [tone, killNote, sustain, pressure];
+}
+
+function renderArenaBattleReport(won) {
+  const rows = arenaReportRows();
+  const duration = arenaBattleDuration();
+  const totalDamage = rows.reduce((sum, row) => sum + row.stats.damage, 0);
+  const totalHealing = rows.reduce((sum, row) => sum + row.stats.healing, 0);
+  const totalTaken = rows.reduce((sum, row) => sum + row.stats.taken, 0);
+  const totalKills = rows.reduce((sum, row) => sum + row.stats.kills, 0);
+  const mvp = rows[0];
+  return `
+    <section class="arena-report">
+      <div class="arena-report-head">
+        <div>
+          <span class="kicker">Tactical Report</span>
+          <h3>${currentLanguage === "en" ? (won ? "Tactical Breakthrough" : "Defence Line Held") : (won ? "戰術突破成功" : "防線未能突破")}</h3>
+          <p>${arenaOpponent?.name || "Opponent"} / Combat time ${Math.round(duration)}s</p>
+        </div>
+        <div class="arena-mvp">
+          <span>MVP</span>
+          <strong>${mvp?.unit.name || "-"}</strong>
+          <small>${mvp ? arenaRoleTitle(mvp) : "NO DATA"}</small>
+        </div>
+      </div>
+      <div class="arena-report-metrics">
+        <div><span>Total DMG</span><strong>${Math.round(totalDamage)}</strong></div>
+        <div><span>Total Heal</span><strong>${Math.round(totalHealing)}</strong></div>
+        <div><span>Kills</span><strong>${totalKills}</strong></div>
+        <div><span>Damage Taken</span><strong>${Math.round(totalTaken)}</strong></div>
+      </div>
+      <div class="arena-analysis">
+        ${arenaTacticalAnalysis(won, rows).map((line) => `<p>${line}</p>`).join("")}
+      </div>
+      <div class="arena-stat-table" role="table" aria-label="Arena battle statistics">
+        <div class="arena-stat-row head" role="row">
+          <span>Unit</span><span>DPS</span><span>Kill</span><span>Assist</span><span>Heal</span><span>Taken</span><span>Skill</span>
+        </div>
+        ${rows.map((row) => `
+          <div class="arena-stat-row" role="row">
+            <span><strong>${row.unit.name}</strong><small>${arenaRoleTitle(row)}</small></span>
+            <span>${row.dps.toFixed(1)}</span>
+            <span>${row.stats.kills}</span>
+            <span>${row.stats.assists}</span>
+            <span>${Math.round(row.stats.healing)}</span>
+            <span>${Math.round(row.stats.taken)}</span>
+            <span>${row.stats.skillUses}/${row.stats.ultUses}</span>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function showArenaResult(won) {
+  running = false;
+  setPauseButtonVisible(false);
+  document.body.classList.add("setup-mode");
+  resizeCanvas();
+  const survivors = squad.filter((unit) => unit.hp > 0);
+  const defenderSurvivors = enemies.filter((unit) => unit.hp > 0);
+  const detail = masterLeagueRun?.lastScoreDetail || calculateMasterBattleScore(won);
+  const runScore = masterLeagueRun?.score || score;
+  const band = masterLeagueRun?.active ? masterBandById(masterLeagueRun.bandId) : masterBandForScore(runScore);
+  const nextBand = masterLeagueRun?.active ? nextMasterBandForRun() : nextMasterBand(runScore);
+  const championPending = Boolean(masterLeagueRun?.pendingChampionBand && arenaSelectedOpponent?.championBand);
+  const isEn = currentLanguage === "en";
+  const promotionChampionLine = championPending
+    ? (isEn
+      ? `Next match is a promotion battle: ${masterBandTitle(arenaSelectedOpponent.championBand)}; current champion squad: ${promotionTeamText(arenaSelectedOpponent)}`
+      : `下一場係升階戰：${arenaSelectedOpponent.championBand.title}；現任該階級盟主隊：${promotionTeamText(arenaSelectedOpponent)}`)
+    : "";
+  const promotionLine = championPending
+    ? (isEn
+      ? `Defeat this champion to enter ${masterBandName(arenaSelectedOpponent.championBand)}.`
+      : `打贏現任盟主先可以升上 ${arenaSelectedOpponent.championBand.name}`)
+    : "";
+  arenaResultTitleEl.textContent = won ? "Master League Victory" : "Master League End";
+  arenaResultCopyEl.innerHTML = `
+    <div>
+      <span class="kicker">Battle Score</span>
+      <div class="arena-result-score">${detail.total}</div>
+    </div>
+    <div class="arena-result-lines">
+      <span>${won ? (isEn ? `Defeated ${arenaOpponent?.name || "opponent"}.` : `擊破 ${arenaOpponent?.name || "opponent"}。`) : (isEn ? `${arenaOpponent?.name || "Opponent"} held the line. Run ended.` : `${arenaOpponent?.name || "Opponent"} 守住戰線，Run 結束。`)}</span>
+      <span>Run Score ${runScore} / Band ${masterBandName(band)}${nextBand ? ` / ${isEn ? "Next threshold" : "下一門檻"} ${nextBand.min}` : ` / ${isEn ? "Top Band" : "最高 Band"}`}</span>
+      <span>${isEn ? "Time Left" : "剩餘"} ${Math.ceil(arenaTimeLeft)}s / ${isEn ? "Attackers Alive" : "攻方存活"} ${survivors.length} / ${isEn ? "Defenders Alive" : "守方存活"} ${defenderSurvivors.length}</span>
+    </div>
+    <div class="arena-result-build">
+      <span>Base ${detail.base} / HP +${detail.hpBonus} / Time +${detail.timeBonus} / Cost +${detail.costBonus}</span>
+      <span>Streak +${detail.streakBonus} / Death -${detail.deathPenalty} / Champion +${detail.championBonus}</span>
+      ${promotionChampionLine ? `<span>${promotionChampionLine}</span>` : ""}
+      ${promotionLine ? `<span>${promotionLine}</span>` : ""}
+      <span>${championPending ? (isEn ? "Promotion battle unlocked. Win the next match to rank up." : "下一場將會係升階戰，打贏先可以升 Band。") : won ? (isEn ? "Victory. You may continue to the next match." : "勝利，可繼續下一關。") : (isEn ? "Defeat. Run ended and current score is recorded." : "失敗，Run 結束並結算目前分數。")}</span>
+    </div>
+    ${renderArenaBattleReport(won)}
+  `;
+  arenaResultRematchEl.textContent = championPending ? (isEn ? "Enter Promotion" : "進入升階戰") : won && masterLeagueRun?.active ? (isEn ? "Continue Run" : "繼續 Run") : (isEn ? "New Run" : "再開一局");
+  arenaResultBackEl.textContent = isEn ? "Back to Arena" : "返回 Arena";
+  resultEl.hidden = true;
+  rewardEl.hidden = true;
+  formationEl.hidden = true;
+  arenaEl.hidden = true;
+  briefingEl.hidden = true;
+  arenaResultEl.hidden = false;
+}
+
 async function showFormation() {
   running = false;
   setPauseButtonVisible(false);
@@ -3683,6 +6117,8 @@ async function showFormation() {
   await loadFormationArt();
   document.body.classList.add("setup-mode");
   briefingEl.hidden = true;
+  arenaEl.hidden = true;
+  arenaResultEl.hidden = true;
   rewardEl.hidden = true;
   resultEl.hidden = true;
   resultEl.classList.remove("lost", "won");
@@ -3703,7 +6139,9 @@ async function startBattleFromFormation() {
   }
   showLoading("載入戰鬥機體...");
   await loadBattleArt();
+  battleMode = "campaign";
   formationEl.hidden = true;
+  arenaResultEl.hidden = true;
   document.body.classList.remove("setup-mode");
   resizeCanvas();
   reset();
@@ -3737,7 +6175,7 @@ function renderDatabase() {
 }
 
 function drawBackground() {
-  const bg = art.get(battlefieldArt);
+  const bg = art.get(battleMode === "arena" ? arenaBattlefieldArt : battlefieldArt);
   if (bg?.complete && bg.naturalWidth > 0) {
     ctx.drawImage(bg, 0, 0, bg.naturalWidth, bg.naturalHeight, 0, 0, W, H);
     ctx.fillStyle = "rgba(2,5,10,0.24)";
@@ -3760,7 +6198,7 @@ function drawBackground() {
     ctx.fillRect(s.x, s.y, s.size, s.size);
     ctx.globalAlpha = 1;
   });
-  drawEnergyBoundary();
+  if (battleMode !== "arena") drawEnergyBoundary();
   ctx.fillStyle = "rgba(75,228,255,0.08)";
   ctx.fillRect(0, H - 72, W, 72);
 }
@@ -3817,11 +6255,19 @@ function attackOffset(actor) {
   };
 }
 
+function spriteFacingScale(actor) {
+  const desired = actor?.faction === "Enemy" ? "left" : "right";
+  const original = actor?.spriteFacing || "right";
+  return original === desired ? 1 : -1;
+}
+
 function drawSheetSprite(unit, width, height, yOffset = 0) {
   const img = art.get(unit.sprite || unit.sheet);
   if (!img?.complete || img.naturalWidth <= 0) return false;
   ctx.shadowColor = unit.color;
   ctx.shadowBlur = selected?.id === unit.id || focusedUnit?.id === unit.id ? 28 : 14;
+  const facing = spriteFacingScale(unit);
+  if (facing < 0) ctx.scale(-1, 1);
   if (unit.sprite) {
     ctx.drawImage(img, -width / 2, -height / 2 + yOffset, width, height);
   } else if (unit.crop) {
@@ -3965,6 +6411,14 @@ function drawEnemy(enemy) {
   ctx.save();
   ctx.translate(enemy.x + offset.x, enemy.y + offset.y);
   ctx.rotate(Math.sin(now() * 5 + enemy.y) * 0.08);
+  if (enemy.pvpSprite) {
+    const size = 100 * (enemy.spriteScale || 1);
+    if (drawSheetSprite(enemy, size, size, -4)) {
+      ctx.restore();
+      drawBar(enemy.x - 32, enemy.y + 48, 64, enemy.hp / enemy.maxHp, "#ff5b66");
+      return;
+    }
+  }
   const size = (enemy.type === "commander" ? 94 : 82) * getEnemyScale(enemy);
   if (drawSheetSprite(enemy, size, size, -2)) {
     ctx.restore();
@@ -5277,12 +7731,17 @@ function loadFormationArt() {
 }
 
 function loadBattleArt() {
-  const paths = new Set([battlefieldArt]);
+  const paths = new Set([battlefieldArt, arenaBattlefieldArt]);
   selectedSquadSeeds().forEach((unit) => {
     if (unit.sprite) paths.add(unit.sprite);
     if (unit.sheet) paths.add(unit.sheet);
     if (unit.activeIcon) paths.add(unit.activeIcon);
     if (unit.ultimateIcon) paths.add(unit.ultimateIcon);
+  });
+  arenaDefenseNames.forEach((name) => {
+    const unit = squadSeeds.find((seed) => seed.name === name);
+    if (unit?.sprite) paths.add(unit.sprite);
+    if (unit?.sheet) paths.add(unit.sheet);
   });
   Object.values(enemyTypes).forEach((unit) => {
     if (unit.sprite) paths.add(unit.sprite);
@@ -5327,7 +7786,7 @@ function hydrateDeferredImages(root = document) {
 }
 
 canvas.addEventListener("pointerdown", (event) => {
-  if (!running || paused) return;
+  if (!running || paused || battleMode === "arena") return;
   const point = canvasPoint(event);
   selected = unitAt(point);
   if (selected) {
@@ -5343,19 +7802,19 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 canvas.addEventListener("pointermove", (event) => {
-  if (!running || paused || !selected) return;
+  if (!running || paused || battleMode === "arena" || !selected) return;
   pointer = canvasPoint(event);
 });
 
 canvas.addEventListener("pointerup", (event) => {
-  if (!running || paused || !selected) return;
+  if (!running || paused || battleMode === "arena" || !selected) return;
   issueCommand(selected, canvasPoint(event));
   selected = null;
   pointer = null;
 });
 
 canvas.addEventListener("dblclick", (event) => {
-  if (!running || paused) return;
+  if (!running || paused || battleMode === "arena") return;
   const unit = unitAt(canvasPoint(event));
   if (unit) activateSkill(unit);
 });
@@ -5376,7 +7835,7 @@ skillButtonsEl.addEventListener("pointerdown", (event) => {
   if (!button) return;
   event.preventDefault();
   event.stopPropagation();
-  if (!running || paused) return;
+  if (!running || paused || battleMode === "arena") return;
   const unit = squad.find((u) => u.id === button.dataset.unitId);
   if (!unit) return;
   focusedUnit = unit;
@@ -5430,19 +7889,167 @@ pauseResumeEl.addEventListener("click", () => {
   setPaused(false);
 });
 
+pauseHomeEl?.addEventListener("click", showBriefing);
+
 pauseFormationEl.addEventListener("click", () => {
+  if (battleMode === "arena") return;
   showFormation();
 });
 
 languageToggleEl?.addEventListener("click", toggleLanguage);
 
+document.querySelectorAll("[data-title-board]").forEach((button) => {
+  button.addEventListener("click", () => setTitleLeaderboardTab(button.dataset.titleBoard));
+});
+
 document.getElementById("start-btn").addEventListener("click", () => {
   showFormation();
+});
+
+arenaBtnEl?.addEventListener("click", async () => {
+  if (!masterLeagueRun?.active && !(await requestMasterLeagueTeamName())) return;
+  showArena();
+});
+
+arenaBackEl?.addEventListener("click", showBriefing);
+
+arenaResultBackEl?.addEventListener("click", showArena);
+
+arenaResultHomeEl?.addEventListener("click", showBriefing);
+
+arenaResultRematchEl?.addEventListener("click", () => {
+  if (masterLeagueRun?.active) showArena();
+  else {
+    masterLeagueRun = null;
+    arenaSelectedOpponent = null;
+    showArena();
+  }
+});
+
+arenaSaveEl?.addEventListener("click", () => {
+  if (!masterLeagueRun?.active) confirmMasterLeagueEntry();
+});
+
+arenaRefreshEl?.addEventListener("click", () => {
+  if (masterLeagueRun?.active) {
+    if (masterLeagueSearchTimer) window.clearTimeout(masterLeagueSearchTimer);
+    masterLeagueSearching = false;
+    masterLeagueRun = null;
+    arenaSelectedOpponent = null;
+    applyProfileDefense();
+    renderArena();
+    return;
+  }
+  loadArenaOpponents();
+});
+
+pilotSaveNameEl?.addEventListener("click", () => {
+  if (masterLeagueRun?.active) {
+    renderPilotPanel("Run 已開始，戰隊名已鎖定。");
+    return;
+  }
+  const name = (pilotNameInputEl.value || "Pilot").replace(/\s+/g, " ").trim().slice(0, 16) || "Pilot";
+  localStorage.setItem("mecha-heart-player-name", name);
+  savePilotProfileLocal({ ...pilotProfile, name });
+  renderPilotPanel("戰隊名已更新，今次 Run 會用呢個名字。");
+  renderArena();
+});
+
+pilotRecoverEl?.addEventListener("click", recoverPilotProfile);
+
+arenaCoreListEl?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-core-id]");
+  if (!button) return;
+  arenaSelectedCore = button.dataset.coreId;
+  renderArena();
+});
+
+arenaUnitListEl?.addEventListener("click", (event) => {
+  const moduleCard = event.target.closest("[data-module-id]");
+  if (moduleCard) {
+    if (moduleCard.disabled) return;
+    arenaModules[arenaSelectedUnitName] = moduleCard.dataset.moduleId;
+    renderArena();
+    return;
+  }
+  const tacticCard = event.target.closest("[data-ai-id]");
+  if (tacticCard) {
+    arenaAi[arenaSelectedUnitName] = normalizeArenaAiId(tacticCard.dataset.aiId);
+    renderArena();
+    return;
+  }
+  const pick = event.target.closest("[data-arena-pick]");
+  if (pick) {
+    const name = pick.dataset.arenaPick;
+    if (arenaDefenseNames.includes(name)) {
+      arenaSelectedUnitName = name;
+    } else if (arenaDefenseNames.length < 4) {
+      arenaDefenseNames = [...arenaDefenseNames, name];
+      arenaSelectedUnitName = name;
+    } else {
+      const replaceIndex = Math.max(0, arenaDefenseNames.indexOf(arenaSelectedUnitName));
+      const removed = arenaDefenseNames[replaceIndex];
+      delete arenaModules[removed];
+      delete arenaAi[removed];
+      delete arenaPositions[removed];
+      arenaDefenseNames[replaceIndex] = name;
+      arenaSelectedUnitName = name;
+    }
+    normalizeArenaBuild();
+    renderArena();
+    return;
+  }
+  const unitEl = event.target.closest("[data-unit-name]");
+  if (!unitEl) return;
+  arenaSelectedUnitName = unitEl.dataset.unitName;
+  renderArena();
+});
+
+arenaPositionGridEl?.addEventListener("click", (event) => {
+  const cell = event.target.closest("[data-position-index]");
+  if (!cell || !arenaSelectedUnitName) return;
+  const index = Number(cell.dataset.positionIndex);
+  const occupant = arenaDefenseNames.find((name) => Number(arenaPositions[name]) === index);
+  if (occupant && occupant !== arenaSelectedUnitName) arenaPositions[occupant] = arenaPositions[arenaSelectedUnitName];
+  arenaPositions[arenaSelectedUnitName] = index;
+  renderArena();
+});
+
+arenaOpponentListEl?.addEventListener("click", (event) => {
+  if (event.target.closest("[data-master-start]")) {
+    confirmMasterLeagueEntry();
+    return;
+  }
+  const choice = event.target.closest("[data-master-choice]");
+  if (choice) {
+    const opponent = masterLeagueRun?.choices?.[Number(choice.dataset.masterChoice)];
+    if (opponent) {
+      arenaSelectedOpponent = opponent;
+      startArenaChallenge(opponent);
+    }
+    return;
+  }
+  if (event.target.closest("[data-master-cancel-opponent]")) {
+    arenaSelectedOpponent = null;
+    renderArena();
+    return;
+  }
+  if (event.target.closest("[data-master-fight]")) {
+    if (arenaSelectedOpponent) startArenaChallenge(arenaSelectedOpponent);
+    return;
+  }
+  const button = event.target.closest("[data-opponent-index]");
+  if (!button) return;
+  selectMasterOpponent(arenaOpponents[Number(button.dataset.opponentIndex)]);
 });
 
 formationStartEl.addEventListener("click", () => {
   startBattleFromFormation();
 });
+
+formationHomeEl?.addEventListener("click", showBriefing);
+rewardHomeEl?.addEventListener("click", showBriefing);
+document.getElementById("result-home")?.addEventListener("click", showBriefing);
 
 document.getElementById("restart-btn").addEventListener("click", () => {
   showFormation();
@@ -5468,6 +8075,7 @@ updateAutoBattleControl();
 commandEl.textContent = t("idle");
 initStars();
 resizeCanvas();
+setTitleLeaderboardTab("ace");
 loadLeaderboard();
 render();
 frame();

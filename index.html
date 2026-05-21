@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
     <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=58" />
+    <link rel="stylesheet" href="src/styles.css?v=82" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -20,6 +20,21 @@
             <strong>Loading</strong>
             <small id="loading-copy">載入機體圖像...</small>
           </div>
+        </div>
+        <div id="arena-name-modal" class="arena-name-modal" hidden>
+          <form class="arena-name-panel" role="dialog" aria-modal="true" aria-labelledby="arena-name-title">
+            <p class="kicker">Master League Arena</p>
+            <h2 id="arena-name-title">請決定挑戰隊伍名稱</h2>
+            <p>呢個名字會記錄喺今次 Master League Run，同成功挑戰盟主後顯示俾下一位玩家。</p>
+            <label>
+              <span>戰隊名</span>
+              <input id="arena-name-input" maxlength="16" autocomplete="nickname" placeholder="輸入戰隊名" />
+            </label>
+            <div class="arena-name-actions">
+              <button id="arena-name-confirm" type="submit">開始編隊</button>
+              <button id="arena-name-cancel" type="button" data-i18n="backMain">回主畫面</button>
+            </div>
+          </form>
         </div>
         <div id="battle-controls" class="battle-controls" hidden>
           <button id="auto-battle-toggle" class="auto-battle-toggle" type="button" aria-pressed="false">
@@ -38,6 +53,7 @@
             <p data-i18n="pauseCopy">戰場時間已停止。可以繼續作戰，或者返回編隊重新整備。</p>
             <div class="pause-actions">
               <button id="pause-resume" type="button" data-i18n="pauseResume">繼續作戰</button>
+              <button id="pause-home" type="button" data-i18n="backMain">回主畫面</button>
               <button id="pause-formation" type="button" data-i18n="pauseFormation">回編隊</button>
             </div>
           </section>
@@ -50,19 +66,25 @@
               <span>Heart</span>
             </h1>
             <p data-i18n="titleSubtitle">軌道戰場 Roguelike 小隊指揮</p>
-            <span class="title-version">(ver.123)</span>
+            <span class="title-version">(ver.163)</span>
           </div>
           <div class="title-actions">
-            <button id="start-btn" class="title-start" data-i18n="startBattle">開始作戰</button>
+            <button id="start-btn" class="title-start" data-i18n="startBattle">挑戰模式</button>
+            <button id="arena-btn" class="title-start arena-start" type="button" data-i18n="masterLeague">大師聯盟</button>
             <button id="language-toggle" class="language-toggle" type="button">English / 繁中</button>
           </div>
           <section id="title-leaderboard" class="leaderboard-panel title-leaderboard" aria-live="polite">
+            <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard type">
+              <button id="title-ace-tab" class="leaderboard-tab active" data-title-board="ace" type="button" role="tab" aria-selected="true">王牌</button>
+              <button id="title-master-tab" class="leaderboard-tab" data-title-board="master" type="button" role="tab" aria-selected="false">Master League</button>
+            </div>
             <div class="leaderboard-head">
               <p class="kicker">Top 10 Ranking</p>
               <h3 data-i18n="aceRanking">王牌排行榜</h3>
             </div>
             <p id="title-leaderboard-message">讀取排行榜中...</p>
             <ol id="title-leaderboard-list" class="leaderboard-list"></ol>
+            <ol id="title-master-leaderboard-list" class="leaderboard-list master-leaderboard-list" hidden></ol>
           </section>
         </div>
         <div id="formation" hidden>
@@ -75,6 +97,7 @@
               </div>
               <div class="formation-actions">
                 <strong id="formation-count">已選 4/4</strong>
+                <button id="formation-home" type="button" data-i18n="backMain">回主畫面</button>
                 <button id="formation-start" data-i18n="launchMission">開始地圖</button>
               </div>
             </header>
@@ -115,10 +138,63 @@
             </div>
           </div>
         </div>
+        <div id="arena" hidden>
+          <div class="arena-shell">
+            <header class="arena-head">
+              <div>
+                <p class="kicker">Ghost Arena</p>
+                <h2>競技場編隊</h2>
+                <p>用 1000 Cost 組出你的防守隊。核心固定 300 Cost，每架機可裝 1 個模組並指定 AI 指令與防守位置。</p>
+              </div>
+              <div class="arena-actions">
+                <strong id="arena-cost">Cost 0 / 1000</strong>
+                <button id="arena-save" type="button">同步防守隊</button>
+                <button id="arena-refresh" type="button">刷新對手</button>
+              </div>
+            </header>
+            <section class="pilot-panel">
+              <div>
+                <p class="kicker">Pilot Sync</p>
+                <h3 id="pilot-name-label">Pilot</h3>
+                <p id="pilot-sync-message">準備同步玩家檔案。</p>
+              </div>
+              <div class="pilot-controls">
+                <input id="pilot-name-input" maxlength="16" autocomplete="nickname" placeholder="Pilot name" />
+                <button id="pilot-save-name" type="button">改名</button>
+                <button id="pilot-recover" type="button">Recover</button>
+              </div>
+              <code id="pilot-code-display">MH-....</code>
+            </section>
+            <section class="arena-grid">
+              <div class="arena-builder">
+                <section class="arena-panel">
+                  <h3>戰術核心</h3>
+                  <div id="arena-core-list" class="arena-option-list"></div>
+                </section>
+                <section class="arena-panel">
+                  <h3>防守機體</h3>
+                  <div id="arena-unit-list" class="arena-unit-list"></div>
+                </section>
+              </div>
+              <section class="arena-panel arena-map-panel">
+                <h3>防守陣型</h3>
+                <div id="arena-position-grid" class="arena-position-grid" aria-label="Arena defense grid"></div>
+              </section>
+              <section class="arena-panel arena-opponents">
+                <h3>挑戰對手</h3>
+                <div id="arena-opponent-list" class="arena-opponent-list"></div>
+              </section>
+            </section>
+            <div class="arena-footer">
+              <button id="arena-back" type="button" data-i18n="backMain">回主畫面</button>
+            </div>
+          </div>
+        </div>
         <div id="reward" hidden>
           <div>
             <p class="kicker" data-i18n="bossDefeated">Boss 擊破</p>
             <h2 data-i18n="chooseUpgrade">選擇一項強化</h2>
+            <button id="reward-home" class="screen-home-button" type="button" data-i18n="backMain">回主畫面</button>
           </div>
           <div id="reward-options"></div>
         </div>
@@ -140,7 +216,30 @@
             </form>
             <ol id="leaderboard-list" class="leaderboard-list"></ol>
           </section>
-          <button id="restart-btn" data-i18n="redeploy">再次出擊</button>
+          <div class="result-actions">
+            <button id="restart-btn" data-i18n="redeploy">再次出擊</button>
+            <button id="result-home" class="screen-home-button" type="button" data-i18n="backMain">回主畫面</button>
+          </div>
+        </div>
+        <div id="arena-result" hidden>
+          <section class="arena-result-panel">
+            <p class="kicker">Ghost Arena</p>
+            <h2 id="arena-result-title">Arena Result</h2>
+            <div class="arena-result-actions">
+              <button id="arena-result-rematch" type="button">再次挑戰</button>
+              <button id="arena-result-back" type="button">返回 Arena</button>
+              <button id="arena-result-home" type="button" data-i18n="backMain">回主畫面</button>
+            </div>
+            <div id="arena-result-copy" class="arena-result-copy"></div>
+            <section class="leaderboard-panel arena-master-board" aria-live="polite">
+              <div class="leaderboard-head">
+                <p class="kicker">Master League Top 10</p>
+                <h3>排行榜</h3>
+              </div>
+              <p id="arena-master-leaderboard-message">讀取 Master League 排行榜中...</p>
+              <ol id="arena-master-leaderboard-list" class="leaderboard-list master-leaderboard-list"></ol>
+            </section>
+          </section>
         </div>
       </section>
       <aside id="hud">
@@ -158,6 +257,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=123"></script>
+    <script src="src/main.js?v=162"></script>
   </body>
 </html>
