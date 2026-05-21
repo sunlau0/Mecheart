@@ -4941,18 +4941,112 @@ h1 {
 }
 
 @media (max-width: 699px) and (orientation: portrait) {
+  body.setup-mode #briefing {
+    align-content: start;
+    display: grid;
+    gap: 14px;
+    grid-template-areas:
+      "title"
+      "start"
+      "board";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    justify-items: stretch;
+    min-height: 100svh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: max(12px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  }
+
+  body.setup-mode .title-content {
+    justify-items: center;
+    margin: 0;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  body.setup-mode .title-logo {
+    margin: 0 0 10px;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  body.setup-mode .title-logo span {
+    font-size: clamp(40px, 15vw, 62px);
+    line-height: 0.84;
+    -webkit-text-stroke: 2px #061d55;
+  }
+
+  body.setup-mode .title-logo span:last-child {
+    font-size: clamp(48px, 18vw, 74px);
+  }
+
+  body.setup-mode .title-content p:not(.kicker) {
+    font-size: clamp(15px, 4.2vw, 18px);
+    max-width: 100%;
+  }
+
+  body.setup-mode .title-actions {
+    gap: 10px;
+    justify-items: stretch;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  body.setup-mode .title-start,
+  body.setup-mode .language-toggle {
+    box-sizing: border-box;
+    font-size: clamp(18px, 5.6vw, 24px);
+    min-height: 54px;
+    min-width: 0;
+    padding: 0 16px;
+    width: 100%;
+  }
+
+  body.setup-mode .language-toggle {
+    font-size: 15px;
+    min-height: 44px;
+  }
+
+  body.setup-mode .title-leaderboard {
+    box-sizing: border-box;
+    grid-area: board;
+    max-height: none;
+    max-width: 100%;
+    overflow: visible;
+    padding: 12px;
+    width: 100%;
+  }
+
+  body.setup-mode .leaderboard-tabs {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-head h3 {
+    font-size: clamp(30px, 10vw, 44px);
+  }
+
+  body.setup-mode .title-leaderboard .leaderboard-list {
+    max-height: none;
+    overflow: visible;
+  }
+
   #arena {
     --arena-gap: 9px;
     --arena-panel-pad: 10px;
     --arena-copy-size: 12px;
-    --arena-heading-size: clamp(30px, 9vw, 42px);
+    --arena-heading-size: clamp(28px, 8.6vw, 38px);
+    box-sizing: border-box;
     overflow: auto;
-    padding: 10px;
+    overflow-x: hidden;
+    padding: max(10px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom));
   }
 
   .arena-shell {
+    box-sizing: border-box;
     height: auto;
     min-height: 100%;
+    width: 100%;
   }
 
   .arena-panel,
@@ -4970,7 +5064,25 @@ h1 {
   .arena-head,
   .arena-build-mode .arena-head,
   .pilot-panel {
+    align-items: start;
     grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .arena-head h2,
+  .arena-build-mode .arena-head h2 {
+    font-size: var(--arena-heading-size);
+    line-height: 0.98;
+    margin-bottom: 6px;
+    overflow-wrap: anywhere;
+  }
+
+  .arena-head p {
+    font-size: 13px;
+    line-height: 1.35;
+    max-width: none;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 
   .arena-actions,
@@ -4986,10 +5098,36 @@ h1 {
     width: 100%;
   }
 
+  #arena-cost strong {
+    font-size: clamp(22px, 8vw, 34px);
+  }
+
+  .pilot-panel.champion-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .champion-board {
+    display: flex;
+    gap: 8px;
+    grid-template-columns: none;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .champion-row {
+    flex: 0 0 min(188px, 72vw);
+    min-height: 154px;
+    scroll-snap-align: start;
+  }
+
   .arena-build-mode .arena-builder,
   .arena-run-mode .arena-grid {
     display: grid;
     grid-template-columns: 1fr;
+    min-width: 0;
   }
 
   .arena-run-mode .arena-builder {
@@ -5009,12 +5147,30 @@ h1 {
   .arena-build-mode .arena-unit-list,
   .arena-build-mode .arena-module-grid,
   .arena-build-mode .arena-roster {
+    display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .arena-build-mode .arena-panel,
+  .arena-run-mode .arena-panel {
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .arena-build-mode .arena-unit {
     grid-template-columns: 58px minmax(0, 1fr);
     min-height: 72px;
+    width: 100%;
+  }
+
+  .arena-unit,
+  .arena-module-card,
+  .arena-tactic-card,
+  .master-choice-card,
+  .arena-opponent,
+  .arena-cell {
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   .arena-mecha-brief {
@@ -5027,6 +5183,25 @@ h1 {
 
   .arena-run-mode .arena-unit {
     grid-template-columns: 44px minmax(0, 1fr) minmax(72px, auto);
+  }
+
+  .arena-build-mode .arena-unit h4,
+  .arena-unit h4,
+  .arena-unit p,
+  .arena-mecha-brief h4,
+  .arena-mecha-brief p,
+  .arena-mecha-brief small,
+  .arena-module-card strong,
+  .arena-module-card span,
+  .arena-module-card small,
+  .arena-tactic-card strong,
+  .arena-tactic-card small,
+  .master-choice-card strong,
+  .master-choice-card span,
+  .master-choice-card small {
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: normal;
   }
 
   .arena-run-mode .arena-position-grid,
@@ -5051,14 +5226,11 @@ h1 {
 
   .opponent-icon-strip {
     grid-template-columns: repeat(4, minmax(42px, 1fr));
+    max-width: 100%;
   }
 
   .opponent-icon-strip span {
     width: 100%;
-  }
-
-  .champion-board {
-    grid-template-columns: 1fr;
   }
 
   .arena-footer {
