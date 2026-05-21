@@ -5060,7 +5060,16 @@ h1 {
 
   .arena-grid {
     align-items: start;
+    display: block;
     height: auto;
+    order: 2;
+  }
+
+  .arena-build-mode .arena-builder,
+  .arena-run-mode .arena-builder {
+    display: grid;
+    gap: var(--arena-gap);
+    grid-template-columns: 1fr;
   }
 
   .arena-head,
@@ -5240,8 +5249,11 @@ h1 {
     flex: 0 0 auto;
     justify-content: stretch;
     margin-top: 4px;
-    order: 99;
-    position: static;
+    order: 3;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    z-index: 1;
     width: 100%;
   }
 
