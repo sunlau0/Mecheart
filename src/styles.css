@@ -5043,6 +5043,8 @@ h1 {
   }
 
   .arena-shell {
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
     height: auto;
     min-height: 100%;
@@ -5235,10 +5237,16 @@ h1 {
 
   .arena-footer {
     display: flex;
+    flex: 0 0 auto;
     justify-content: stretch;
+    margin-top: 4px;
+    order: 99;
+    position: static;
+    width: 100%;
   }
 
   .arena-footer button {
+    min-height: 52px;
     width: 100%;
   }
 }

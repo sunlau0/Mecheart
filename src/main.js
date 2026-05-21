@@ -5547,6 +5547,7 @@ async function showArena() {
 }
 
 function showBriefing() {
+  resetMasterLeagueSession();
   running = false;
   paused = false;
   pausedAt = 0;
@@ -6106,6 +6107,17 @@ function showArenaResult(won) {
   arenaEl.hidden = true;
   briefingEl.hidden = true;
   arenaResultEl.hidden = false;
+}
+
+function resetMasterLeagueSession() {
+  if (masterLeagueSearchTimer) window.clearTimeout(masterLeagueSearchTimer);
+  masterLeagueSearchTimer = 0;
+  masterLeagueSearching = false;
+  masterLeagueRun = null;
+  arenaSelectedOpponent = null;
+  arenaOpponent = null;
+  battleMode = "normal";
+  applyProfileDefense();
 }
 
 async function showFormation() {
