@@ -2803,19 +2803,23 @@ function hit(target, amount, color, sourceId = null) {
   return dealt;
 }
 
-function chargeUltimate(sourceId, amount) {
-  const unit = squad.find((u) => u.id === sourceId && u.hp > 0);
+function chargeUltimateUnit(unit, amount) {
   if (!unit) return;
   unit.ultCharge = clamp((unit.ultCharge || 0) + amount * (unit.ultChargeMultiplier || 1), 0, unit.ultMax || 100);
 }
 
+function chargeUltimate(sourceId, amount) {
+  const unit = squad.find((u) => u.id === sourceId && u.hp > 0);
+  chargeUltimateUnit(unit, amount);
+}
+
 function chargeUltimateByHealing(unit, amount) {
   if (!unit || unit.hp <= 0 || amount <= 0) return;
-  chargeUltimate(unit.id, Math.max(1, amount * 0.42));
+  chargeUltimateUnit(unit, Math.max(1, amount * 0.42));
 }
 
 function chargeUltimateByDamageTaken(unit, amount) {
-  if (!unit || unit.faction !== "Allied" || unit.hp <= 0 || amount <= 0 || unit.name === "Accipio") return;
+  if (!unit || (unit.faction !== "Allied" && !unit.arenaDefender) || unit.hp <= 0 || amount <= 0 || unit.name === "Accipio") return;
   const windowNow = now();
   if (!unit.damageUltWindowStart || windowNow - unit.damageUltWindowStart >= 1) {
     unit.damageUltWindowStart = windowNow;
@@ -2829,7 +2833,7 @@ function chargeUltimateByDamageTaken(unit, amount) {
   const charge = clamp((amount / unit.maxHp) * 36 * pressureBonus, 0.35, 3.4);
   const applied = Math.min(room, charge);
   unit.damageUltWindowCharge = (unit.damageUltWindowCharge || 0) + applied;
-  chargeUltimate(unit.id, applied);
+  chargeUltimateUnit(unit, applied);
 }
 
 function chargeAccipioXdr(unit, amount) {
@@ -3505,8 +3509,9 @@ function autoAllySkillAnchor(unit) {
   if (!provider) return null;
   const radius = supportSkillRadius(provider) * 0.78;
   if (dist(unit, provider) <= radius) return null;
+  const sideOffset = battleMode === "arena" && unit.faction === "Enemy" ? 28 : -28;
   return {
-    x: clamp(provider.x - 28, ALLIED_MIN_X, battleMode === "arena" ? ALLIED_MAX_X : AUTO_CHASE_MAX_X),
+    x: clamp(provider.x + sideOffset, ALLIED_MIN_X, battleMode === "arena" ? ALLIED_MAX_X : AUTO_CHASE_MAX_X),
     y: clamp(provider.y + (unit.y >= provider.y ? 34 : -34), ALLIED_MIN_Y, ALLIED_MAX_Y)
   };
 }
@@ -3868,7 +3873,7 @@ function moveAwayFrom(actor, target, amount) {
   const d = Math.hypot(dx, dy) || 1;
   actor.x += (dx / d) * amount;
   actor.y += (dy / d) * amount;
-  if (actor.faction === "Allied") clampToBattlefield(actor, false);
+  if (actor.faction === "Allied" || actor.arenaDefender) clampToBattlefield(actor, false);
 }
 
 function pushDisplacementFactor(actor) {
@@ -3899,7 +3904,7 @@ function bodyRadius(actor) {
 }
 
 function clampUnitAfterSeparation(unit) {
-  if (unit.faction === "Allied") {
+  if (unit.faction === "Allied" || unit.arenaDefender) {
     clampToBattlefield(unit, false);
     return;
   }
@@ -5684,7 +5689,10 @@ function damageArenaAttacker(target, amount, color, source) {
   target.hp = clamp(target.hp - finalAmount, 0, target.maxHp);
   const dealt = hpBefore - target.hp;
   recordBattleDamage(source, target, dealt);
-  if (hpBefore > 0 && target.hp <= 0) recordBattleKill(source, target);
+  if (hpBefore > 0 && target.hp <= 0) {
+    recordBattleKill(source, target);
+    if (source?.name !== "Accipio") chargeUltimateUnit(source, target.boss ? 55 : 28);
+  }
   chargeUltimateByDamageTaken(target, dealt);
   burst(target.x, target.y, color, 8);
   if (source?.arenaEwarCharge) {
@@ -5728,8 +5736,60 @@ function convertArenaDefenderShots(startIndex, defender) {
   }
 }
 
+function updateArenaDefenderUpkeep(defender, dt) {
+  defender.arenaRushTime = Math.max(0, (defender.arenaRushTime || 0) - dt);
+  if (defender.arenaEmergencyRepair && defender.hp / defender.maxHp < 0.32) {
+    defender.arenaEmergencyRepair = false;
+    defender.hp = clamp(defender.hp + defender.maxHp * 0.24, 1, defender.maxHp);
+    defender.shield = Math.max(defender.shield || 0, 3.5);
+    addSkillEffect("repair-shield", defender, { radius: 120, color: "#62e6a7", life: 0.75 });
+  }
+  if (defender.arenaLastStand && defender.hp <= defender.maxHp * 0.1) {
+    defender.arenaLastStand = false;
+    defender.hp = Math.max(defender.hp, 1);
+    defender.shield = Math.max(defender.shield || 0, 5);
+    addSkillEffect("guardian", defender, { radius: 128, color: "#ffd166", life: 0.8 });
+  }
+}
+
+function shouldArenaDefenderUseActive(defender) {
+  if (!defender || defender.hp <= 0 || defender.skillCooldown > 0 || !enemies.some((unit) => unit.hp > 0)) return false;
+  if (defender.ekAuraActive) return false;
+  const teamUnderPressure = squad.some((ally) => ally.hp > 0 && (ally.hp / ally.maxHp < 0.92 || enemyPressureOn(ally)));
+  if (defender.damage < 0 || defender.name === "Seraphim" || defender.name === "Helix" || defender.name === "Accipio") {
+    return teamUnderPressure;
+  }
+  const target = chooseArenaAiTarget(defender);
+  if (!target) return false;
+  if (defender.name === "Caliburn") return dist(defender, target) <= (defender.rushRadius || 220) * 1.05;
+  if (defender.name === "Valkyr") return dist(defender, target) <= (defender.valkyrTauntRange || 315);
+  if (defender.name === "Nova") return weaponDistance(defender, target) <= Math.max(defender.range * 1.6, defender.rushRadius || 210);
+  if (normalizeArenaAiId(defender.arenaAi).startsWith("guard-")) {
+    return teamUnderPressure || weaponDistance(defender, target) <= defender.range * 1.08;
+  }
+  return true;
+}
+
+function shouldArenaDefenderUseUltimate(defender) {
+  if (!defender || defender.hp <= 0 || (defender.ultCharge || 0) < (defender.ultMax || 100)) return false;
+  const liveAttackers = enemies.filter((unit) => unit.hp > 0);
+  if (!liveAttackers.length) return false;
+  const teamInDanger = squad.some((ally) => ally.hp > 0 && ally.hp / ally.maxHp <= 0.72);
+  if (defender.damage < 0 || defender.name === "Seraphim" || defender.name === "Helix" || defender.name === "Accipio") {
+    return teamInDanger || squad.some((ally) => ally.hp <= 0);
+  }
+  const target = chooseArenaAiTarget(defender);
+  return liveAttackers.length >= 3 || teamInDanger || (target && weaponDistance(defender, target) <= Math.max(defender.range * 1.12, 270));
+}
+
+function castArenaDefenderSkills(defender) {
+  if (shouldArenaDefenderUseActive(defender)) activateSkill(defender);
+  if (shouldArenaDefenderUseUltimate(defender)) useUltimate(defender);
+}
+
 function updateArenaDefenderSmart(defender, dt) {
   if (defender.hp <= 0) return;
+  updateArenaDefenderUpkeep(defender, dt);
   const shotStart = shots.length;
   withArenaDefenderContext(() => {
     const frontlineTarget = chooseAutoTarget(defender);
@@ -5740,8 +5800,7 @@ function updateArenaDefenderSmart(defender, dt) {
       const arenaAnchor = arenaAiAnchor(defender, frontlineTarget);
       defender.move = arenaAnchor || null;
       if (arenaAnchor) defender.command = "move";
-      if (shouldAutoUseActive(defender)) activateSkill(defender);
-      if (shouldAutoUseUltimate(defender)) useUltimate(defender);
+      castArenaDefenderSkills(defender);
       stepUnit(defender, dt);
       convertArenaDefenderShots(shotStart, defender);
       return;
@@ -5779,8 +5838,7 @@ function updateArenaDefenderSmart(defender, dt) {
         }
       }
     }
-    if (shouldAutoUseActive(defender)) activateSkill(defender);
-    if (shouldAutoUseUltimate(defender)) useUltimate(defender);
+    castArenaDefenderSkills(defender);
     stepUnit(defender, dt);
   });
   convertArenaDefenderShots(shotStart, defender);
