@@ -2444,6 +2444,11 @@ function activateSkill(unit) {
       unit.x = behindX;
       unit.y = clamp(target.y + offsetY, ALLIED_MIN_Y, ALLIED_MAX_Y);
       unit.target = target.id;
+      unit.move = null;
+      unit.assistId = null;
+      unit.command = "attack";
+      unit.postCastHold = 0;
+      unit.aim = { x: target.x, y: target.y };
       enemies
         .filter((e) => e.hp > 0 && dist(unit, e) < radius)
         .forEach((e) => hit(e, unit.rushDamage || 96, "#ff9b38", unit.id));
