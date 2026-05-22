@@ -5002,20 +5002,40 @@ function fallbackChampionForBand(band) {
 
 function renderChampionBoard() {
   const visibleBands = masterLeagueBands.filter((band) => band.id !== "bronze");
+  const runScore = masterLeagueRun?.score || pilotProfile?.masterLeague?.score || 0;
+  const currentBand = masterLeagueRun?.active ? masterBandById(masterLeagueRun.bandId) : masterBandForScore(runScore);
+  const currentIndex = Math.max(0, visibleBands.findIndex((band) => band.id === currentBand.id));
+  const progressPercent = visibleBands.length > 1 ? (currentIndex / (visibleBands.length - 1)) * 100 : 0;
+  const playerLabel = currentLanguage === "en" ? "Your position" : "目前位置";
   return `
-    <div class="champion-board">
+    <div class="champion-ladder" style="--player-step:${progressPercent.toFixed(2)}%;">
+      <div class="champion-progress" aria-hidden="true">
+        <span></span>
+        <i>${playerLabel}: ${masterBandName(currentBand)}</i>
+      </div>
+      <div class="champion-board">
       ${visibleBands.map((band) => {
         const champion = arenaMasterChampions?.[band.id] || fallbackChampionForBand(band);
         const squadText = champion.defense?.squad?.join(" / ") || "-";
+        const bandIndex = visibleBands.findIndex((item) => item.id === band.id);
+        const rowClass = [
+          "champion-row",
+          `champion-${band.id}`,
+          band.id === currentBand.id ? "current-player-band" : "",
+          bandIndex < currentIndex ? "passed-band" : "",
+          bandIndex > currentIndex ? "future-band" : ""
+        ].filter(Boolean).join(" ");
         return `
-          <article class="champion-row">
+          <article class="${rowClass}">
             <span>${masterBandName(band)}</span>
             <strong>${champion.teamName || champion.name || "Pilot"}</strong>
+            ${band.id === currentBand.id ? `<b class="champion-player-label">${currentLanguage === "en" ? "YOU" : "目前"}</b>` : ""}
             ${renderChampionIconStrip(champion.defense)}
             <small>${squadText}</small>
           </article>
         `;
       }).join("")}
+      </div>
     </div>
   `;
 }
@@ -6361,13 +6381,20 @@ function showArenaResult(won) {
     : "";
   arenaResultTitleEl.textContent = won ? "Master League Victory" : "Master League End";
   arenaResultCopyEl.innerHTML = `
-    <div>
-      <span class="kicker">Battle Score</span>
-      <div class="arena-result-score">${detail.total}</div>
+    <div class="arena-score-summary">
+      <div>
+        <span class="kicker">${isEn ? "Battle Score" : "本場分數"}</span>
+        <div class="arena-result-score">${detail.total}</div>
+      </div>
+      <div class="arena-total-score">
+        <span class="kicker">${isEn ? "Total Run Score" : "累計總分"}</span>
+        <strong>${formatScore(runScore)}</strong>
+        <small>${masterBandName(band)}${nextBand ? ` / ${isEn ? "Next" : "下一階"} ${formatScore(nextBand.min)}` : ` / ${isEn ? "Top Band" : "最高階級"}`}</small>
+      </div>
     </div>
     <div class="arena-result-lines">
       <span>${won ? (isEn ? `Defeated ${arenaOpponent?.name || "opponent"}.` : `擊破 ${arenaOpponent?.name || "opponent"}。`) : (isEn ? `${arenaOpponent?.name || "Opponent"} held the line. Run ended.` : `${arenaOpponent?.name || "Opponent"} 守住戰線，Run 結束。`)}</span>
-      <span>Run Score ${runScore} / Band ${masterBandName(band)}${nextBand ? ` / ${isEn ? "Next threshold" : "下一門檻"} ${nextBand.min}` : ` / ${isEn ? "Top Band" : "最高 Band"}`}</span>
+      <span>${isEn ? "Current Band" : "目前階級"} ${masterBandName(band)}${nextBand ? ` / ${isEn ? "Next threshold" : "下一門檻"} ${formatScore(nextBand.min)}` : ` / ${isEn ? "Top Band" : "最高 Band"}`}</span>
       <span>${isEn ? "Time Left" : "剩餘"} ${Math.ceil(arenaTimeLeft)}s / ${isEn ? "Attackers Alive" : "攻方存活"} ${survivors.length} / ${isEn ? "Defenders Alive" : "守方存活"} ${defenderSurvivors.length}</span>
     </div>
     <div class="arena-result-build">
