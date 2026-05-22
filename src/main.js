@@ -4965,7 +4965,7 @@ function makeChampionOpponent(targetBand) {
     championName: source.name || "Pilot",
     championTeamName: source.teamName || source.name || "Pilot",
     rating: Math.max(source.rating || source.masterScore || 1000, targetBand.min + 260),
-    difficulty: { ...masterLeagueDifficulties[2], id: "champion", label: "盟主戰", multiplier: 1.35, hp: 1.16, damage: 1.16 },
+    difficulty: championDifficultyForBand(targetBand),
     championBand: targetBand,
     defense: cloneDefense(source.defense)
   };
@@ -4987,6 +4987,27 @@ function promotionTeamText(opponent) {
 
 function promotionChampionLabel(opponent) {
   return opponent?.championTeamName || opponent?.championName || opponent?.name?.replace(`${opponent?.championBand?.title || ""} / `, "") || "Pilot";
+}
+
+const championBandPowerScale = {
+  silver: { hp: 0.78, damage: 0.76, multiplier: 1.1 },
+  gold: { hp: 0.9, damage: 0.88, multiplier: 1.18 },
+  platinum: { hp: 1, damage: 1, multiplier: 1.26 },
+  diamond: { hp: 1.1, damage: 1.08, multiplier: 1.34 },
+  master: { hp: 1.2, damage: 1.16, multiplier: 1.44 }
+};
+
+function championDifficultyForBand(targetBand) {
+  const scale = championBandPowerScale[targetBand?.id] || championBandPowerScale.silver;
+  return {
+    ...masterLeagueDifficulties[2],
+    id: "champion",
+    label: "盟主戰",
+    multiplier: scale.multiplier,
+    hp: scale.hp,
+    damage: scale.damage,
+    powerLabel: `HP x${scale.hp.toFixed(2)} / DMG x${scale.damage.toFixed(2)}`
+  };
 }
 
 function fallbackChampionForBand(band) {
@@ -5477,7 +5498,7 @@ function renderMasterOpponentPanelV2() {
             <span>${promotionOpponent.name} / Rating ${promotionOpponent.rating || 1000}</span>
             <small>現任盟主戰隊名：${promotionChampionLabel(promotionOpponent)}</small>
             <small>現任該階級盟主隊：${squadText}</small>
-            <small>${moduleCount} Modules / ${promotionOpponent.defense?.core || "core"} / 打贏先升上 ${promotionOpponent.championBand.name}</small>
+            <small>${promotionOpponent.difficulty?.powerLabel || ""} / 打贏先升上 ${promotionOpponent.championBand.name}</small>
           </div>
         </button>
       </div>`;
@@ -5583,7 +5604,7 @@ function renderMasterOpponentPanelV3() {
             <span>${promotionOpponent.name} / Rating ${promotionOpponent.rating || 1000}</span>
             <small>${currentLanguage === "en" ? "Current champion" : "現任盟主"}: ${promotionChampionLabel(promotionOpponent)}</small>
             <small>${currentLanguage === "en" ? "Champion squad" : "盟主戰隊組合"}: ${squadText}</small>
-            <small>${moduleCount} Modules / ${promotionOpponent.defense?.core || "core"} / ${currentLanguage === "en" ? "Win to enter" : "打贏先升上"} ${masterBandName(promotionOpponent.championBand)}</small>
+            <small>${promotionOpponent.difficulty?.powerLabel || ""} / ${currentLanguage === "en" ? "Win to enter" : "打贏先升上"} ${masterBandName(promotionOpponent.championBand)}</small>
           </div>
         </button>
       </div>`;
