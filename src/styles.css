@@ -3696,15 +3696,39 @@ h1 {
 @media (max-width: 820px) {
   #briefing {
     align-content: start;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
     grid-template-areas:
       "title"
       "start"
       "board";
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
     justify-items: center;
+    overflow-y: auto;
+  }
+
+  .title-content {
+    flex: 0 0 auto;
+    grid-area: auto;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .title-actions {
+    flex: 0 0 auto;
+    grid-area: auto;
+    grid-column: 1;
+    grid-row: 2;
   }
 
   .title-leaderboard {
+    flex: 0 0 auto;
+    grid-area: auto;
+    grid-column: 1 / -1;
+    grid-row: 3;
     max-width: min(430px, 100%);
   }
 
