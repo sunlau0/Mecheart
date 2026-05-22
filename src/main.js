@@ -6758,6 +6758,7 @@ function drawEnemy(enemy) {
     const size = 100 * (enemy.spriteScale || 1);
     if (drawSheetSprite(enemy, size, size, -4)) {
       ctx.restore();
+      drawAccipioEnemyMarks(enemy);
       drawBar(enemy.x - 32, enemy.y + 48, 64, enemy.hp / enemy.maxHp, "#ff5b66");
       return;
     }
