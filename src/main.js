@@ -343,7 +343,7 @@ const arenaDefaultPositions = {
 const arenaCoreOptions = [
   { id: "iron-wall", name: "鐵壁核心", cost: ARENA_CORE_COST, text: "全隊 HP +10%，移速 -6%。", apply: (unit) => { unit.maxHp = Math.round(unit.maxHp * 1.1); unit.hp = unit.maxHp; unit.speed *= 0.94; } },
   { id: "rush-core", name: "速攻核心", cost: ARENA_CORE_COST, text: "開場 15 秒傷害 +18%，之後傷害 -6%。", apply: (unit) => { unit.arenaRushTime = 15; unit.arenaLateDamagePenalty = 0.94; } },
-  { id: "ewar-core", name: "電戰核心", cost: ARENA_CORE_COST, text: "首次技能/普攻命中時附帶短暫干擾。", apply: (unit) => { unit.arenaEwarCharge = true; } },
+  { id: "ewar-core", name: "電戰核心", cost: ARENA_CORE_COST, text: "開戰即釋放干擾波：敵方全隊主動技冷卻 +3 秒，移速 -20% 持續 3 秒。", apply: (unit) => { unit.arenaOpeningEwar = true; } },
   { id: "repair-core", name: "維修核心", cost: ARENA_CORE_COST, text: "每架機低血自動回復一次，但傷害 -6%。", apply: (unit) => { unit.arenaEmergencyRepair = true; unit.damage *= unit.damage > 0 ? 0.94 : 1.08; } },
   { id: "sniper-core", name: "狙擊核心", cost: ARENA_CORE_COST, text: "遠程機傷害 +15%，近戰機防禦稍弱。", apply: (unit) => { if (unit.range >= 260) unit.damage *= 1.15; else unit.arenaDefenseTaken = 1.08; } }
 ];
@@ -1400,7 +1400,7 @@ function localizeArenaAiOption(option) {
 const arenaCoreEnglish = {
   "iron-wall": ["Iron Wall Core", "All units gain HP +10%, but movement speed -6%."],
   "rush-core": ["Rush Core", "Opening 15 seconds damage +18%, then damage -6%."],
-  "ewar-core": ["E-War Core", "First active skill hit briefly disrupts enemy movement and fire control."],
+  "ewar-core": ["E-War Core", "Opening interference wave: enemy active skill cooldown +3s and movement speed -20% for 3 seconds."],
   "repair-core": ["Repair Core", "Each unit auto-repairs once at low HP, but damage -6%."],
   "sniper-core": ["Sniper Core", "Long-range units gain damage +15%; shorter-range units take +8% damage."]
 };
@@ -3653,6 +3653,7 @@ function stepUnit(unit, dt) {
   unit.attackPulse = Math.max(0, (unit.attackPulse || 0) - dt);
   unit.buttonPulse = Math.max(0, (unit.buttonPulse || 0) - dt);
   unit.speedBoost = Math.max(0, (unit.speedBoost || 0) - dt);
+  unit.ewarSlowTime = Math.max(0, (unit.ewarSlowTime || 0) - dt);
   unit.stealthTime = Math.max(0, (unit.stealthTime || 0) - dt);
   unit.regenAuraTime = Math.max(0, (unit.regenAuraTime || 0) - dt);
   unit.regenGlow = Math.max(0, (unit.regenGlow || 0) - dt);
@@ -3732,7 +3733,8 @@ function stepUnit(unit, dt) {
   if (unit.damage < 0 && unit.hp < unit.maxHp * 0.58 && unit.shield <= 0) unit.shield = 1.6;
   const quantumMoveBoost = unit.name === "Nova" && unit.quantumTime > 0 ? 3 : 1;
   const seedMoveBoost = unit.seedAwakenTime > 0 ? 1.35 : 1;
-  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost * seedMoveBoost * himawariSpeedFactor(unit);
+  const ewarSlowFactor = unit.ewarSlowTime > 0 ? 0.8 : 1;
+  const moveSpeed = unit.speed * (unit.speedBoost > 0 ? 1.34 : 1) * quantumMoveBoost * seedMoveBoost * ewarSlowFactor * himawariSpeedFactor(unit);
 
   if (unit.name === "MEGA(EK專用機)") {
     unit.lostTime = Math.max(0, (unit.lostTime || 0) - dt);
@@ -5636,6 +5638,26 @@ function prepareArenaAttackSquad() {
   });
 }
 
+function applyOpeningEwarPulse(sourceTeam, targetTeam) {
+  if (!sourceTeam.some((unit) => unit.hp > 0 && unit.arenaOpeningEwar)) return;
+  targetTeam
+    .filter((unit) => unit.hp > 0)
+    .forEach((unit) => {
+      unit.skillCooldown = Math.max(unit.skillCooldown || 0, 3);
+      unit.ewarSlowTime = Math.max(unit.ewarSlowTime || 0, 3);
+      unit.slowTime = Math.max(unit.slowTime || 0, 3);
+      unit.jamTime = Math.max(unit.jamTime || 0, 3);
+    });
+  const center = targetTeam
+    .filter((unit) => unit.hp > 0)
+    .reduce((point, unit, index, list) => ({
+      x: point.x + unit.x / list.length,
+      y: point.y + unit.y / list.length
+    }), { x: 0, y: 0 });
+  burst(center.x || W * 0.5, center.y || H * 0.5, "#c37bff", 72);
+  addSkillEffect("jam-aura", null, { x: center.x || W * 0.5, y: center.y || H * 0.5, radius: 360, color: "#c37bff", life: 1.35, follow: false });
+}
+
 async function startArenaChallenge(opponent) {
   if (!opponent?.defense?.squad?.length) return;
   showLoading("Loading Arena battle...");
@@ -5659,6 +5681,8 @@ async function startArenaChallenge(opponent) {
   sparks = [];
   gravityFields = [];
   skillEffects = [];
+  applyOpeningEwarPulse(squad, enemies);
+  applyOpeningEwarPulse(enemies, squad);
   wave = 1;
   score = 0;
   nextWaveAt = Number.POSITIVE_INFINITY;
@@ -5712,11 +5736,6 @@ function damageArenaAttacker(target, amount, color, source) {
   }
   chargeUltimateByDamageTaken(target, dealt);
   burst(target.x, target.y, color, 8);
-  if (source?.arenaEwarCharge) {
-    source.arenaEwarCharge = false;
-    target.skillCooldown = Math.max(target.skillCooldown || 0, 1.8);
-    addSkillEffect("impact-grid", null, { x: target.x, y: target.y, radius: 96, color: "#c37bff", life: 0.5, follow: false });
-  }
 }
 
 function healArenaDefender(source, ally, amount) {
@@ -6184,7 +6203,7 @@ function showArenaResult(won) {
     </div>
     ${renderArenaBattleReport(won)}
   `;
-  arenaResultRematchEl.textContent = championPending ? (isEn ? "Enter Promotion" : "進入升階戰") : won && masterLeagueRun?.active ? (isEn ? "Continue Run" : "繼續 Run") : (isEn ? "New Run" : "再開一局");
+  arenaResultRematchEl.textContent = championPending ? (isEn ? "Enter Promotion" : "進入升階戰") : won && masterLeagueRun?.active ? (isEn ? "Continue Run" : "繼續挑戰") : (isEn ? "New Run" : "再開一局");
   arenaResultBackEl.textContent = isEn ? "Back to Arena" : "返回 Arena";
   resultEl.hidden = true;
   rewardEl.hidden = true;
