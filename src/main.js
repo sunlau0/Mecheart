@@ -2353,7 +2353,7 @@ function activateSkill(unit) {
     addSkillEffect("repair-shield", unit, { radius, color: "#62e6a7", life: 1.2 });
     setMessage("幻象修復與護盾已部署");
   } else if (unit.name === "Accipio") {
-    const marks = clearAccipioMarks();
+    const marks = clearAccipioMarks(unit);
     const healBoost = unit.accipioHealBoost || 1;
     const hotDuration = unit.accipioHotDuration || 6;
     const shieldDuration = unit.accipioShieldDuration || 7;
@@ -2678,7 +2678,7 @@ function useUltimate(unit) {
     const knockRadius = unit.himawariTantrumRadius || 205;
     [...squad, ...enemies].filter((actor) => actor.hp > 0 && actor.id !== unit.id && dist(unit, actor) < knockRadius).forEach((actor) => {
       moveAwayFrom(actor, unit, 180);
-      if (actor.faction === "Enemy") hit(actor, 28 + unit.damage * 0.5, "#ff62d6", unit.id);
+      if (isBattleOpponent(unit, actor)) hit(actor, 28 + unit.damage * 0.5, "#ff62d6", unit.id);
     });
     const damage = unit.himawariLaserDamage || 72;
     enemies.filter((enemy) => enemy.hp > 0).forEach((enemy) => {
@@ -2775,27 +2775,31 @@ function hit(target, amount, color, sourceId = null) {
   const source = battleActorById(sourceId);
   const hpBefore = target.hp;
   let finalAmount = amount * sourceDamageFactor(source);
-  if (source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
+  const targetIsOpponent = isBattleOpponent(source, target);
+  const sourceIsPlayerSide = source ? battleAlliesFor(source).some((unit) => !unit.arenaDefender && unit.faction === "Allied") : false;
+  if (source?.name?.startsWith("Eumist") && targetIsOpponent) {
     finalAmount *= 1 + getEumistMistMarks(target, source) * 0.04;
   }
   target.hp = Math.max(0, target.hp - finalAmount);
   const dealt = hpBefore - target.hp;
   recordBattleDamage(source, target, dealt);
-  if (dealt > 0 && source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
+  if (dealt > 0 && source?.name?.startsWith("Eumist") && targetIsOpponent) {
     applyEumistMistMark(source, target);
   }
-  if (dealt > 0 && target.faction === "Enemy" && (target.accipioMarks || 0) > 0) {
+  if (dealt > 0 && targetIsOpponent && (target.accipioMarks || 0) > 0) {
     triggerAccipioMarkHeal(target, source);
   }
   burst(target.x, target.y, color, 10);
   if (wasAlive && target.hp <= 0) {
     recordBattleKill(source, target);
     if (source?.name !== "Accipio") chargeUltimate(sourceId, target.boss ? 55 : 28);
-    score += target.points || 50;
-    if (target.boss) score += wave * 100;
-    if (score > bestScore) {
-      bestScore = score;
-      localStorage.setItem("cosmic-heart-best", String(bestScore));
+    if (sourceIsPlayerSide && target.faction === "Enemy") {
+      score += target.points || 50;
+      if (target.boss) score += wave * 100;
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem("cosmic-heart-best", String(bestScore));
+      }
     }
   }
   return dealt;
@@ -2843,11 +2847,23 @@ function activeAccipio() {
   return squad.find((unit) => unit.name === "Accipio" && unit.hp > 0) || null;
 }
 
-function isAccipioRearSupportActive(unit) {
+function teamForActor(actor) {
+  if (!actor) return [];
+  if (squad.some((unit) => unit.id === actor.id)) return squad;
+  if (enemies.some((unit) => unit.id === actor.id)) return enemies;
+  return actor.faction === "Enemy" ? enemies : squad;
+}
+
+function activeAccipioForActor(actor) {
+  return teamForActor(actor).find((unit) => unit.name === "Accipio" && unit.hp > 0) || null;
+}
+
+function isAccipioRearSupportActive(unit, team = squad) {
   if (!unit || unit.name !== "Accipio" || unit.hp <= 0) return false;
-  return squad
+  const enemySide = unit.faction === "Enemy" || unit.arenaDefender;
+  return team
     .filter((ally) => ally.hp > 0 && ally.id !== unit.id)
-    .every((ally) => unit.x <= ally.x + 8);
+    .every((ally) => enemySide ? unit.x >= ally.x - 8 : unit.x <= ally.x + 8);
 }
 
 function addAccipioMark(unit, enemy) {
@@ -2858,9 +2874,10 @@ function addAccipioMark(unit, enemy) {
   addSkillEffect("accipio-lock", unit, { tx: enemy.x, ty: enemy.y, radius: bodyRadius(enemy) + 44, color: "#62f6b0", life: 0.48 });
 }
 
-function clearAccipioMarks() {
+function clearAccipioMarks(unit = null) {
   let total = 0;
-  enemies.forEach((enemy) => {
+  const targets = unit ? battleOpponentsFor(unit) : enemies;
+  targets.forEach((enemy) => {
     total += enemy.accipioMarks || 0;
     enemy.accipioMarks = 0;
     enemy.accipioMarkTime = 0;
@@ -2871,14 +2888,17 @@ function clearAccipioMarks() {
 }
 
 function triggerAccipioMarkHeal(enemy, attacker) {
-  const unit = activeAccipio();
-  if (!unit || !enemy || enemy.faction !== "Enemy" || (enemy.accipioMarks || 0) <= 0) return;
-  if (!attacker || attacker.faction !== "Allied" || attacker.hp <= 0) return;
+  const unit = activeAccipioForActor(attacker);
+  if (!unit || !enemy || (enemy.accipioMarks || 0) <= 0) return;
+  if (!attacker || attacker.hp <= 0) return;
+  const attackerTeam = teamForActor(attacker);
+  const targetTeam = teamForActor(enemy);
+  if (!attackerTeam.length || !targetTeam.length || attackerTeam === targetTeam) return;
   const stamp = now();
   enemy.accipioMarkHealCooldowns = enemy.accipioMarkHealCooldowns || {};
   if ((enemy.accipioMarkHealCooldowns[attacker.id] || 0) > stamp) return;
   enemy.accipioMarkHealCooldowns[attacker.id] = stamp + 0.35;
-  const rearBonus = isAccipioRearSupportActive(unit) ? 1.3 : 1;
+  const rearBonus = isAccipioRearSupportActive(unit, attackerTeam) ? 1.3 : 1;
   const amount = ((unit.damage * 0.32) + attacker.maxHp * 0.014 * enemy.accipioMarks) * rearBonus * (unit.accipioHealBoost || 1);
   healAlly(unit, attacker, amount, "#62f6b0");
   chargeAccipioXdr(unit, 1.8);
@@ -2902,9 +2922,11 @@ function grantAccipioShield(ally, duration, protection = 0, radiusScale = 0.82) 
 }
 
 function updateAccipioMarks(dt) {
-  enemies.forEach((enemy) => {
-    enemy.accipioMarkTime = Math.max(0, (enemy.accipioMarkTime || 0) - dt);
-    if (enemy.accipioMarkTime <= 0) enemy.accipioMarks = 0;
+  [squad, enemies].forEach((group) => {
+    group.forEach((unit) => {
+      unit.accipioMarkTime = Math.max(0, (unit.accipioMarkTime || 0) - dt);
+      if (unit.accipioMarkTime <= 0) unit.accipioMarks = 0;
+    });
   });
 }
 
@@ -2947,7 +2969,7 @@ function updateAccipioPassive(unit, dt) {
   }
   unit.accipioKneeTime = 5;
   unit.cooldown = Math.max(unit.cooldown || 0, 5);
-  clearAccipioMarks();
+  clearAccipioMarks(unit);
   burst(unit.x, unit.y, "#ff5b66", 18);
   addSkillEffect("accipio-knee", unit, { radius: bodyRadius(unit) + 52, color: "#ff5b66", life: 5, follow: true });
   setMessage("Accipio: 膝患復發");
@@ -3292,6 +3314,11 @@ function battleAlliesFor(actor) {
 
 function battleOpponentsFor(actor) {
   return battleAlliesFor(actor) === squad ? enemies : squad;
+}
+
+function isBattleOpponent(source, target) {
+  if (!source || !target) return false;
+  return battleOpponentsFor(source).some((unit) => unit.id === target.id);
 }
 
 function updateGravityFields(dt) {
@@ -3929,7 +3956,6 @@ function stepUnit(unit, dt) {
             .slice(0, 5);
           targets.forEach((enemy) => {
             shots.push({ x: unit.x, y: unit.y, tx: enemy.x, ty: enemy.y, color: unit.color, life: 0.22, maxLife: 0.22, damage: unit.damage * 0.75, target: enemy.id, source: unit.id, accipioMark: true });
-            addAccipioMark(unit, enemy);
           });
         } else if (unit.name === "MEGA(EK專用機)") {
           const radius = unit.omniSlashRadius || 132;
@@ -4162,13 +4188,22 @@ function update(dt) {
       const source = enemies.find((e) => e.id === shot.source);
       const target = squad.find((u) => u.id === shot.arenaTarget);
       damageArenaAttacker(target, shot.arenaDamage, shot.color, source);
+      if (shot.accipioMark && source && target) addAccipioMark(source, target);
+      if (target && shot.splashRadius) {
+        squad
+          .filter((unit) => unit.hp > 0 && unit.id !== target.id && dist(unit, target) < shot.splashRadius)
+          .forEach((unit) => damageArenaAttacker(unit, shot.splashDamage || shot.arenaDamage * 0.35, shot.color, source));
+        addSkillEffect("impact-grid", null, { x: target.x, y: target.y, radius: shot.splashRadius, color: shot.color, life: 0.45, follow: false });
+      }
     }
     if (shot.life <= 0 && shot.damage && !shot.resolved) {
       shot.resolved = true;
       if (!battleActorAlive(shot.source)) return;
+      const source = battleActorById(shot.source);
       const target = enemies.find((e) => e.id === shot.target);
       if (target) {
         hit(target, shot.damage, shot.color, shot.source);
+        if (shot.accipioMark && source) addAccipioMark(source, target);
         if (shot.splashRadius) {
           enemies
             .filter((e) => e.hp > 0 && e.id !== target.id && dist(e, target) < shot.splashRadius)
@@ -5820,11 +5855,18 @@ function arenaDefenderDamage(defender, target) {
 
 function damageArenaAttacker(target, amount, color, source) {
   if (!target || target.hp <= 0) return;
-  const finalAmount = amount * unitDefenseFactor(target) * himawariDefenseFactor(target);
+  let finalAmount = amount * sourceDamageFactor(source);
+  const targetIsOpponent = isBattleOpponent(source, target);
+  if (source?.name?.startsWith("Eumist") && targetIsOpponent) {
+    finalAmount *= 1 + getEumistMistMarks(target, source) * 0.04;
+  }
+  finalAmount *= unitDefenseFactor(target) * himawariDefenseFactor(target);
   const hpBefore = target.hp;
   target.hp = clamp(target.hp - finalAmount, 0, target.maxHp);
   const dealt = hpBefore - target.hp;
   recordBattleDamage(source, target, dealt);
+  if (dealt > 0 && source?.name?.startsWith("Eumist") && targetIsOpponent) applyEumistMistMark(source, target);
+  if (dealt > 0 && (target.accipioMarks || 0) > 0) triggerAccipioMarkHeal(target, source);
   if (hpBefore > 0 && target.hp <= 0) {
     recordBattleKill(source, target);
     if (source?.name !== "Accipio") chargeUltimateUnit(source, target.boss ? 55 : 28);
@@ -6591,6 +6633,7 @@ function drawMech(unit) {
     if (unit.shield > 0) {
       drawShieldBubble(unit.x, unit.y - 8, 50, false);
     }
+    drawAccipioEnemyMarks(unit);
     drawBar(unit.x - 34, unit.y + 44, 68, unit.hp / unit.maxHp, "#62e6a7");
     return;
   }
@@ -6627,6 +6670,7 @@ function drawMech(unit) {
     ctx.arc(unit.x, unit.y - 6, 44 + unit.regenGlow * 18, 0, Math.PI * 2);
     ctx.stroke();
   }
+  drawAccipioEnemyMarks(unit);
   drawBar(unit.x - 34, unit.y + 42, 68, unit.hp / unit.maxHp, "#62e6a7");
 }
 
