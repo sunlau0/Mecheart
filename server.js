@@ -89,10 +89,12 @@ function withDefaultRankings(rankings) {
 }
 
 function normalizeMasterRankings(rankings = []) {
-  const bestByPlayer = new Map();
-  (Array.isArray(rankings) ? rankings : [])
+  const bestByRun = new Map();
+  const bestLegacyDuplicate = new Map();
+  const entries = (Array.isArray(rankings) ? rankings : [])
     .filter((entry) => Number.isFinite(Number(entry?.score)))
     .map((entry, index) => ({
+      runId: sanitizeToken(entry.runId),
       playerId: sanitizeToken(entry.playerId),
       name: sanitizeName(entry.name),
       score: sanitizeScore(entry.score),
@@ -100,15 +102,20 @@ function normalizeMasterRankings(rankings = []) {
       team: Array.isArray(entry.team) ? entry.team.map(String).slice(0, 4) : [],
       submittedAt: typeof entry.submittedAt === "string" ? entry.submittedAt : "",
       order: index
-    }))
-    .forEach((entry) => {
-      const key = entry.playerId || entry.name.toLocaleLowerCase();
-      const current = bestByPlayer.get(key);
-      if (!current || entry.score > current.score || (entry.score === current.score && entry.submittedAt > current.submittedAt)) {
-        bestByPlayer.set(key, entry);
-      }
-    });
-  return [...bestByPlayer.values()]
+    }));
+  entries.forEach((entry) => {
+    const key = entry.runId || `${entry.name.toLocaleLowerCase()}|${entry.score}|${entry.bandId}|${entry.team.join("/")}`;
+    const bucket = entry.runId ? bestByRun : bestLegacyDuplicate;
+    const current = bucket.get(key);
+    if (!current || entry.score > current.score || (entry.score === current.score && entry.submittedAt > current.submittedAt)) {
+      bucket.set(key, entry);
+    }
+  });
+  return entries
+    .filter((entry) => {
+      const key = entry.runId || `${entry.name.toLocaleLowerCase()}|${entry.score}|${entry.bandId}|${entry.team.join("/")}`;
+      return (entry.runId ? bestByRun : bestLegacyDuplicate).get(key) === entry;
+    })
     .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.order - b.order)
     .slice(0, 10);
 }
@@ -292,6 +299,7 @@ createServer(async (req, res) => {
           return;
         }
         if (payload.action === "result") {
+          const runId = sanitizeToken(payload.masterLeague?.runId);
           const runScore = sanitizeScore(payload.masterLeague?.score);
           const runDefense = payload.masterLeague?.defense;
           const submittedBandId = sanitizeToken(payload.masterLeague?.bandId);
@@ -324,6 +332,7 @@ createServer(async (req, res) => {
             }
             arena.rankings = normalizeMasterRankings([
               {
+                runId,
                 playerId,
                 name: profile.name,
                 score: runScore,

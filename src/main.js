@@ -1985,10 +1985,12 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
 }
 
 function normalizeMasterLeaderboard(rankings = []) {
-  const bestByPlayer = new Map();
-  rankings
+  const bestByRun = new Map();
+  const bestLegacyDuplicate = new Map();
+  const entries = rankings
     .filter((entry) => entry && Number.isFinite(Number(entry.score)))
     .map((entry, index) => ({
+      runId: typeof entry.runId === "string" ? entry.runId : "",
       playerId: typeof entry.playerId === "string" ? entry.playerId : "",
       name: sanitizePlayerName(entry.name || "Pilot"),
       score: Math.max(0, Math.floor(Number(entry.score) || 0)),
@@ -1996,15 +1998,20 @@ function normalizeMasterLeaderboard(rankings = []) {
       team: Array.isArray(entry.team) ? entry.team.slice(0, 4) : Array.isArray(entry.defense?.squad) ? entry.defense.squad.slice(0, 4) : [],
       submittedAt: typeof entry.submittedAt === "string" ? entry.submittedAt : "",
       order: index
-    }))
-    .forEach((entry) => {
-      const key = entry.playerId || entry.name.toLocaleLowerCase();
-      const current = bestByPlayer.get(key);
-      if (!current || entry.score > current.score || (entry.score === current.score && entry.submittedAt > current.submittedAt)) {
-        bestByPlayer.set(key, entry);
-      }
-    });
-  return [...bestByPlayer.values()]
+    }));
+  entries.forEach((entry) => {
+    const key = entry.runId || `${entry.name.toLocaleLowerCase()}|${entry.score}|${entry.bandId}|${entry.team.join("/")}`;
+    const bucket = entry.runId ? bestByRun : bestLegacyDuplicate;
+    const current = bucket.get(key);
+    if (!current || entry.score > current.score || (entry.score === current.score && entry.submittedAt > current.submittedAt)) {
+      bucket.set(key, entry);
+    }
+  });
+  return entries
+    .filter((entry) => {
+      const key = entry.runId || `${entry.name.toLocaleLowerCase()}|${entry.score}|${entry.bandId}|${entry.team.join("/")}`;
+      return (entry.runId ? bestByRun : bestLegacyDuplicate).get(key) === entry;
+    })
     .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.order - b.order)
     .slice(0, 10);
 }
@@ -4736,12 +4743,17 @@ function cloneDefense(defense) {
   return JSON.parse(JSON.stringify(defense || {}));
 }
 
+function makeMasterRunId() {
+  return `${pilotProfile?.playerId || "local"}-${Date.now().toString(36)}-${makeLocalToken(6)}`;
+}
+
 function startMasterLeagueRun() {
   if (arenaBuildCost() > ARENA_TOTAL_COST) {
     renderPilotPanel("Cost 超出上限，不能參賽。");
     return;
   }
   masterLeagueRun = {
+    runId: makeMasterRunId(),
     active: true,
     score: 0,
     streak: 0,
@@ -4784,6 +4796,7 @@ function confirmMasterLeagueEntry() {
     return;
   }
   masterLeagueRun = {
+    runId: makeMasterRunId(),
     active: true,
     score: 0,
     streak: 0,
@@ -6097,6 +6110,7 @@ async function submitArenaResult(won) {
     if (!pilotCloudReady) throw new Error("Pilot profile is not synced.");
     const defeatedChampionBandId = lastDefeatedChampionBandId;
     const masterLeague = masterLeagueRun ? {
+      runId: masterLeagueRun.runId || "",
       score: masterLeagueRun.score || 0,
       bandId: masterLeagueRun.bandId || masterBandForScore(masterLeagueRun.score || 0).id,
       championBandId: defeatedChampionBandId || arenaOpponent?.championBand?.id || "",
@@ -6160,6 +6174,8 @@ async function endArena(won) {
   }
   if (masterLeagueRun?.score > 0) {
     saveLocalMasterLeaderboard({
+      runId: masterLeagueRun.runId || "",
+      playerId: pilotProfile?.playerId || "",
       name: pilotProfile?.name || "Pilot",
       score: masterLeagueRun.score,
       bandId: masterLeagueRun.bandId || masterBandForScore(masterLeagueRun.score).id,
