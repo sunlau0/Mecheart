@@ -900,8 +900,8 @@ body.paused-mode #game {
 
 .title-leaderboard .leaderboard-list {
   gap: 5px;
-  max-height: 380px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .title-leaderboard .leaderboard-list li {
@@ -5285,4 +5285,9 @@ h1 {
     min-height: 52px;
     width: 100%;
   }
+}
+
+body.setup-mode .title-leaderboard .leaderboard-list {
+  max-height: none;
+  overflow: visible;
 }

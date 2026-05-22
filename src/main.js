@@ -1985,9 +1985,11 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
 }
 
 function normalizeMasterLeaderboard(rankings = []) {
-  return rankings
+  const bestByPlayer = new Map();
+  rankings
     .filter((entry) => entry && Number.isFinite(Number(entry.score)))
     .map((entry, index) => ({
+      playerId: typeof entry.playerId === "string" ? entry.playerId : "",
       name: sanitizePlayerName(entry.name || "Pilot"),
       score: Math.max(0, Math.floor(Number(entry.score) || 0)),
       bandId: entry.bandId || masterBandForScore(Number(entry.score) || 0).id,
@@ -1995,6 +1997,14 @@ function normalizeMasterLeaderboard(rankings = []) {
       submittedAt: typeof entry.submittedAt === "string" ? entry.submittedAt : "",
       order: index
     }))
+    .forEach((entry) => {
+      const key = entry.playerId || entry.name.toLocaleLowerCase();
+      const current = bestByPlayer.get(key);
+      if (!current || entry.score > current.score || (entry.score === current.score && entry.submittedAt > current.submittedAt)) {
+        bestByPlayer.set(key, entry);
+      }
+    });
+  return [...bestByPlayer.values()]
     .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.order - b.order)
     .slice(0, 10);
 }
