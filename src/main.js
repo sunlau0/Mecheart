@@ -1615,9 +1615,10 @@ function recordBattleKill(source, target) {
   if (!source || !target) return;
   ensureBattleStats(source).kills += 1;
   const cutoff = now() - 14;
+  const helperPool = battleAlliesFor(source);
   Object.entries(target.damageLedger || {}).forEach(([sourceId, entry]) => {
     if (sourceId === source.id || (entry.time || 0) < cutoff) return;
-    const helper = squad.find((unit) => unit.id === sourceId && unit.hp > 0);
+    const helper = helperPool.find((unit) => unit.id === sourceId && unit.hp > 0);
     if (helper) ensureBattleStats(helper).assists += 1;
   });
 }
@@ -1984,21 +1985,17 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
 }
 
 function normalizeMasterLeaderboard(rankings = []) {
-  const bestByName = new Map();
-  rankings
+  return rankings
     .filter((entry) => entry && Number.isFinite(Number(entry.score)))
-    .map((entry) => ({
+    .map((entry, index) => ({
       name: sanitizePlayerName(entry.name || "Pilot"),
       score: Math.max(0, Math.floor(Number(entry.score) || 0)),
       bandId: entry.bandId || masterBandForScore(Number(entry.score) || 0).id,
-      team: Array.isArray(entry.team) ? entry.team.slice(0, 4) : Array.isArray(entry.defense?.squad) ? entry.defense.squad.slice(0, 4) : []
+      team: Array.isArray(entry.team) ? entry.team.slice(0, 4) : Array.isArray(entry.defense?.squad) ? entry.defense.squad.slice(0, 4) : [],
+      submittedAt: typeof entry.submittedAt === "string" ? entry.submittedAt : "",
+      order: index
     }))
-    .forEach((entry) => {
-      const key = entry.name.toLowerCase();
-      if (!bestByName.has(key) || entry.score > bestByName.get(key).score) bestByName.set(key, entry);
-    });
-  return [...bestByName.values()]
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.order - b.order)
     .slice(0, 10);
 }
 
@@ -2774,7 +2771,7 @@ function useUltimate(unit) {
 
 function hit(target, amount, color, sourceId = null) {
   const wasAlive = target.hp > 0;
-  const source = squad.find((u) => u.id === sourceId && u.hp > 0);
+  const source = battleActorById(sourceId);
   const hpBefore = target.hp;
   let finalAmount = amount * sourceDamageFactor(source);
   if (source?.name === "Eumist (Eunice專用機)" && target.faction === "Enemy") {
@@ -2809,7 +2806,7 @@ function chargeUltimateUnit(unit, amount) {
 }
 
 function chargeUltimate(sourceId, amount) {
-  const unit = squad.find((u) => u.id === sourceId && u.hp > 0);
+  const unit = battleActorById(sourceId);
   chargeUltimateUnit(unit, amount);
 }
 
@@ -2911,18 +2908,20 @@ function updateAccipioMarks(dt) {
 }
 
 function updateAccipioHot(dt) {
-  squad.forEach((ally) => {
-    ally.accipioHotTime = Math.max(0, (ally.accipioHotTime || 0) - dt);
-    ally.accipioShieldTime = Math.max(0, (ally.accipioShieldTime || 0) - dt);
-    ally.accipioProtectionTime = Math.max(0, (ally.accipioProtectionTime || 0) - dt);
-    if (ally.accipioShieldTime <= 0 && ally.accipioProtectionTime <= 0) ally.accipioShieldRadiusScale = 1;
-    if (ally.hp <= 0 || ally.accipioHotTime <= 0) return;
-    const unit = squad.find((source) => source.id === ally.accipioHotSource && source.hp > 0);
-    if (!unit) return;
-    const lowHpBoost = ally.hp / ally.maxHp < 0.45 ? 1.6 : 1;
-    const amount = (ally.maxHp * 0.032 + unit.damage * 0.35) * lowHpBoost * (unit.accipioHealBoost || 1) * dt;
-    const healed = healAlly(unit, ally, amount, "#62f6b0");
-    if (healed > 0) chargeAccipioXdr(unit, 0.45 * dt);
+  [squad, enemies].forEach((group) => {
+    group.forEach((ally) => {
+      ally.accipioHotTime = Math.max(0, (ally.accipioHotTime || 0) - dt);
+      ally.accipioShieldTime = Math.max(0, (ally.accipioShieldTime || 0) - dt);
+      ally.accipioProtectionTime = Math.max(0, (ally.accipioProtectionTime || 0) - dt);
+      if (ally.accipioShieldTime <= 0 && ally.accipioProtectionTime <= 0) ally.accipioShieldRadiusScale = 1;
+      if (ally.hp <= 0 || ally.accipioHotTime <= 0) return;
+      const unit = group.find((source) => source.id === ally.accipioHotSource && source.hp > 0);
+      if (!unit) return;
+      const lowHpBoost = ally.hp / ally.maxHp < 0.45 ? 1.6 : 1;
+      const amount = (ally.maxHp * 0.032 + unit.damage * 0.35) * lowHpBoost * (unit.accipioHealBoost || 1) * dt;
+      const healed = healAlly(unit, ally, amount, "#62f6b0");
+      if (healed > 0) chargeAccipioXdr(unit, 0.45 * dt);
+    });
   });
 }
 
@@ -3144,11 +3143,12 @@ function updateHimawariPoison(dt) {
   skillEffects
     .filter((effect) => effect.type === "himawari-poison")
     .forEach((effect) => {
-      if (effect.source && !squad.some((unit) => unit.id === effect.source && unit.hp > 0)) {
+      const source = battleActorById(effect.source);
+      if (effect.source && (!source || source.hp <= 0)) {
         effect.life = 0;
         return;
       }
-      const target = enemies.find((enemy) => enemy.id === effect.targetId && enemy.hp > 0);
+      const target = battleOpponentsFor(source).find((enemy) => enemy.id === effect.targetId && enemy.hp > 0);
       if (!target) {
         effect.life = 0;
         return;
@@ -3235,12 +3235,13 @@ function updateMirageDomains(dt) {
   skillEffects
     .filter((effect) => effect.type === "mirage-domain")
     .forEach((effect) => {
-      if (effect.source && !squad.some((unit) => unit.id === effect.source && unit.hp > 0)) {
+      const source = battleActorById(effect.source);
+      if (effect.source && (!source || source.hp <= 0)) {
         effect.life = 0;
         return;
       }
       effect.tick = (effect.tick || 0) + dt;
-      enemies
+      battleOpponentsFor(source)
         .filter((enemy) => enemy.hp > 0 && dist(enemy, effect) < effect.radius)
         .forEach((enemy) => {
           enemy.jamTime = Math.max(enemy.jamTime || 0, 0.45);
@@ -3277,14 +3278,30 @@ function battleActorAlive(sourceId) {
   return !sourceId || [...squad, ...enemies].some((actor) => actor.id === sourceId && actor.hp > 0);
 }
 
+function battleActorById(sourceId) {
+  return [...squad, ...enemies].find((actor) => actor.id === sourceId) || null;
+}
+
+function battleAlliesFor(actor) {
+  if (!actor) return squad;
+  if (squad.includes(actor)) return squad;
+  if (enemies.includes(actor)) return enemies;
+  return actor.arenaDefender ? enemies : squad;
+}
+
+function battleOpponentsFor(actor) {
+  return battleAlliesFor(actor) === squad ? enemies : squad;
+}
+
 function updateGravityFields(dt) {
   gravityFields.forEach((field) => {
-    if (!battleActorAlive(field.source)) {
+    const source = battleActorById(field.source);
+    if (field.source && (!source || source.hp <= 0)) {
       field.life = 0;
       return;
     }
     field.life -= dt;
-    enemies
+    battleOpponentsFor(source)
       .filter((enemy) => enemy.hp > 0 && dist(enemy, field) < field.radius)
       .forEach((enemy) => {
         moveToward(enemy, field, field.pull * dt);
@@ -4076,10 +4093,10 @@ function update(dt) {
     effect.life -= dt;
   });
   skillEffects = skillEffects.filter((effect) => effect.life > 0);
-  enemies = enemies.filter((e) => e.hp > 0);
+  if (battleMode !== "arena") enemies = enemies.filter((e) => e.hp > 0);
 
   if (battleMode === "arena") {
-    if (!enemies.length) endArena(true);
+    if (!enemies.some((e) => e.hp > 0)) endArena(true);
     else if (!squad.some((u) => u.hp > 0) || arenaTimeLeft <= 0) endArena(false);
   }
 
@@ -5782,6 +5799,13 @@ function shouldArenaDefenderUseUltimate(defender) {
   return liveAttackers.length >= 3 || teamInDanger || (target && weaponDistance(defender, target) <= Math.max(defender.range * 1.12, 270));
 }
 
+function shouldArenaDefenderRetreat(defender, target) {
+  if (!defender || !target || defender.damage <= 0 || defender.range <= 130) return false;
+  const ai = normalizeArenaAiId(defender.arenaAi);
+  if (arenaUnitRole(defender) === "tank" || ai === "frontline" || ai.startsWith("guard-")) return false;
+  return weaponDistance(defender, target) < defender.range * 0.34;
+}
+
 function castArenaDefenderSkills(defender) {
   if (shouldArenaDefenderUseActive(defender)) activateSkill(defender);
   if (shouldArenaDefenderUseUltimate(defender)) useUltimate(defender);
@@ -5827,7 +5851,7 @@ function updateArenaDefenderSmart(defender, dt) {
           defender.target = target.id;
           defender.move = arenaAnchor;
           defender.command = "move";
-        } else if (defender.damage > 0 && defender.range > 130 && weaponDistance(defender, target) < defender.range * 0.34) {
+        } else if (shouldArenaDefenderRetreat(defender, target)) {
           defender.move = {
             x: clamp(defender.x + Math.sign(defender.x - target.x || 1) * 78, ALLIED_MIN_X, ALLIED_MAX_X),
             y: clamp(defender.y + (defender.y >= target.y ? 52 : -52), ALLIED_MIN_Y, ALLIED_MAX_Y)
@@ -5950,6 +5974,8 @@ async function endArena(won) {
     } else {
       if (masterLeagueSearchTimer) window.clearTimeout(masterLeagueSearchTimer);
       masterLeagueSearching = false;
+      masterLeagueRun.pendingChampionBand = null;
+      arenaSelectedOpponent = null;
       masterLeagueRun.active = false;
     }
   }
@@ -5958,7 +5984,8 @@ async function endArena(won) {
       name: pilotProfile?.name || "Pilot",
       score: masterLeagueRun.score,
       bandId: masterLeagueRun.bandId || masterBandForScore(masterLeagueRun.score).id,
-      team: currentLeagueTacticalBuild().squad
+      team: currentLeagueTacticalBuild().squad,
+      submittedAt: new Date().toISOString()
     });
   }
   await submitArenaResult(won);
@@ -6125,7 +6152,7 @@ function showArenaResult(won) {
   const runScore = masterLeagueRun?.score || score;
   const band = masterLeagueRun?.active ? masterBandById(masterLeagueRun.bandId) : masterBandForScore(runScore);
   const nextBand = masterLeagueRun?.active ? nextMasterBandForRun() : nextMasterBand(runScore);
-  const championPending = Boolean(masterLeagueRun?.pendingChampionBand && arenaSelectedOpponent?.championBand);
+  const championPending = Boolean(won && masterLeagueRun?.pendingChampionBand && arenaSelectedOpponent?.championBand);
   const isEn = currentLanguage === "en";
   const promotionChampionLine = championPending
     ? (isEn
@@ -6477,6 +6504,7 @@ function drawMech(unit) {
 }
 
 function drawEnemy(enemy) {
+  if (enemy.hp <= 0) return;
   const offset = attackOffset(enemy);
   ctx.save();
   ctx.translate(enemy.x + offset.x, enemy.y + offset.y);

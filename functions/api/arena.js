@@ -58,22 +58,18 @@ function masterBandForScore(score) {
 }
 
 function normalizeRankings(rankings = []) {
-  const bestByPlayer = new Map();
-  rankings
+  return rankings
     .filter((entry) => entry && Number.isFinite(Number(entry.score)))
-    .map((entry) => ({
+    .map((entry, index) => ({
       playerId: sanitizeToken(entry.playerId),
       name: sanitizeName(entry.name),
       score: Math.max(0, Math.floor(Number(entry.score) || 0)),
       bandId: sanitizeToken(entry.bandId) || masterBandForScore(Number(entry.score) || 0).id,
-      team: Array.isArray(entry.team) ? entry.team.map(String).slice(0, 4) : []
+      team: Array.isArray(entry.team) ? entry.team.map(String).slice(0, 4) : [],
+      submittedAt: typeof entry.submittedAt === "string" ? entry.submittedAt : "",
+      order: index
     }))
-    .forEach((entry) => {
-      const key = entry.playerId || entry.name.toLowerCase();
-      if (!bestByPlayer.has(key) || entry.score > bestByPlayer.get(key).score) bestByPlayer.set(key, entry);
-    });
-  return [...bestByPlayer.values()]
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score - a.score || a.submittedAt.localeCompare(b.submittedAt) || a.order - b.order)
     .slice(0, 10);
 }
 
@@ -170,7 +166,8 @@ export async function onRequestPost({ request, env }) {
           name: profile.name,
           score: runScore,
           bandId: runBand.id,
-          team: runDefense.squad
+          team: runDefense.squad,
+          submittedAt: new Date().toISOString()
         },
         ...(await store.get(RANKINGS_KEY, "json") || [])
       ]);
