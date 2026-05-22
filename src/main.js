@@ -2420,7 +2420,8 @@ function activateSkill(unit) {
     if (target) {
       const radius = unit.rushRadius || 210;
       const behindLimit = battleMode === "arena" ? ALLIED_MAX_X : (autoBattleEnabled ? AUTO_CHASE_MAX_X : ALLIED_MAX_X);
-      const behindX = clamp(target.x + bodyRadius(target) + 42, ALLIED_MIN_X, behindLimit);
+      const backstabSide = unit.faction === "Enemy" ? -1 : 1;
+      const behindX = clamp(target.x + backstabSide * (bodyRadius(target) + 42), ALLIED_MIN_X, behindLimit);
       const offsetY = target.y > H * 0.5 ? -28 : 28;
       const from = { x: unit.x, y: unit.y };
       unit.x = behindX;
@@ -3544,12 +3545,95 @@ function autoLureAnchor(unit, target) {
   return { x: desiredX, y: desiredY };
 }
 
+function offensiveSkillRadius(unit) {
+  if (!unit || unit.skillCooldown > 0) return 0;
+  if (unit.name === "Caliburn") return unit.rushRadius || 220;
+  if (unit.name.startsWith("Eumist")) return unit.eumistSkillRadius || 218;
+  if (unit.name.startsWith("MEGA")) return unit.ekAuraRange || 235;
+  if (unit.name === "Valkyr") return unit.valkyrTauntRange || 315;
+  if (unit.name === "Mirage") return unit.jamRadius || 270;
+  return 0;
+}
+
+function ultimateSkillRadius(unit) {
+  if (!unit || (unit.ultCharge || 0) < (unit.ultMax || 100)) return 0;
+  if (unit.name === "Valkyr") return unit.gnFieldRadius || 170;
+  if (unit.name === "Mirage") return unit.mirageDomainRadius || 294;
+  if (unit.name.startsWith("Himawari")) return unit.himawariTantrumRadius || 205;
+  if (unit.name === "Caliburn") return 245;
+  return 0;
+}
+
+function targetsInRadius(point, radius) {
+  return enemies.filter((enemy) => enemy.hp > 0 && dist(point, enemy) <= radius + bodyRadius(enemy) * 0.45);
+}
+
+function bestOffensiveSkillAnchor(unit) {
+  const radius = offensiveSkillRadius(unit);
+  if (!radius) return null;
+  const liveTargets = enemies.filter((enemy) => enemy.hp > 0);
+  if (!liveTargets.length) return null;
+  const currentHits = targetsInRadius(unit, radius).length;
+  let best = { point: null, hits: currentHits };
+  liveTargets.forEach((target) => {
+    const cluster = liveTargets.filter((enemy) => dist(target, enemy) <= radius * 0.86 + bodyRadius(enemy) * 0.35);
+    const center = cluster.reduce((point, enemy) => {
+      point.x += enemy.x;
+      point.y += enemy.y;
+      return point;
+    }, { x: 0, y: 0 });
+    center.x /= cluster.length;
+    center.y /= cluster.length;
+    const point = {
+      x: clamp(center.x, ALLIED_MIN_X, ALLIED_MAX_X),
+      y: clamp(center.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+    };
+    if (cluster.length > best.hits || (cluster.length === best.hits && best.point && dist(unit, point) < dist(unit, best.point))) {
+      best = { point, hits: cluster.length };
+    }
+  });
+  const desiredHits = Math.max(1, best.hits);
+  if (!best.point || currentHits >= desiredHits) return null;
+  return dist(unit, best.point) > Math.max(18, radius * 0.16) ? best.point : null;
+}
+
+function bestUltimateSkillAnchor(unit) {
+  const radius = ultimateSkillRadius(unit);
+  if (!radius) return null;
+  const liveTargets = enemies.filter((enemy) => enemy.hp > 0);
+  if (liveTargets.length < 2) return null;
+  const currentHits = targetsInRadius(unit, radius).length;
+  let best = { point: null, hits: currentHits };
+  liveTargets.forEach((target) => {
+    const cluster = liveTargets.filter((enemy) => dist(target, enemy) <= radius * 0.9 + bodyRadius(enemy) * 0.35);
+    const center = cluster.reduce((point, enemy) => {
+      point.x += enemy.x;
+      point.y += enemy.y;
+      return point;
+    }, { x: 0, y: 0 });
+    center.x /= cluster.length;
+    center.y /= cluster.length;
+    const point = {
+      x: clamp(center.x, ALLIED_MIN_X, ALLIED_MAX_X),
+      y: clamp(center.y, ALLIED_MIN_Y, ALLIED_MAX_Y)
+    };
+    if (cluster.length > best.hits || (cluster.length === best.hits && best.point && dist(unit, point) < dist(unit, best.point))) {
+      best = { point, hits: cluster.length };
+    }
+  });
+  if (!best.point || currentHits >= best.hits) return null;
+  return dist(unit, best.point) > Math.max(18, radius * 0.16) ? best.point : null;
+}
+
 function shouldAutoUseActive(unit) {
   if (!unit || unit.hp <= 0 || unit.skillCooldown > 0 || !enemies.some((enemy) => enemy.hp > 0)) return false;
   if (unit.ekAuraActive) return false;
   if (unit.damage < 0 || unit.name === "Seraphim" || unit.name === "Helix" || unit.name === "Accipio") {
     return squad.some((ally) => ally.hp > 0 && ally.hp / ally.maxHp < 0.82);
   }
+  const radius = offensiveSkillRadius(unit);
+  if (radius) return targetsInRadius(unit, radius).length > 0;
+  if (unit.name === "Nova") return Boolean(chooseAutoTarget(unit));
   return true;
 }
 
@@ -3560,6 +3644,7 @@ function shouldAutoUseUltimate(unit) {
   const bossAlive = liveEnemies.some((enemy) => enemy.boss);
   const enemyClustered = liveEnemies.length >= 6;
   const squadInDanger = squad.some((ally) => ally.hp > 0 && ally.hp / ally.maxHp <= 0.38);
+  if (battleMode === "arena") return liveEnemies.length >= 2 || squadInDanger || Boolean(chooseAutoTarget(unit));
   return bossAlive || enemyClustered || squadInDanger;
 }
 
@@ -3571,10 +3656,12 @@ function updateAutoBattle() {
     const ai = battleMode === "arena" ? normalizeArenaAiId(unit.arenaAi) : "";
     if (target && ai === "frontline") {
       const arenaAnchor = arenaAiAnchor(unit, target);
+      const skillAnchor = arenaAnchor ? null : (bestOffensiveSkillAnchor(unit) || bestUltimateSkillAnchor(unit));
       unit.target = target.id;
-      unit.move = arenaAnchor || null;
+      unit.move = arenaAnchor || skillAnchor || null;
       unit.assistId = null;
-      unit.command = arenaAnchor ? "move" : (unit.damage < 0 ? "support" : "attack");
+      unit.command = (arenaAnchor || skillAnchor) ? "move" : (unit.damage < 0 ? "support" : "attack");
+      if (skillAnchor) return;
       if (shouldAutoUseActive(unit)) activateSkill(unit);
       if (shouldAutoUseUltimate(unit)) useUltimate(unit);
       return;
@@ -3600,6 +3687,14 @@ function updateAutoBattle() {
       if (arenaAnchor) {
         unit.target = target.id;
         unit.move = arenaAnchor;
+        unit.assistId = null;
+        unit.command = "move";
+        return;
+      }
+      const skillAnchor = bestOffensiveSkillAnchor(unit) || bestUltimateSkillAnchor(unit);
+      if (skillAnchor) {
+        unit.target = target.id;
+        unit.move = skillAnchor;
         unit.assistId = null;
         unit.command = "move";
         return;
@@ -5822,6 +5917,7 @@ function shouldArenaDefenderRetreat(defender, target) {
   if (!defender || !target || defender.damage <= 0 || defender.range <= 130) return false;
   const ai = normalizeArenaAiId(defender.arenaAi);
   if (arenaUnitRole(defender) === "tank" || ai === "frontline" || ai.startsWith("guard-")) return false;
+  if (defender.name === "Caliburn" || defender.name === "Nova" || defender.name.startsWith("Eumist") || defender.name.startsWith("MEGA")) return false;
   return weaponDistance(defender, target) < defender.range * 0.34;
 }
 
@@ -5841,8 +5937,14 @@ function updateArenaDefenderSmart(defender, dt) {
       defender.assistId = null;
       defender.command = defender.damage < 0 ? "support" : "attack";
       const arenaAnchor = arenaAiAnchor(defender, frontlineTarget);
-      defender.move = arenaAnchor || null;
-      if (arenaAnchor) defender.command = "move";
+      const skillAnchor = arenaAnchor ? null : (bestOffensiveSkillAnchor(defender) || bestUltimateSkillAnchor(defender));
+      defender.move = arenaAnchor || skillAnchor || null;
+      if (arenaAnchor || skillAnchor) defender.command = "move";
+      if (skillAnchor) {
+        stepUnit(defender, dt);
+        convertArenaDefenderShots(shotStart, defender);
+        return;
+      }
       castArenaDefenderSkills(defender);
       stepUnit(defender, dt);
       convertArenaDefenderShots(shotStart, defender);
@@ -5870,14 +5972,20 @@ function updateArenaDefenderSmart(defender, dt) {
           defender.target = target.id;
           defender.move = arenaAnchor;
           defender.command = "move";
-        } else if (shouldArenaDefenderRetreat(defender, target)) {
-          defender.move = {
-            x: clamp(defender.x + Math.sign(defender.x - target.x || 1) * 78, ALLIED_MIN_X, ALLIED_MAX_X),
-            y: clamp(defender.y + (defender.y >= target.y ? 52 : -52), ALLIED_MIN_Y, ALLIED_MAX_Y)
-          };
-          defender.command = "move";
         } else {
-          defender.move = null;
+          const skillAnchor = bestOffensiveSkillAnchor(defender) || bestUltimateSkillAnchor(defender);
+          if (skillAnchor) {
+            defender.move = skillAnchor;
+            defender.command = "move";
+          } else if (shouldArenaDefenderRetreat(defender, target)) {
+            defender.move = {
+              x: clamp(defender.x + Math.sign(defender.x - target.x || 1) * 78, ALLIED_MIN_X, ALLIED_MAX_X),
+              y: clamp(defender.y + (defender.y >= target.y ? 52 : -52), ALLIED_MIN_Y, ALLIED_MAX_Y)
+            };
+            defender.command = "move";
+          } else {
+            defender.move = null;
+          }
         }
       }
     }
