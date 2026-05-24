@@ -88,12 +88,14 @@ const BACKDROP_VERSION = 27;
 const UNIT_ART_VERSION = 48;
 const REWARD_ICON_VERSION = 39;
 const SKILL_ICON_VERSION = 48;
+const ARENA_ICON_VERSION = 1;
 const IMAGE_LOAD_TIMEOUT_MS = 3000;
 const REWARD_TIER_WEIGHTS = { common: 0.68, rare: 0.29, ultra: 0.03 };
 const REWARD_ULTRA_PITY_LIMIT = 8;
 const assetVersion = (path) => {
   if (path.includes("battlefield-bg")) return BACKDROP_VERSION;
   if (path.includes("arena-bg")) return BACKDROP_VERSION;
+  if (path.includes("arena-icon-")) return ARENA_ICON_VERSION;
   if (path.includes("skill-")) return SKILL_ICON_VERSION;
   if (path.includes("upgrade-")) return REWARD_ICON_VERSION;
   return UNIT_ART_VERSION;
@@ -379,6 +381,34 @@ const arenaAiAliases = {
   protect: "guard-healer",
   "anti-assault": "focus-attacker",
   survive: "skirmish"
+};
+const arenaCoreIcons = {
+  "iron-wall": "assets/arena-icon-iron-wall.webp",
+  "rush-core": "assets/arena-icon-rush-core.webp",
+  "ewar-core": "assets/arena-icon-ewar-core.webp",
+  "repair-core": "assets/arena-icon-repair-core.webp",
+  "sniper-core": "assets/arena-icon-sniper-core.webp"
+};
+const arenaModuleIcons = {
+  "": "assets/arena-icon-no-module.webp",
+  "opening-shield": "assets/arena-icon-opening-shield.webp",
+  "range-tune": "assets/arena-icon-range-tune.webp",
+  "cooldown-tune": "assets/arena-icon-cooldown-reactor.webp",
+  "armor-weave": "assets/arena-icon-composite-armor.webp",
+  "focus-lens": "assets/arena-icon-focus-lens.webp",
+  "first-ult": "assets/arena-icon-cooldown-reactor.webp",
+  "duel-reactor": "assets/arena-icon-rush-core.webp",
+  "guardian-loop": "assets/arena-icon-guard-tank.webp"
+};
+const masterLeagueAiIcons = {
+  "focus-tank": "assets/arena-icon-guard-tank.webp",
+  "focus-attacker": "assets/arena-icon-focus-lens.webp",
+  "focus-healer": "assets/arena-icon-guard-healer.webp",
+  "guard-healer": "assets/arena-icon-guard-healer.webp",
+  "guard-attacker": "assets/arena-icon-guard-attacker.webp",
+  "guard-tank": "assets/arena-icon-guard-tank.webp",
+  frontline: "assets/arena-icon-ai-frontline.webp",
+  skirmish: "assets/arena-icon-ai-skirmish.webp"
 };
 
 const arenaPresetOpponents = [
@@ -5261,9 +5291,12 @@ function renderArena() {
     const core = localizeArenaCoreOption(rawCore);
     return `
     <button class="arena-option ${core.id === arenaSelectedCore ? "selected" : ""}" data-core-id="${core.id}" type="button" ${masterLeagueRun?.active ? "disabled" : ""}>
-      <strong>${core.name}</strong>
-      <span>${core.cost} Cost</span>
-      <small>${core.text}</small>
+      <img class="arena-card-icon" src="${assetSrc(arenaCoreIcons[core.id] || arenaCoreIcons["iron-wall"])}" alt="" aria-hidden="true" />
+      <span class="arena-card-copy">
+        <strong>${core.name}</strong>
+        <span>${core.cost} Cost</span>
+        <small>${core.text}</small>
+      </span>
     </button>
   `;
   }).join("");
@@ -5272,12 +5305,14 @@ function renderArena() {
     const unit = squadSeeds.find((seed) => seed.name === name);
     const module = arenaModuleById(arenaModules[name]);
     const ai = arenaAiById(arenaAi[name]);
+    const displayUnit = unit ? localizeUnit(unit) : null;
     return `
       <article class="arena-unit ${name === arenaSelectedUnitName ? "selected" : ""}" data-unit-name="${name}">
-        <img src="${assetSrc(unit.sprite || unit.art)}" alt="${unit.name}" />
+        <img src="${assetSrc(unit.art || unit.sprite)}" alt="${unit.name}" />
         <div>
           <h4>${unit.name}</h4>
-          <p>${module ? `${module.tier} / ${module.name} / ${module.cost}` : "No module / 0 Cost"}</p>
+          <p>${displayUnit?.role || ""}</p>
+          <p>${module ? `${module.tier} / ${module.name} / ${module.cost} Cost` : "No module / 0 Cost"}</p>
           <p>AI: ${ai.name}</p>
         </div>
         <button class="arena-unit-focus" data-unit-name="${name}" type="button">${currentLanguage === "en" ? "Set" : "設定"}</button>
@@ -5294,6 +5329,8 @@ function renderArena() {
   const selectedAi = arenaAiById(arenaAi[arenaSelectedUnitName]);
   const selectedUnit = squadSeeds.find((seed) => seed.name === arenaSelectedUnitName) || squadSeeds[0];
   const displaySelectedUnit = localizeUnit(selectedUnit);
+  const selectedPosition = arenaPositions[arenaSelectedUnitName];
+  const selectedPositionLabel = Number.isFinite(Number(selectedPosition)) ? `Grid ${Number(selectedPosition) + 1}` : "Unset";
   const selectedUnitDetail = selectedUnit ? `
     <section class="arena-mecha-brief">
       <img src="${assetSrc(selectedUnit.art || selectedUnit.sprite)}" alt="${selectedUnit.name}" />
@@ -5309,6 +5346,25 @@ function renderArena() {
       </div>
     </section>
   ` : "";
+  const selectedHeroDetail = selectedUnit ? `
+    <section class="arena-mecha-brief arena-mecha-hero">
+      <div class="arena-mecha-stage">
+        <img src="${assetSrc(selectedUnit.art || selectedUnit.sprite)}" alt="${selectedUnit.name}" />
+      </div>
+      <div class="arena-mecha-copy">
+        <p class="kicker">Selected Unit</p>
+        <h4>${displaySelectedUnit.name}</h4>
+        <dl>
+          <div><dt>${currentLanguage === "en" ? "Role" : "定位"}</dt><dd>${displaySelectedUnit.role || "-"}</dd></div>
+          <div><dt>${currentLanguage === "en" ? "Weapon" : "武器"}</dt><dd>${displaySelectedUnit.weapon || "-"}</dd></div>
+          <div><dt>AI</dt><dd>${selectedAi.name}</dd></div>
+          <div><dt>${currentLanguage === "en" ? "Position" : "站位"}</dt><dd>${selectedPositionLabel}</dd></div>
+        </dl>
+        <p>${displaySelectedUnit.trait || ""}</p>
+        <small>${displaySelectedUnit.tactic || ""}</small>
+      </div>
+    </section>
+  ` : "";
   const moduleCards = `
     <section class="arena-module-library">
       <div class="arena-module-head">
@@ -5317,6 +5373,7 @@ function renderArena() {
       </div>
       <div class="arena-module-grid">
         <button class="arena-module-card ${!selectedModule ? "selected" : ""}" data-module-id="" type="button" ${masterLeagueRun?.active ? "disabled" : ""}>
+          <img class="arena-card-icon" src="${assetSrc(arenaModuleIcons[""])}" alt="" aria-hidden="true" />
           <strong>No Module</strong>
           <span>0 Cost</span>
           <small>${currentLanguage === "en" ? "Costs nothing and keeps the unit at baseline performance." : "不消耗 Cost，保持基礎性能。"}</small>
@@ -5327,6 +5384,7 @@ function renderArena() {
           const selected = option.id === arenaModules[arenaSelectedUnitName];
           return `
             <button class="arena-module-card tier-${option.tier.toLowerCase()} ${selected ? "selected" : ""}" data-module-id="${option.id}" type="button" ${duplicate || masterLeagueRun?.active ? "disabled" : ""}>
+              <img class="arena-card-icon" src="${assetSrc(arenaModuleIcons[option.id] || arenaModuleIcons[""])}" alt="" aria-hidden="true" />
               <strong>${option.tier} / ${option.name}</strong>
               <span>${option.cost} Cost${duplicate ? ` / ${currentLanguage === "en" ? "Already used" : "已被其他機體裝備"}` : ""}</span>
               <small>${option.text}</small>
@@ -5347,6 +5405,7 @@ function renderArena() {
           const option = localizeArenaAiOption(rawOption);
           return `
           <button class="arena-tactic-card ${option.id === normalizeArenaAiId(arenaAi[arenaSelectedUnitName]) ? "selected" : ""}" data-ai-id="${option.id}" type="button">
+            <img class="arena-card-icon" src="${assetSrc(masterLeagueAiIcons[option.id] || masterLeagueAiIcons.frontline)}" alt="" aria-hidden="true" />
             <strong>${option.name}</strong>
             <small>${option.text}</small>
           </button>
@@ -5355,7 +5414,32 @@ function renderArena() {
       </div>
     </section>
   `;
-  arenaUnitListEl.innerHTML = `${unitCards}${masterLeagueRun?.active ? "" : selectedUnitDetail}${moduleCards}${tacticCards}${masterLeagueRun?.active ? "" : `<div class="arena-roster">${roster}</div>`}`;
+  const buildLayout = `
+    <div class="arena-hangar-layout">
+      <section class="arena-hangar-panel arena-formation-hangar">
+        <div class="arena-section-head">
+          <p class="kicker">Formation Hangar</p>
+          <h4>${currentLanguage === "en" ? "Battle Line" : "出擊編隊"}</h4>
+        </div>
+        <div class="arena-formation-line">${unitCards}</div>
+      </section>
+      <section class="arena-hangar-panel arena-selected-loadout">
+        ${selectedHeroDetail}
+        ${moduleCards}
+        ${tacticCards}
+      </section>
+      <section class="arena-roster-panel">
+        <div class="arena-section-head">
+          <p class="kicker">Mecha Roster</p>
+          <h4>${currentLanguage === "en" ? "Reserve Units" : "機體庫"}</h4>
+        </div>
+        <div class="arena-roster">${roster}</div>
+      </section>
+    </div>
+  `;
+  arenaUnitListEl.innerHTML = masterLeagueRun?.active
+    ? `${unitCards}${moduleCards}${tacticCards}`
+    : buildLayout;
 
   arenaPositionGridEl.innerHTML = arenaPositionSlots.map((slot, index) => {
     const occupant = arenaDefenseNames.find((name) => Number(arenaPositions[name]) === index);
