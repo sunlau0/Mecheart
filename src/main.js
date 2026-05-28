@@ -502,10 +502,10 @@ const masterLeagueScoring = {
 };
 
 const squadSeeds = [
-{ name: "Asterion", faction: "Allied", role: "相轉移裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp", spriteFacing: "left" },
+{ name: "Asterion", faction: "Allied", role: "重裝甲前衛", weapon: "對艦光束軍刀 / 重力制御核心", trait: "最高耐久。守護爆發可保護附近友軍，並令自身短時間持續回血。", tactic: "先把它拉進敵群吸火；大絕重力球可放在目標身後，把大範圍敵人拉成一團方便集火。", color: "#4be4ff", x: 260, y: 250, maxHp: 175, range: 190, damage: 19, rate: 0.82, speed: 145, skill: "守護爆發", activeDesc: "短時間替附近友軍加上護盾，並為 Asterion 自身少量持續回血。", ultimate: "重力球", ultimateDesc: "在目標身後生成重力球，持續將大範圍敵人拉向中心。", activeIcon: "assets/skill-asterion-guardian.webp", ultimateIcon: "assets/skill-asterion-gravity.webp", art: "assets/asterion-profile.webp", sprite: "assets/sd-asterion.webp", spriteFacing: "left" },
 { name: "Caliburn", faction: "Allied", role: "光束軍刀決鬥機", weapon: "雙軍刀突擊 / 近距離光束手槍", trait: "攻速最高，爆發強，但裝甲較薄。", tactic: "等 Asterion 拉住仇恨後，把它拉去斬落孤立目標或指揮機。", color: "#ff5b66", x: 310, y: 390, maxHp: 130, range: 210, damage: 31, rate: 0.7, speed: 172, skill: "SEED 突擊", activeDesc: "斬擊 Caliburn 附近所有敵人。", ultimate: "流星斬", ultimateDesc: "對最近多個目標造成重擊。", activeIcon: "assets/skill-caliburn-active.webp", ultimateIcon: "assets/skill-caliburn-ultimate.webp", art: "assets/caliburn-profile.webp", sprite: "assets/sd-caliburn.webp", spriteFacing: "left" },
 { name: "Seraphim", faction: "Allied", role: "修復與護盾支援機", weapon: "納米修復光束 / 守護護盾", trait: "大範圍即時修復，主動技能同時為友軍上護盾。", tactic: "鎖定前線友軍後，Seraphim 會保持最大補血距離內跟隨，適合救急和穩住全隊血線。", color: "#62e6a7", x: 190, y: 500, maxHp: 145, range: 235, damage: -30, rate: 0.88, speed: 150, skill: "幻象修復", activeDesc: "大範圍修復附近友軍，並為範圍內友軍加上護盾。", ultimate: "天使光環", ultimateDesc: "復活倒下友軍，並大幅回復全隊。", activeIcon: "assets/skill-seraphim-active.webp", ultimateIcon: "assets/skill-seraphim-ultimate.webp", art: "assets/seraphim-profile.webp", sprite: "assets/sd-seraphim.webp", spriteFacing: "left" },
-  { name: "Orion", faction: "Allied", role: "龍騎兵清場炮擊機", weapon: "多重鎖定光束炮 / 遙控炮莢", trait: "普通攻擊會同時射擊射程內所有敵機，擅長掃走整批低血目標。", tactic: "放在安全側翼覆蓋戰場。普攻可持續壓制射程內所有敵人；主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp", spriteFacing: "right" },
+  { name: "Orion", faction: "Allied", role: "多重鎖定清場射擊機", weapon: "多重鎖定光束炮 / 遙控炮莢", trait: "普通攻擊會同時射擊射程內所有敵機，擅長掃走整批低血目標。", tactic: "放在安全側翼覆蓋戰場。普攻可持續壓制射程內所有敵人；主動技優先收割低血敵人，大絕適合清場但打 Boss 效率一般。", color: "#ffd166", x: 180, y: 150, maxHp: 96, range: 260, damage: 19, rate: 1.08, speed: 115, skill: "全方位齊射", activeDesc: "遙控炮莢優先射擊多名低血敵人。", ultimate: "衛星全炮門", ultimateDesc: "向全場敵人掃射，對小型敵機效果最佳。", activeIcon: "assets/skill-orion-active.webp", ultimateIcon: "assets/skill-orion-ultimate.webp", art: "assets/orion-profile.webp", sprite: "assets/sd-orion.webp", spriteFacing: "right" },
   { name: "Valkyr", faction: "Allied", role: "重盾嘲諷防線機", weapon: "大型抗光束盾 / GN 力場發生器", trait: "防禦力高，能主動吸引敵人火力；大絕可持續推開貼近敵機。", tactic: "放在前線邊緣承受火力，主動嘲諷把敵人拉住；GN 力場適合保護後排或阻止敵群壓入。", color: "#8bd7ff", x: 230, y: 250, maxHp: 190, range: 185, damage: 16, rate: 1.02, speed: 120, skill: "挑釁信標", activeDesc: "嘲諷範圍內敵人，強制它們攻擊 Valkyr。", ultimate: "GN 力場", ultimateDesc: "一段時間內生成小範圍力場，持續推開接近的敵機。", activeIcon: "assets/skill-valkyr-taunt.webp", ultimateIcon: "assets/skill-valkyr-gn-field.webp", art: "assets/player-valkyr-profile.webp", sprite: "assets/player-valkyr-sd.webp", spriteFacing: "right" },
   { name: "Lancer", faction: "Allied", role: "軌道狙擊機", weapon: "超長距離穿甲光束長槍", trait: "單發傷害極高，擅長處理重裝敵人和 Boss。", tactic: "留在後排鎖定高 HP 目標，避免被高速敵機近身。", color: "#4aa8ff", x: 170, y: 210, maxHp: 98, range: 500, damage: 34, rate: 1.82, speed: 112, skill: "穿甲狙擊", activeDesc: "立即狙擊當前最高 HP 敵人，造成破甲重擊。", ultimate: "軌道貫穿", ultimateDesc: "向最強敵人發射超遠距離貫穿炮。", activeIcon: "assets/skill-lancer-active-v1.webp", ultimateIcon: "assets/skill-lancer-ultimate-v1.webp", art: "assets/player-lancer-profile.webp", sprite: "assets/player-lancer-sd.webp", spriteFacing: "right" },
   { name: "Nova", faction: "Allied", role: "高機動突擊機", weapon: "量子刃 / 短距離相位推進器", trait: "速度最快，可穿插敵陣背刺，但耐久中等。", tactic: "用量子背刺切入敵方後排；量子化期間可穿透機體自由移動並爆發輸出。", color: "#ff9b38", x: 250, y: 430, maxHp: 128, range: 190, damage: 34, rate: 0.76, speed: 198, skill: "量子背刺", activeDesc: "高速移動到目標身後，並對附近敵人造成範圍斬擊。", ultimate: "量子化", ultimateDesc: "短時間穿透敵我機體自由移動，移速 +200%，普通攻擊變成範圍斬擊並提升攻擊力。", activeIcon: "assets/skill-nova-backstab-ai-v6.webp", ultimateIcon: "assets/skill-nova-phase-ai-v6.webp", art: "assets/player-nova-profile.webp", sprite: "assets/player-nova-sd.webp", spriteFacing: "right" },
@@ -644,10 +644,10 @@ const upgradePool = [
     }
   },
   {
-    id: "phase-armor",
+    id: "heavy-armor",
     type: "裝甲",
-    name: "相轉移裝甲改修",
-    icon: "assets/upgrade-phase-armor.webp",
+    name: "重裝甲改修",
+    icon: "assets/upgrade-heavy-armor.webp",
     text: "全體友軍最大 HP +25，並立即修復 25 HP。",
     apply() {
       squad.forEach((u) => {
@@ -709,11 +709,11 @@ const upgradePool = [
     }
   },
   {
-    id: "dragoon-pods",
+    id: "multi-lock-pods",
     unit: "Orion",
     type: "Orion 武器",
-    name: "龍騎兵炮莢擴充",
-    icon: "assets/upgrade-dragoon-pods.webp",
+    name: "多重鎖定炮莢擴充",
+    icon: "assets/upgrade-multi-lock-pods.webp",
     text: "Orion 攻速更快、射程 +35，主動技發射更多清場炮莢。",
     apply() {
       const u = squad.find((unit) => unit.name === "Orion");
@@ -1168,7 +1168,7 @@ const upgradePool = [
 
 const unitEnglish = {
   Asterion: {
-    role: "Phase-Armour Vanguard",
+    role: "Heavy-Armour Vanguard",
     weapon: "Anti-Ship Beam Sabre / Gravity Control Core",
     trait: "Highest durability. Guardian Burst shields nearby allies and restores Asterion over time.",
     tactic: "Drag it into the pack to draw fire. Drop Gravity Core behind priority targets to bunch hostiles up for focused fire.",
@@ -1198,7 +1198,7 @@ const unitEnglish = {
     ultimateDesc: "Revives fallen allies and restores the whole squad."
   },
   Orion: {
-    role: "Dragoon Sweeper Artillery",
+    role: "Multi-Lock Sweeper Shooter",
     weapon: "Multi-Lock Beam Cannon / Remote Gun Pods",
     trait: "Basic attacks fire at every hostile in range, making Orion excellent at sweeping weak swarms.",
     tactic: "Keep it on a safe flank to cover the field. Basic attacks suppress all hostiles in range; its active harvests low-HP targets and the ultimate clears crowds but is weaker into bosses.",
@@ -1356,11 +1356,11 @@ const unitEnglish = {
 
 const rewardEnglish = {
   "beam-capacitors": ["Weapons", "High-Output Beam Capacitors", "Weapon damage for all attack units +15%."],
-  "phase-armor": ["Armour", "Phase-Armour Retrofit", "All allied units gain +25 max HP and instantly repair 25 HP."],
+  "heavy-armor": ["Armour", "Heavy-Armour Retrofit", "All allied units gain +25 max HP and instantly repair 25 HP."],
   "guardian-reactor": ["Asterion Skill", "Guardian Reactor", "Asterion gains +45 max HP and +5 damage. Guardian Burst self-repairs longer; Gravity Core gets a wider pull."],
   "seed-rush": ["Caliburn Weapon", "SEED Rush OS", "Caliburn gains +12 damage, attacks faster, and hits harder with its rush skill."],
   "repair-drones": ["Seraphim Skill", "Repair Drone Swarm", "Seraphim heals more, reaches further, and Phantom Repair adds thicker shields."],
-  "dragoon-pods": ["Orion Weapon", "Dragoon Pod Expansion", "Orion fires faster, gains +35 range, and launches more clearing pods with its active."],
+  "multi-lock-pods": ["Orion Weapon", "Multi-Lock Pod Expansion", "Orion fires faster, gains +35 range, and launches more clearing pods with its active."],
   "valkyr-zero-core": ["Valkyr Skill", "GN Defence Core", "Valkyr gains +55 max HP and +12% defence. Taunt Beacon lasts longer; GN Field gets wider and stronger."],
   "lancer-rail-scope": ["Lancer Weapon", "Orbital Targeting Scope", "Lancer gains +14 damage and +35 range. Piercing Snipe and Orbital Pierce hit harder."],
   "nova-assault-wing": ["Nova Quantum", "Quantum Phase Core", "Nova gains +12 damage, +30 range and +24 speed. Quantum Backstab hits harder and gets a wider strike area."],
