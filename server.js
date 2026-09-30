@@ -18,6 +18,7 @@ const types = {
 };
 
 const defaultRankings = [
+  { name: "Sun", score: 362830, submittedAt: "2026-09-30T12:00:00.000Z" },
   { name: "Sun", score: 99230 },
   { name: "Candy", score: 86000 },
   { name: "Hayden", score: 85800 },
@@ -25,8 +26,11 @@ const defaultRankings = [
 ];
 
 const leaderboardFile = join(root, ".local-data", "leaderboard.json");
+const leaderboardMetadataFile = join(root, ".local-data", "leaderboard-metadata.json");
+const metadataTtlMs = 90 * 24 * 60 * 60 * 1000;
 const playerFile = join(root, ".local-data", "players.json");
 const arenaFile = join(root, ".local-data", "arena.json");
+const arenaMetadataFile = join(root, ".local-data", "arena-metadata.json");
 const masterLeagueBands = [
   { id: "bronze", min: 0 },
   { id: "silver", min: 2500 },
@@ -59,6 +63,31 @@ function makeRecordId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function platformFromUserAgent(value) {
+  const userAgent = String(value || "").toLowerCase();
+  if (/ipad/.test(userAgent)) return "iPad";
+  if (/iphone|ipod/.test(userAgent)) return "iPhone";
+  if (/android/.test(userAgent)) return "Android";
+  if (/windows/.test(userAgent)) return "Windows PC";
+  if (/macintosh|mac os x/.test(userAgent)) return "macOS";
+  if (/linux/.test(userAgent)) return "Linux PC";
+  return "Other";
+}
+
+async function saveLeaderboardMetadata(entry, req) {
+  const metadata = await readStore(leaderboardMetadataFile, {});
+  const cutoff = Date.now() - metadataTtlMs;
+  for (const [id, item] of Object.entries(metadata)) {
+    if (!Number.isFinite(Date.parse(item?.collectedAt)) || Date.parse(item.collectedAt) < cutoff) delete metadata[id];
+  }
+  metadata[entry.id] = {
+    platform: platformFromUserAgent(req.headers["user-agent"]),
+    location: null,
+    collectedAt: entry.submittedAt
+  };
+  await writeStore(leaderboardMetadataFile, metadata);
+}
+
 function normalizeEntry(entry, index) {
   return {
     id: typeof entry?.id === "string" ? entry.id : "",
@@ -83,7 +112,7 @@ function withDefaultRankings(rankings) {
       sanitizeName(entry?.name).toLocaleLowerCase() === seed.name.toLocaleLowerCase() &&
       sanitizeScore(entry?.score) === seed.score
     );
-    if (!hasSeed) combined.push({ ...seed, id: `seed-${seed.name.toLocaleLowerCase()}` });
+    if (!hasSeed) combined.push({ ...seed, id: `seed-${seed.name.toLocaleLowerCase()}-${seed.score}` });
   }
   return combined;
 }
@@ -216,6 +245,7 @@ createServer(async (req, res) => {
           submittedAt: new Date().toISOString()
         };
         const updated = normalizeRankings([...rankings, entry]);
+        await saveLeaderboardMetadata(entry, req);
         await writeLeaderboard(updated);
         const rank = updated.findIndex((item) => item.id === entry.id) + 1;
         sendJson(res, {
@@ -330,6 +360,7 @@ createServer(async (req, res) => {
               const currentTop = arena.champions.overall;
               if (!currentTop || runScore > sanitizeScore(currentTop.masterScore)) arena.champions.overall = championRecord;
             }
+            const submittedAt = new Date().toISOString();
             arena.rankings = normalizeMasterRankings([
               {
                 runId,
@@ -338,10 +369,22 @@ createServer(async (req, res) => {
                 score: runScore,
                 bandId: runBand.id,
                 team: runDefense.squad,
-                submittedAt: new Date().toISOString()
+                submittedAt
               },
               ...(arena.rankings || [])
             ]);
+            const metadata = await readStore(arenaMetadataFile, {});
+            const cutoff = Date.now() - metadataTtlMs;
+            for (const [id, item] of Object.entries(metadata)) {
+              if (!Number.isFinite(Date.parse(item?.collectedAt)) || Date.parse(item.collectedAt) < cutoff) delete metadata[id];
+            }
+            metadata[runId || makeRecordId()] = {
+              playerId,
+              platform: platformFromUserAgent(req.headers["user-agent"]),
+              location: null,
+              collectedAt: submittedAt
+            };
+            await writeStore(arenaMetadataFile, metadata);
           }
           players[playerId] = profile;
           await writeStore(playerFile, players);
@@ -359,6 +402,12 @@ createServer(async (req, res) => {
         sendJson(res, { ok: true, defense: payload.defense, pvpStats: profile.pvpStats || { rating: 1000, wins: 0, losses: 0 } });
         return;
       }
+    }
+
+    if (url.pathname.startsWith("/.local-data/")) {
+      res.writeHead(404);
+      res.end("Not found");
+      return;
     }
 
     const pathname = url.pathname === "/" ? "/index.html" : url.pathname;

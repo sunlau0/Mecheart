@@ -5,6 +5,8 @@ const DEFENSE_INDEX_KEY = "arena:defense:index";
 const RESULT_PREFIX = "arena:result:";
 const CHAMPIONS_KEY = "arena:champions";
 const RANKINGS_KEY = "arena:master:rankings";
+const PRIVATE_METADATA_PREFIX = "arena:private:";
+const PRIVATE_METADATA_TTL = 90 * 24 * 60 * 60;
 const OPPONENT_LIMIT = 12;
 const masterLeagueBands = [
   { id: "bronze", min: 0 },
@@ -35,6 +37,28 @@ function sanitizeName(value) {
     .trim()
     .slice(0, 16);
   return name || "Pilot";
+}
+
+function collectPlayerMetadata(request) {
+  const userAgent = String(request.headers.get("user-agent") || "").toLowerCase();
+  const cf = request.cf || {};
+  let platform = "Other";
+  if (/ipad/.test(userAgent)) platform = "iPad";
+  else if (/iphone|ipod/.test(userAgent)) platform = "iPhone";
+  else if (/android/.test(userAgent)) platform = "Android";
+  else if (/windows/.test(userAgent)) platform = "Windows PC";
+  else if (/macintosh|mac os x/.test(userAgent)) platform = "macOS";
+  else if (/linux/.test(userAgent)) platform = "Linux PC";
+
+  const country = String(cf.country || "").toUpperCase();
+  const region = String(cf.region || "").replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 64);
+  return {
+    platform,
+    location: {
+      country: /^[A-Z]{2}$/.test(country) ? country : "",
+      region
+    }
+  };
 }
 
 function sanitizeDefense(defense) {
@@ -130,6 +154,7 @@ export async function onRequestPost({ request, env }) {
   if (payload?.action === "result") {
     const won = Boolean(payload.won);
     const score = Math.max(0, Math.floor(Number(payload.score) || 0));
+    const runId = sanitizeToken(payload.masterLeague?.runId);
     const runScore = Math.max(0, Math.floor(Number(payload.masterLeague?.score) || 0));
     const runDefense = sanitizeDefense(payload.masterLeague?.defense);
     const submittedBandId = sanitizeToken(payload.masterLeague?.bandId);
@@ -172,6 +197,15 @@ export async function onRequestPost({ request, env }) {
         ...(await store.get(RANKINGS_KEY, "json") || [])
       ]);
       await store.put(RANKINGS_KEY, JSON.stringify(rankings));
+      const metadata = collectPlayerMetadata(request);
+      const metadataId = runId || globalThis.crypto?.randomUUID?.() || String(Date.now());
+      await store.put(`${PRIVATE_METADATA_PREFIX}${metadataId}:${playerId}`, JSON.stringify({
+        playerId,
+        runId,
+        platform: metadata.platform,
+        location: metadata.location,
+        collectedAt: new Date().toISOString()
+      }), { expirationTtl: PRIVATE_METADATA_TTL });
       profile.masterLeague.rank = rankings.findIndex((entry) => entry.playerId === playerId && entry.score === runScore) + 1 || null;
     }
     profile.updatedAt = new Date().toISOString();

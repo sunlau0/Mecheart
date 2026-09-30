@@ -17,9 +17,12 @@ Cloudflare Pages 連 GitHub 部署時，`functions/api/leaderboard.js` 會自動
 
 如果未綁定 KV，遊戲仍會顯示預設排名：
 
+- Sun - 362830 (2026-09-30)
 - Sun - 99230
 - Candy - 86000
 - Hayden - 85800
 - Jeanis - 60080
 
 但未綁定 KV 時，新玩家提交分數只會在本機預覽，不會同步到其他玩家。
+
+排行榜公開資料只包含名稱、分數及提交日期。提交排行榜時，API 會將裝置平台與 Cloudflare 提供的國家／區域（不含城市）分開保存，90 日後過期；本遊戲程式不會把 IP 寫入 KV 或本機 metadata 檔。Cloudflare 網絡本身仍會處理連線 IP，實際平台日誌保留由 Cloudflare 設定決定。

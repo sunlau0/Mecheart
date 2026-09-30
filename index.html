@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha Heart</title>
     <link rel="preload" as="image" href="assets/title-screen.webp?v=21" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="src/styles.css?v=105" />
+    <link rel="stylesheet" href="src/styles.css?v=106" />
   </head>
   <body class="setup-mode">
     <main id="game-shell">
@@ -26,6 +26,7 @@
             <p class="kicker">Master League Arena</p>
             <h2 id="arena-name-title">請決定挑戰隊伍名稱</h2>
             <p>呢個名字會記錄喺今次 Master League Run，同成功挑戰盟主後顯示俾下一位玩家。</p>
+            <p id="arena-privacy-note" class="arena-privacy-note">提交排行榜分數時，會私下記錄國家／區域（如可用）及裝置平台，保存 90 日；遊戲不會保存 IP。</p>
             <label>
               <span>戰隊名</span>
               <input id="arena-name-input" maxlength="16" autocomplete="nickname" placeholder="輸入戰隊名" />
@@ -210,6 +211,7 @@
                 <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" placeholder="Pilot" />
                 <button type="submit" data-i18n="submitScore">提交分數</button>
               </div>
+              <p class="leaderboard-privacy-note" data-i18n="leaderboardPrivacyNote">提交排行榜分數時，會私下記錄國家／區域（如可用）及裝置平台，保存 90 日；遊戲不會保存 IP。公開榜只顯示名稱、分數和日期。</p>
               <p id="leaderboard-message">讀取排行榜中...</p>
             </form>
             <ol id="leaderboard-list" class="leaderboard-list"></ol>
@@ -255,6 +257,6 @@
         </div>
       </aside>
     </main>
-    <script src="src/main.js?v=202"></script>
+    <script src="src/main.js?v=203"></script>
   </body>
 </html>

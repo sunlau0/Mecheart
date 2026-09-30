@@ -1,4 +1,5 @@
 const DEFAULT_RANKINGS = [
+  { name: "Sun", score: 362830, submittedAt: "2026-09-30T12:00:00.000Z" },
   { name: "Sun", score: 99230 },
   { name: "Candy", score: 86000 },
   { name: "Hayden", score: 85800 },
@@ -8,6 +9,8 @@ const DEFAULT_RANKINGS = [
 const KV_BINDING = "MECHA_HEART_RANKING";
 const LEADERBOARD_KEY = "top10";
 const TOP_LIMIT = 10;
+const PRIVATE_METADATA_PREFIX = "private:leaderboard:";
+const PRIVATE_METADATA_TTL = 90 * 24 * 60 * 60;
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
@@ -37,6 +40,28 @@ function makeRecordId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function collectPlayerMetadata(request) {
+  const userAgent = String(request.headers.get("user-agent") || "").toLowerCase();
+  const cf = request.cf || {};
+  let platform = "Other";
+  if (/ipad/.test(userAgent)) platform = "iPad";
+  else if (/iphone|ipod/.test(userAgent)) platform = "iPhone";
+  else if (/android/.test(userAgent)) platform = "Android";
+  else if (/windows/.test(userAgent)) platform = "Windows PC";
+  else if (/macintosh|mac os x/.test(userAgent)) platform = "macOS";
+  else if (/linux/.test(userAgent)) platform = "Linux PC";
+
+  const country = String(cf.country || "").toUpperCase();
+  const region = String(cf.region || "").replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 64);
+  return {
+    platform,
+    location: {
+      country: /^[A-Z]{2}$/.test(country) ? country : "",
+      region
+    }
+  };
+}
+
 function normalizeEntry(entry, index) {
   return {
     id: typeof entry?.id === "string" ? entry.id : "",
@@ -61,7 +86,7 @@ function withDefaultRankings(rankings) {
       sanitizeName(entry?.name).toLocaleLowerCase() === seed.name.toLocaleLowerCase() &&
       sanitizeScore(entry?.score) === seed.score
     );
-    if (!hasSeed) combined.push({ ...seed, id: `seed-${seed.name.toLocaleLowerCase()}` });
+    if (!hasSeed) combined.push({ ...seed, id: `seed-${seed.name.toLocaleLowerCase()}-${seed.score}` });
   }
   return combined;
 }
@@ -106,6 +131,14 @@ export async function onRequestPost({ request, env }) {
     score: sanitizeScore(payload?.score),
     submittedAt: new Date().toISOString()
   };
+  const metadata = collectPlayerMetadata(request);
+  await store.put(`${PRIVATE_METADATA_PREFIX}${entry.id}`, JSON.stringify({
+    entryId: entry.id,
+    platform: metadata.platform,
+    location: metadata.location,
+    collectedAt: entry.submittedAt
+  }), { expirationTtl: PRIVATE_METADATA_TTL });
+
   const updated = normalizeRankings([...rankings, entry]);
   await store.put(LEADERBOARD_KEY, JSON.stringify(updated));
   const rank = updated.findIndex((item) => item.id === entry.id) + 1;

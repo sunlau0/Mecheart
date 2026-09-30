@@ -142,6 +142,9 @@ const uiText = {
     ranking: "排行榜",
     enterName: "輸入姓名",
     submitScore: "提交分數",
+    leaderboardPrivacyNote: "提交排行榜分數時，會私下記錄國家／區域（如可用）及裝置平台，保存 90 日；遊戲不會保存 IP。公開榜只顯示名稱、分數和日期。",
+    dateLabel: "日期",
+    dateUnknown: "日期未記錄",
     redeploy: "再次出擊",
     hudKicker: "戰術艦橋介面",
     hudTitle: "小隊狀態",
@@ -214,6 +217,9 @@ const uiText = {
     ranking: "Leaderboard",
     enterName: "Enter Name",
     submitScore: "Submit Score",
+    leaderboardPrivacyNote: "Leaderboard submissions privately store coarse country/region (when available) and device platform for 90 days. The game does not store IP addresses; only name, score and date are public.",
+    dateLabel: "Date",
+    dateUnknown: "Date unavailable",
     redeploy: "Redeploy",
     hudKicker: "Tactical Bridge Interface",
     hudTitle: "Squad Status",
@@ -262,6 +268,7 @@ const t = (key, replacements = {}) => {
 };
 const labelFaction = (faction) => faction === "Allied" ? t("allied") : t("enemy");
 const leaderboardDefaults = [
+  { name: "Sun", score: 362830, submittedAt: "2026-09-30T12:00:00.000Z" },
   { name: "Sun", score: 99230 },
   { name: "Candy", score: 86000 },
   { name: "Hayden", score: 85800 },
@@ -1989,6 +1996,14 @@ function formatScore(value) {
   return String(Math.max(0, Math.floor(Number(value) || 0)));
 }
 
+function formatLeaderboardDate(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return t("dateUnknown");
+  return currentLanguage === "en"
+    ? `${match[1]}-${match[2]}-${match[3]}`
+    : `${match[1]}/${match[2]}/${match[3]}`;
+}
+
 function normalizeLeaderboard(rankings) {
   return (Array.isArray(rankings) ? rankings : []).map((entry, index) => ({
     id: typeof entry?.id === "string" ? entry.id : "",
@@ -2007,7 +2022,7 @@ function renderLeaderboardList(listEl, rankings, highlightScore = null) {
   listEl.innerHTML = normalized.map((entry, index) => `
     <li class="${highlightScore !== null && entry.score === highlightScore ? "current-score" : ""}">
       <span class="rank-number">${index + 1}</span>
-      <strong>${escapeHtml(entry.name)}</strong>
+      <strong>${escapeHtml(entry.name)}<small class="leaderboard-date">${t("dateLabel")} ${escapeHtml(formatLeaderboardDate(entry.submittedAt))}</small></strong>
       <em>${formatScore(entry.score)}</em>
     </li>
   `).join("");
@@ -2074,7 +2089,10 @@ function renderMasterLeaderboardList(listEl, rankings = masterLeagueRankings, hi
     return `
       <li class="${highlightScore !== null && entry.score === highlightScore ? "current-score" : ""}">
         <span class="rank-number">${index + 1}</span>
-        <strong>${escapeHtml(entry.name)}<small>${masterBandName(band)} / ${escapeHtml(entry.team.join(" / ") || "-")}</small></strong>
+        <strong>${escapeHtml(entry.name)}
+          <small>${masterBandName(band)} / ${escapeHtml(entry.team.join(" / ") || "-")}</small>
+          <small class="leaderboard-date">${t("dateLabel")} ${escapeHtml(formatLeaderboardDate(entry.submittedAt))}</small>
+        </strong>
         <em>${formatScore(entry.score)}</em>
       </li>
     `;
@@ -4855,9 +4873,11 @@ function requestMasterLeagueTeamName() {
   const title = arenaNameModalEl.querySelector("#arena-name-title");
   const copy = arenaNameModalEl.querySelector(".arena-name-panel > p:not(.kicker)");
   const label = arenaNameModalEl.querySelector("label span");
+  const privacyNote = arenaNameModalEl.querySelector("#arena-privacy-note");
   if (currentLanguage === "en") {
     if (title) title.textContent = "Choose Your Challenge Squad Name";
     if (copy) copy.textContent = "This name is recorded for the current Master League run. If you defeat a champion, it will be shown to the next challenger.";
+    if (privacyNote) privacyNote.textContent = "Leaderboard submissions privately record coarse country/region (when available) and device platform for 90 days. The game does not store IP addresses.";
     if (label) label.textContent = "Squad Name";
     if (arenaNameInputEl) arenaNameInputEl.placeholder = "Enter squad name";
     if (arenaNameConfirmEl) arenaNameConfirmEl.textContent = "Start Formation";
@@ -4865,6 +4885,7 @@ function requestMasterLeagueTeamName() {
   } else {
     if (title) title.textContent = "請決定挑戰隊伍名稱";
     if (copy) copy.textContent = "呢個名字會記錄喺今次 Master League Run，同成功挑戰盟主後顯示俾下一位玩家。";
+    if (privacyNote) privacyNote.textContent = "提交排行榜分數時，會私下記錄國家／區域（如可用）及裝置平台，保存 90 日；遊戲不會保存 IP。";
     if (label) label.textContent = "戰隊名";
     if (arenaNameInputEl) arenaNameInputEl.placeholder = "輸入戰隊名";
     if (arenaNameConfirmEl) arenaNameConfirmEl.textContent = "開始編隊";
